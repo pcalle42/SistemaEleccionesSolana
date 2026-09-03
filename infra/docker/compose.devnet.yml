@@ -1,0 +1,8 @@
+services:
+  postgres:
+    labels:
+      votaciones.environment: devnet
+
+  valkey:
+    labels:
+      votaciones.environment: devnet

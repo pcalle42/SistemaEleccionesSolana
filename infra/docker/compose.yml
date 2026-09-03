@@ -1,0 +1,73 @@
+name: ${COMPOSE_PROJECT_NAME:-votaciones}
+
+services:
+  postgres:
+    image: postgres:17.11-alpine3.23@sha256:9ae4e8f8d0284836a505f0b2e825144e32e20499856e7dc5f7b99e19d10eedd6
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      PGTZ: UTC
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
+      TZ: UTC
+    expose:
+      - '5432'
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready --username "$${POSTGRES_USER}" --dbname "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-file: '3'
+        max-size: 10m
+    networks:
+      - internal
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  valkey:
+    image: valkey/valkey:8.1.10-alpine3.24@sha256:b21fd94099dcd4bc6b2b9230daef69b6558b887ad4a2a1afe56ff6e745a88cdb
+    command:
+      - valkey-server
+      - --appendonly
+      - 'no'
+      - --save
+      - ''
+      - --loglevel
+      - notice
+    expose:
+      - '6379'
+    healthcheck:
+      test: [CMD, valkey-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    logging:
+      driver: json-file
+      options:
+        max-file: '3'
+        max-size: 10m
+    networks:
+      - internal
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  internal:
+    name: ${COMPOSE_PROJECT_NAME:-votaciones}_internal
+    internal: true
+
+volumes:
+  postgres-data:
+    name: ${COMPOSE_PROJECT_NAME:-votaciones}_postgres_data

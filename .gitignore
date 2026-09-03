@@ -48,6 +48,8 @@ test-ledger/
 data/
 *.dump
 *.sql.gz
+infra/postgres/backups/*
+!infra/postgres/backups/README.md
 
 # Editors and operating systems
 .DS_Store

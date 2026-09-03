@@ -3,8 +3,9 @@
 Monorepo en construcción para una plataforma electoral verificable con
 separación entre identidad y voto.
 
-> Estado: bootstrap técnico. Todavía no existe un flujo electoral funcional ni
-> este repositorio debe utilizarse en producción.
+> Estado: infraestructura local/devnet para PostgreSQL y Valkey. Todavía no
+> existe un flujo electoral funcional ni este repositorio debe utilizarse en
+> producción.
 
 ## Requisitos
 
@@ -12,8 +13,8 @@ separación entre identidad y voto.
 - pnpm 10.9.0
 - Git
 
-PostgreSQL, Valkey, Docker, Circom y Solana se incorporarán y documentarán en sus
-etapas correspondientes; no son necesarios para validar el bootstrap.
+Docker es necesario para ejecutar la infraestructura. Circom y Solana se
+incorporarán y documentarán en sus etapas correspondientes.
 
 ## Instalación
 
@@ -43,8 +44,20 @@ pnpm build
 los workspaces conocidos. No elimina fuentes, configuración, datos ni artefactos
 ZK preservados.
 
-No existe todavía un comando `dev`: ninguna aplicación ejecutable debe simularse
-durante el bootstrap.
+No existe todavía un comando `dev`: las aplicaciones aún no son ejecutables.
+
+## Infraestructura
+
+PostgreSQL y Valkey pueden levantarse en modo local con:
+
+```bash
+pnpm infra:up
+pnpm infra:smoke
+```
+
+Use `pnpm infra:down` para detenerlos sin borrar PostgreSQL. Consulte
+[`infra/README.md`](infra/README.md) para devnet, configuración, persistencia,
+logs y reset protegido.
 
 ## Estructura
 
@@ -60,6 +73,7 @@ durante el bootstrap.
 1. [`docs/00-consolidado-arquitectura.md`](docs/00-consolidado-arquitectura.md)
 2. [`docs/01-plan-maestro-construccion.md`](docs/01-plan-maestro-construccion.md)
 3. [`docs/02-bootstrap-repositorio.md`](docs/02-bootstrap-repositorio.md)
+4. [`docs/03-infraestructura-local-devnet.md`](docs/03-infraestructura-local-devnet.md)
 
 ## Seguridad
 
