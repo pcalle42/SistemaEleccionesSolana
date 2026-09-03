@@ -1,0 +1,22 @@
+{
+  "name": "@votaciones/voter-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "pretest": "pnpm build",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@votaciones/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@votaciones/config-typescript": "workspace:*",
+    "@votaciones/shared-testing": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "@votaciones/config-typescript/base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["eslint.config.mjs", "scripts/**/*.mjs"]
+}

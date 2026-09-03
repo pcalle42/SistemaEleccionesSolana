@@ -1,0 +1,64 @@
+# Dependencies and package-manager state
+node_modules/
+.pnpm-store/
+
+# Builds, coverage, and caches
+dist/
+build/
+!docs/build/
+!docs/build/**
+coverage/
+.cache/
+.vite/
+*.tsbuildinfo
+
+# Runtime output
+*.log
+logs/
+tmp/
+temp/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.seed
+*.secret
+*keypair*.json
+
+# Zero-knowledge private or generated artifacts
+zk/artifacts/*
+!zk/artifacts/README.md
+**/*.wtns
+**/*.proof.json
+**/*.zkey
+**/pot*.ptau
+
+# Rust, Solana, and Anchor local output
+target/
+.anchor/
+test-ledger/
+
+# Local data and database dumps
+data/
+*.dump
+*.sql.gz
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Foreign package-manager lockfiles
+package-lock.json
+yarn.lock
+bun.lock
+bun.lockb

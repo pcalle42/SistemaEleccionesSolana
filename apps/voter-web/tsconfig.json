@@ -1,0 +1,7 @@
+{
+  "extends": "@votaciones/config-typescript/frontend.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"]
+}

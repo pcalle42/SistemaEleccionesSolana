@@ -1,0 +1,13 @@
+{
+  "name": "@votaciones/config-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.json": "./base.json",
+    "./frontend.json": "./frontend.json",
+    "./nestjs.json": "./nestjs.json",
+    "./node.json": "./node.json",
+    "./test.json": "./test.json"
+  }
+}

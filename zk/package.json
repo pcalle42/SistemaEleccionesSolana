@@ -1,0 +1,19 @@
+{
+  "name": "@votaciones/zk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "pretest": "pnpm build",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@votaciones/config-typescript": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

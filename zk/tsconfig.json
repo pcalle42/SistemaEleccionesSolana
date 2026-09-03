@@ -1,0 +1,7 @@
+{
+  "extends": "@votaciones/config-typescript/node.json",
+  "compilerOptions": {
+    "rootDir": "."
+  },
+  "include": ["scripts/**/*.ts", "tests/**/*.ts"]
+}

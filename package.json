@@ -1,0 +1,32 @@
+{
+  "name": "sistema-elecciones-solana",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Monorepo para el sistema Votaciones.",
+  "type": "module",
+  "packageManager": "pnpm@10.9.0",
+  "engines": {
+    "node": ">=22.22.0 <23",
+    "pnpm": ">=10 <11"
+  },
+  "scripts": {
+    "build": "pnpm --recursive --if-present build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "clean": "node scripts/clean.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "pnpm build && pnpm --recursive --if-present test",
+    "test:unit": "pnpm build && pnpm --recursive --if-present test:unit",
+    "typecheck": "pnpm build && pnpm --recursive --if-present typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "@votaciones/config-eslint": "workspace:*",
+    "@votaciones/config-typescript": "workspace:*",
+    "eslint": "10.9.1",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@votaciones/shared-crypto",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "pretest": "pnpm build",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@votaciones/config-typescript": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@votaciones/shared-testing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@votaciones/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@votaciones/config-typescript": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
