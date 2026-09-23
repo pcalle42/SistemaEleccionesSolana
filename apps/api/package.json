@@ -5,19 +5,32 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
+    "db:health": "tsx src/database/cli.ts health",
+    "db:migrate": "tsx src/database/cli.ts migrate",
+    "db:migrate:test": "tsx src/database/cli.ts migrate --target test",
+    "db:seed": "tsx src/database/cli.ts seed",
+    "db:status": "tsx src/database/cli.ts status",
     "pretest": "pnpm build",
-    "test": "vitest run",
-    "test:unit": "vitest run",
+    "test": "vitest run --exclude '**/*.integration.spec.ts'",
+    "test:integration": "pnpm db:migrate:test && vitest run --config vitest.integration.config.ts",
+    "test:unit": "vitest run --exclude '**/*.integration.spec.ts'",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@votaciones/shared-types": "workspace:*",
-    "@votaciones/shared-validation": "workspace:*"
+    "@votaciones/shared-validation": "workspace:*",
+    "dotenv": "18.0.3",
+    "drizzle-orm": "0.45.3",
+    "pg": "8.23.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@types/pg": "8.23.1",
     "@votaciones/config-typescript": "workspace:*",
     "@votaciones/shared-testing": "workspace:*",
+    "drizzle-kit": "0.31.11",
+    "tsx": "4.23.15",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

@@ -1,5 +1,9 @@
 # Evidencia de validación — etapa 03
 
+> Este archivo conserva la evidencia histórica de la etapa 03. Desde la etapa
+> 04, PostgreSQL devnet publica un puerto exclusivamente en loopback para las
+> migraciones y pruebas; consulte `apps/api/PERSISTENCE_VALIDATION.md`.
+
 Fecha: 2026-09-03
 
 Host de validación: macOS arm64, Docker Engine 29.5.3, Docker Compose 5.1.4

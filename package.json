@@ -9,10 +9,23 @@
     "node": ">=22.22.0 <23",
     "pnpm": ">=10 <11"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
   "scripts": {
     "build": "pnpm --recursive --if-present build",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "clean": "node scripts/clean.mjs",
+    "db:backup": "bash infra/scripts/db-backup.sh devnet",
+    "db:generate": "pnpm --filter @votaciones/api db:generate",
+    "db:health": "pnpm --filter @votaciones/api db:health",
+    "db:migrate": "pnpm --filter @votaciones/api db:migrate",
+    "db:reset": "bash infra/scripts/db-reset.sh local",
+    "db:restore": "bash infra/scripts/db-restore.sh devnet",
+    "db:seed": "pnpm --filter @votaciones/api db:seed",
+    "db:status": "pnpm --filter @votaciones/api db:status",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "infra:config": "bash infra/scripts/config.sh local",
@@ -25,6 +38,7 @@
     "infra:verify:persistence": "bash infra/scripts/verify-persistence.sh local",
     "lint": "eslint .",
     "test": "pnpm build && pnpm --recursive --if-present test",
+    "test:integration": "pnpm --filter @votaciones/api test:integration",
     "test:unit": "pnpm build && pnpm --recursive --if-present test:unit",
     "typecheck": "pnpm build && pnpm --recursive --if-present typecheck",
     "devnet:config": "bash infra/scripts/config.sh devnet",

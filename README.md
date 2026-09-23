@@ -3,9 +3,9 @@
 Monorepo en construcción para una plataforma electoral verificable con
 separación entre identidad y voto.
 
-> Estado: infraestructura local/devnet para PostgreSQL y Valkey. Todavía no
-> existe un flujo electoral funcional ni este repositorio debe utilizarse en
-> producción.
+> Estado: infraestructura local/devnet y capa base de persistencia PostgreSQL.
+> Todavía no existe un flujo electoral funcional ni este repositorio debe
+> utilizarse en producción.
 
 ## Requisitos
 
@@ -59,6 +59,23 @@ Use `pnpm infra:down` para detenerlos sin borrar PostgreSQL. Consulte
 [`infra/README.md`](infra/README.md) para devnet, configuración, persistencia,
 logs y reset protegido.
 
+## Persistencia PostgreSQL
+
+La API integra Drizzle ORM sobre `pg`, con un rol administrativo exclusivo para
+migraciones y un rol runtime sin privilegios de superusuario. El flujo local es:
+
+```bash
+pnpm infra:up
+pnpm db:migrate
+pnpm db:status
+pnpm db:health
+pnpm test:integration
+```
+
+Los comandos `db:reset`, `db:restore` e `infra:reset` son destructivos y exigen
+`--force`. Consulte [`apps/api/src/database/README.md`](apps/api/src/database/README.md)
+para configuración, migraciones, pruebas, backup y restore.
+
 ## Estructura
 
 - `apps/`: procesos desplegables futuros: API, administración y votación.
@@ -74,6 +91,7 @@ logs y reset protegido.
 2. [`docs/01-plan-maestro-construccion.md`](docs/01-plan-maestro-construccion.md)
 3. [`docs/02-bootstrap-repositorio.md`](docs/02-bootstrap-repositorio.md)
 4. [`docs/03-infraestructura-local-devnet.md`](docs/03-infraestructura-local-devnet.md)
+5. [`docs/04-postgresql-modelo-persistencia.md`](docs/04-postgresql-modelo-persistencia.md)
 
 ## Seguridad
 

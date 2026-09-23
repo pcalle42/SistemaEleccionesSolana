@@ -1,8 +1,8 @@
 # Infraestructura local y devnet
 
-Esta etapa ejecuta únicamente PostgreSQL y Valkey mediante Docker Compose. Las
-aplicaciones, migraciones, seeds, circuitos y componentes Solana se incorporarán
-en etapas posteriores.
+Esta infraestructura ejecuta PostgreSQL y Valkey mediante Docker Compose. Las
+migraciones PostgreSQL se gestionan desde la API; los circuitos y componentes
+Solana se incorporarán en etapas posteriores.
 
 ## Versiones fijadas
 
@@ -35,8 +35,8 @@ Los puertos pueden cambiarse creando `infra/local/.env` a partir de
 ### Devnet
 
 - proyecto Compose: `votaciones-devnet`;
-- PostgreSQL y Valkey solo son accesibles desde `votaciones-devnet_internal`;
-- no publica puertos al host;
+- PostgreSQL está disponible en `127.0.0.1:55432` para migraciones y pruebas;
+- Valkey solo es accesible desde `votaciones-devnet_internal`;
 - credenciales conocidas y exclusivamente de integración;
 - volumen: `votaciones-devnet_postgres_data`.
 
@@ -105,7 +105,17 @@ El reset:
 4. recrea los servicios y espera sus health checks.
 
 Los datos eliminados por reset no son recuperables salvo que exista un backup.
-Los procedimientos formales de backup/restore pertenecen a la etapa 04.
+
+El reset de la base, que conserva el volumen y Valkey, se ejecuta con
+`pnpm db:reset -- --force`. Los backups devnet usan formato custom de PostgreSQL:
+
+```bash
+pnpm db:backup
+pnpm db:restore -- --force infra/postgres/backups/<archivo>.dump
+```
+
+Restore reemplaza la base devnet completa y valida el archivo antes de hacerlo.
+Los dumps se crean con permisos restrictivos y están ignorados por Git.
 
 ## Logs
 
@@ -122,9 +132,9 @@ no responde.
 
 ### Puerto ocupado
 
-Local publica puertos solo sobre loopback. Copie `infra/local/.env.example` a
-`infra/local/.env`, cambie `POSTGRES_HOST_PORT` o `VALKEY_HOST_PORT` y vuelva a
-ejecutar `pnpm infra:up`.
+Local y PostgreSQL devnet publican puertos solo sobre loopback. Copie el
+`.env.example` del perfil a `.env`, cambie `POSTGRES_HOST_PORT` (o
+`VALKEY_HOST_PORT` en local) y vuelva a levantar el perfil.
 
 ### PostgreSQL unhealthy
 

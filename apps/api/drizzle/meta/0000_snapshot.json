@@ -1,0 +1,27 @@
+{
+  "id": "8db4a785-05be-447b-985a-bcf440b813fa",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {},
+  "enums": {},
+  "schemas": {
+    "admin": "admin",
+    "app": "app",
+    "audit": "audit",
+    "election": "election",
+    "eligibility": "eligibility",
+    "identity": "identity",
+    "result": "result",
+    "voting": "voting"
+  },
+  "views": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
