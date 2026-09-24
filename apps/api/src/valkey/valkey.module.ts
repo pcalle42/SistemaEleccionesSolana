@@ -14,6 +14,13 @@ export function createValkeyModule(
   observer: ValkeyObserver = {},
 ): ValkeyModule {
   const config = getValkeyConfig(environment);
+  return createValkeyModuleFromConfig(config, observer);
+}
+
+export function createValkeyModuleFromConfig(
+  config: ValkeyConfig,
+  observer: ValkeyObserver = {},
+): ValkeyModule {
   const client = createValkeyClient(config, observer);
   return {
     config,

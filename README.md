@@ -3,8 +3,8 @@
 Monorepo en construcción para una plataforma electoral verificable con
 separación entre identidad y voto.
 
-> Estado: infraestructura local/devnet, persistencia PostgreSQL y boundary
-> efímero Valkey. Todavía no existe un flujo electoral funcional ni este
+> Estado: infraestructura local/devnet y plataforma backend NestJS con
+> PostgreSQL y Valkey. Todavía no existe un flujo electoral funcional ni este
 > repositorio debe utilizarse en producción.
 
 ## Requisitos
@@ -44,7 +44,18 @@ pnpm build
 los workspaces conocidos. No elimina fuentes, configuración, datos ni artefactos
 ZK preservados.
 
-No existe todavía un comando `dev`: las aplicaciones aún no son ejecutables.
+La API técnica puede ejecutarse, después de levantar infraestructura y aplicar
+migraciones, con:
+
+```bash
+pnpm infra:up
+pnpm db:migrate
+pnpm api:dev
+```
+
+Expone liveness/readiness y OpenAPI; todavía no expone operaciones electorales.
+Consulte [`apps/api/README.md`](apps/api/README.md) para configuración, contratos,
+tests y troubleshooting.
 
 ## Infraestructura
 
@@ -108,6 +119,7 @@ namespaces, TTLs y políticas ante indisponibilidad.
 4. [`docs/03-infraestructura-local-devnet.md`](docs/03-infraestructura-local-devnet.md)
 5. [`docs/04-postgresql-modelo-persistencia.md`](docs/04-postgresql-modelo-persistencia.md)
 6. [`docs/05-valkey-cache-coordinacion.md`](docs/05-valkey-cache-coordinacion.md)
+7. [`docs/06-backend-nestjs-base.md`](docs/06-backend-nestjs-base.md)
 
 ## Seguridad
 

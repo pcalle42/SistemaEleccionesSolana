@@ -15,6 +15,8 @@
     ]
   },
   "scripts": {
+    "api:dev": "pnpm --filter @votaciones/api dev",
+    "api:start": "pnpm --filter @votaciones/api start",
     "build": "pnpm --recursive --if-present build",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "clean": "node scripts/clean.mjs",
@@ -38,6 +40,7 @@
     "infra:verify:persistence": "bash infra/scripts/verify-persistence.sh local",
     "lint": "eslint .",
     "test": "pnpm build && pnpm --recursive --if-present test",
+    "test:e2e": "pnpm --filter @votaciones/api test:e2e",
     "test:integration": "pnpm --filter @votaciones/api test:integration",
     "test:unit": "pnpm build && pnpm --recursive --if-present test:unit",
     "typecheck": "pnpm build && pnpm --recursive --if-present typecheck",
