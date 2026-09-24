@@ -41,6 +41,8 @@
     "test:integration": "pnpm --filter @votaciones/api test:integration",
     "test:unit": "pnpm build && pnpm --recursive --if-present test:unit",
     "typecheck": "pnpm build && pnpm --recursive --if-present typecheck",
+    "valkey:health": "pnpm --filter @votaciones/api valkey:health",
+    "valkey:verify:loss": "bash infra/scripts/verify-valkey-loss.sh local",
     "devnet:config": "bash infra/scripts/config.sh devnet",
     "devnet:down": "bash infra/scripts/down.sh devnet",
     "devnet:logs": "bash infra/scripts/logs.sh devnet",

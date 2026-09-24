@@ -50,6 +50,8 @@ pnpm infra:config
 pnpm infra:up
 pnpm infra:status
 pnpm infra:smoke
+pnpm valkey:health
+pnpm valkey:verify:loss
 pnpm infra:verify:persistence
 pnpm infra:logs
 pnpm infra:logs -- postgres
@@ -154,6 +156,8 @@ pnpm infra:logs -- valkey
 ```
 
 Valkey es efímero en esta etapa; reiniciarlo no debe afectar estado durable.
+Use `pnpm valkey:verify:loss` para comprobar esa propiedad y la reconstrucción de
+cache desde PostgreSQL sin vaciados globales.
 
 ### Recreación completa
 

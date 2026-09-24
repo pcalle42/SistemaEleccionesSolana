@@ -15,13 +15,15 @@
     "test": "vitest run --exclude '**/*.integration.spec.ts'",
     "test:integration": "pnpm db:migrate:test && vitest run --config vitest.integration.config.ts",
     "test:unit": "vitest run --exclude '**/*.integration.spec.ts'",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "valkey:health": "tsx src/valkey/cli.ts health"
   },
   "dependencies": {
     "@votaciones/shared-types": "workspace:*",
     "@votaciones/shared-validation": "workspace:*",
     "dotenv": "18.0.3",
     "drizzle-orm": "0.45.3",
+    "ioredis": "6.0.0",
     "pg": "8.23.0"
   },
   "devDependencies": {

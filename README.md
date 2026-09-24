@@ -3,9 +3,9 @@
 Monorepo en construcción para una plataforma electoral verificable con
 separación entre identidad y voto.
 
-> Estado: infraestructura local/devnet y capa base de persistencia PostgreSQL.
-> Todavía no existe un flujo electoral funcional ni este repositorio debe
-> utilizarse en producción.
+> Estado: infraestructura local/devnet, persistencia PostgreSQL y boundary
+> efímero Valkey. Todavía no existe un flujo electoral funcional ni este
+> repositorio debe utilizarse en producción.
 
 ## Requisitos
 
@@ -76,6 +76,21 @@ Los comandos `db:reset`, `db:restore` e `infra:reset` son destructivos y exigen
 `--force`. Consulte [`apps/api/src/database/README.md`](apps/api/src/database/README.md)
 para configuración, migraciones, pruebas, backup y restore.
 
+## Valkey
+
+Valkey se usa únicamente para cache reconstruible y primitivas temporales de
+coordinación. PostgreSQL continúa siendo la fuente de verdad.
+
+```bash
+pnpm infra:up
+pnpm valkey:health
+pnpm test:integration
+pnpm valkey:verify:loss
+```
+
+Consulte [`apps/api/src/valkey/README.md`](apps/api/src/valkey/README.md) para
+namespaces, TTLs y políticas ante indisponibilidad.
+
 ## Estructura
 
 - `apps/`: procesos desplegables futuros: API, administración y votación.
@@ -92,6 +107,7 @@ para configuración, migraciones, pruebas, backup y restore.
 3. [`docs/02-bootstrap-repositorio.md`](docs/02-bootstrap-repositorio.md)
 4. [`docs/03-infraestructura-local-devnet.md`](docs/03-infraestructura-local-devnet.md)
 5. [`docs/04-postgresql-modelo-persistencia.md`](docs/04-postgresql-modelo-persistencia.md)
+6. [`docs/05-valkey-cache-coordinacion.md`](docs/05-valkey-cache-coordinacion.md)
 
 ## Seguridad
 
