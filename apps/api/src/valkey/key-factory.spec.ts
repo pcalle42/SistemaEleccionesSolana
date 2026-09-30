@@ -14,6 +14,6 @@ describe('ValkeyKeyFactory', () => {
   it('rejects arbitrary separators and raw sensitive-looking input', () => {
     const keys = new ValkeyKeyFactory('local');
     expect(() => keys.temporaryChallenge('token:secret')).toThrow('namespace-safe');
-    expect(() => keys.authLoginRate('person@example.test')).toThrow('digest');
+    expect(() => keys.adminLoginRateUser('person@example.test')).toThrow('digest');
   });
 });

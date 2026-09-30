@@ -3,9 +3,9 @@
 Monorepo en construcción para una plataforma electoral verificable con
 separación entre identidad y voto.
 
-> Estado: infraestructura local/devnet y plataforma backend NestJS con
-> PostgreSQL y Valkey. Todavía no existe un flujo electoral funcional ni este
-> repositorio debe utilizarse en producción.
+> Estado: infraestructura local/devnet, plataforma backend NestJS y autenticación
+> administrativa inicial con PostgreSQL y Valkey. Todavía no existe un flujo
+> electoral funcional ni este repositorio debe utilizarse en producción.
 
 ## Requisitos
 
@@ -56,6 +56,11 @@ pnpm api:dev
 Expone liveness/readiness y OpenAPI; todavía no expone operaciones electorales.
 Consulte [`apps/api/README.md`](apps/api/README.md) para configuración, contratos,
 tests y troubleshooting.
+
+Después de migrar la base, cree la única cuenta administrativa mediante
+`pnpm admin:create`. La contraseña se solicita sin eco y no existe credencial
+productiva por defecto. Consulte
+[`apps/api/src/modules/auth/README.md`](apps/api/src/modules/auth/README.md).
 
 ## Infraestructura
 
@@ -120,6 +125,7 @@ namespaces, TTLs y políticas ante indisponibilidad.
 5. [`docs/04-postgresql-modelo-persistencia.md`](docs/04-postgresql-modelo-persistencia.md)
 6. [`docs/05-valkey-cache-coordinacion.md`](docs/05-valkey-cache-coordinacion.md)
 7. [`docs/06-backend-nestjs-base.md`](docs/06-backend-nestjs-base.md)
+8. [`docs/07-autenticacion-administrativa.md`](docs/07-autenticacion-administrativa.md)
 
 ## Seguridad
 

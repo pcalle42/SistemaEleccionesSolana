@@ -205,9 +205,13 @@ describe('NestJS HTTP foundation', () => {
 
     expect(document.paths['/health/live']).toBeDefined();
     expect(document.paths['/health/ready']).toBeDefined();
+    expect(document.paths['/api/v1/admin/auth/login']).toBeDefined();
+    expect(document.paths['/api/v1/admin/auth/logout']).toBeDefined();
     expect(serialized).not.toContain('DATABASE_URL');
     expect(serialized).not.toContain('VALKEY_URL');
     expect(serialized).not.toContain('not-logged');
+    expect(serialized).not.toContain('passwordHash');
+    expect(serialized).not.toContain('sessionToken');
   });
 
   it('does not expose Swagger UI when disabled', async () => {

@@ -8,6 +8,13 @@
       "when": 1790177803848,
       "tag": "0000_bootstrap-persistence",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790271724015,
+      "tag": "0001_careful_talon",
+      "breakpoints": true
     }
   ]
 }

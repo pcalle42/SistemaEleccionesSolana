@@ -1,7 +1,8 @@
 # API NestJS
 
 Base HTTP del sistema Votaciones. Esta etapa integra NestJS con PostgreSQL y
-Valkey, pero no contiene autenticación, lógica electoral ni procesamiento ZK.
+Valkey e incluye autenticación administrativa local. No contiene todavía lógica
+electoral ni procesamiento ZK.
 
 ## Requisitos
 
@@ -108,6 +109,21 @@ impide arrancar la API y queda visible como degradación de readiness. Consulte
 En el perfil devnet, Valkey pertenece a la red interna de Compose. Una API
 ejecutada directamente en el host arrancará, pero mostrará Valkey como
 `unavailable`; para integración completa debe ejecutarse dentro de esa red.
+
+## Autenticación administrativa
+
+La cuenta inicial se crea sin credenciales default y sin pasar passwords en la
+línea de comandos:
+
+```bash
+pnpm admin:create
+```
+
+La API usa Argon2id, sesión opaca server-side en Valkey, cookie `HttpOnly`,
+timeouts idle/absoluto, CSRF ligado a sesión, rate limiting y auditoría
+persistente. Consulte
+[`src/modules/auth/README.md`](src/modules/auth/README.md) para endpoints,
+configuración, revocación y recuperación operacional.
 
 ## Tests y build
 

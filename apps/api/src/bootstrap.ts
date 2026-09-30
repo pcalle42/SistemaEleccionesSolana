@@ -25,7 +25,7 @@ export function configureApplication(app: NestExpressApplication, config: AppCon
   });
   app.use(requestIdMiddleware);
   app.enableCors({
-    allowedHeaders: ['content-type', 'authorization', 'x-request-id'],
+    allowedHeaders: ['content-type', 'authorization', 'x-csrf-token', 'x-request-id'],
     credentials: true,
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     origin: [...config.http.corsOrigins],

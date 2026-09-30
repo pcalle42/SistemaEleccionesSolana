@@ -8,6 +8,11 @@ export function createOpenApiDocument(app: INestApplication): OpenAPIObject {
     .setTitle('Votaciones API')
     .setDescription('Technical API foundation for Votaciones.')
     .setVersion('1.0')
+    .addCookieAuth(
+      '__Host-votaciones_admin_session',
+      { in: 'cookie', type: 'apiKey' },
+      'admin-session',
+    )
     .build();
   return SwaggerModule.createDocument(app, options);
 }

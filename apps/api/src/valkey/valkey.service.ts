@@ -16,6 +16,11 @@ export interface CacheAsideResult {
   readonly value: string;
 }
 
+export interface IncrementResult {
+  readonly count: number;
+  readonly ttlSeconds: number;
+}
+
 function assertTtl(ttlSeconds: number): void {
   if (!Number.isSafeInteger(ttlSeconds) || ttlSeconds <= 0) {
     throw new RangeError('TTL must be a positive integer number of seconds');
@@ -81,6 +86,27 @@ export class ValkeyService {
 
   async ttl(key: ValkeyKey): Promise<number> {
     return this.required('ttl', () => this.client.ttl(key));
+  }
+
+  async incrementWithExpiry(key: ValkeyKey, ttlSeconds: number): Promise<IncrementResult> {
+    assertTtl(ttlSeconds);
+    const result = await this.required('increment-with-expiry', () =>
+      this.client.eval(
+        "local count = redis.call('INCR', KEYS[1]); if count == 1 then redis.call('EXPIRE', KEYS[1], ARGV[1]); end; return {count, redis.call('TTL', KEYS[1])}",
+        1,
+        key,
+        String(ttlSeconds),
+      ),
+    );
+    if (
+      !Array.isArray(result) ||
+      result.length !== 2 ||
+      typeof result[0] !== 'number' ||
+      typeof result[1] !== 'number'
+    ) {
+      throw new ValkeyUnavailableError('increment-with-expiry');
+    }
+    return { count: result[0], ttlSeconds: result[1] };
   }
 
   async getOrLoadString(

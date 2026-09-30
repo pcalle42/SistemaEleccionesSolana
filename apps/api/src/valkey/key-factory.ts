@@ -24,8 +24,20 @@ export class ValkeyKeyFactory {
     this.#prefix = `votaciones:${segment(environment, 'environment')}:${VALKEY_KEY_VERSION}`;
   }
 
-  authLoginRate(subjectDigest: string): ValkeyKey {
-    return this.#key('auth', 'login-rate', validatedSubjectDigest(subjectDigest));
+  adminLoginRateNetwork(subjectDigest: string): ValkeyKey {
+    return this.#key('auth', 'login-rate-network', validatedSubjectDigest(subjectDigest));
+  }
+
+  adminLoginRateUser(subjectDigest: string): ValkeyKey {
+    return this.#key('auth', 'login-rate-user', validatedSubjectDigest(subjectDigest));
+  }
+
+  adminSession(sessionDigest: string): ValkeyKey {
+    return this.#key('auth', 'admin-session', validatedSubjectDigest(sessionDigest));
+  }
+
+  adminSessionGeneration(adminId: string): ValkeyKey {
+    return this.#key('auth', 'admin-session-generation', segment(adminId, 'admin ID'));
   }
 
   publicElectionCache(electionId: string): ValkeyKey {

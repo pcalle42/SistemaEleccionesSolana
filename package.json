@@ -11,10 +11,14 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "argon2",
       "esbuild"
     ]
   },
   "scripts": {
+    "admin:create": "pnpm --filter @votaciones/api admin:create",
+    "admin:reset-password": "pnpm --filter @votaciones/api admin:reset-password",
+    "admin:revoke-sessions": "pnpm --filter @votaciones/api admin:revoke-sessions",
     "api:dev": "pnpm --filter @votaciones/api dev",
     "api:start": "pnpm --filter @votaciones/api start",
     "build": "pnpm --recursive --if-present build",

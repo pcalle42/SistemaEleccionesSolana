@@ -5,6 +5,25 @@ export type RuntimeEnvironment = 'local' | 'test' | 'devnet' | 'production';
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'silent';
 
 export interface AppConfig {
+  readonly auth: {
+    readonly argon2: {
+      readonly memoryCostKiB: number;
+      readonly parallelism: number;
+      readonly timeCost: number;
+    };
+    readonly cookieName: string;
+    readonly cookieSecure: boolean;
+    readonly csrfHeaderName: string;
+    readonly passwordMaximumLength: number;
+    readonly passwordMinimumLength: number;
+    readonly rateLimit: {
+      readonly networkMaximum: number;
+      readonly userMaximum: number;
+      readonly windowSeconds: number;
+    };
+    readonly sessionAbsoluteSeconds: number;
+    readonly sessionIdleSeconds: number;
+  };
   readonly database: DatabaseConfig;
   readonly environment: RuntimeEnvironment;
   readonly http: {
@@ -117,8 +136,48 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
   if (!host || /\s/.test(host)) {
     throw new Error('APP_HOST is invalid');
   }
+  const cookieSecure = boolean(environment, 'ADMIN_COOKIE_SECURE', runtime === 'production');
+  if (runtime === 'production' && !cookieSecure) {
+    throw new Error('ADMIN_COOKIE_SECURE must be true in production');
+  }
+  const sessionIdleSeconds = integer(
+    environment,
+    'ADMIN_SESSION_IDLE_SECONDS',
+    15 * 60,
+    60,
+    60 * 60,
+  );
+  const sessionAbsoluteSeconds = integer(
+    environment,
+    'ADMIN_SESSION_ABSOLUTE_SECONDS',
+    8 * 60 * 60,
+    5 * 60,
+    24 * 60 * 60,
+  );
+  if (sessionAbsoluteSeconds <= sessionIdleSeconds) {
+    throw new Error('ADMIN_SESSION_ABSOLUTE_SECONDS must exceed ADMIN_SESSION_IDLE_SECONDS');
+  }
 
   return Object.freeze({
+    auth: Object.freeze({
+      argon2: Object.freeze({
+        memoryCostKiB: integer(environment, 'ADMIN_ARGON2_MEMORY_KIB', 19_456, 19_456, 262_144),
+        parallelism: integer(environment, 'ADMIN_ARGON2_PARALLELISM', 1, 1, 4),
+        timeCost: integer(environment, 'ADMIN_ARGON2_TIME_COST', 2, 2, 10),
+      }),
+      cookieName: cookieSecure ? '__Host-votaciones_admin_session' : 'votaciones_admin_session',
+      cookieSecure,
+      csrfHeaderName: 'x-csrf-token',
+      passwordMaximumLength: 256,
+      passwordMinimumLength: 16,
+      rateLimit: Object.freeze({
+        networkMaximum: integer(environment, 'ADMIN_LOGIN_NETWORK_MAXIMUM', 20, 5, 100),
+        userMaximum: integer(environment, 'ADMIN_LOGIN_USER_MAXIMUM', 5, 2, 20),
+        windowSeconds: integer(environment, 'ADMIN_LOGIN_WINDOW_SECONDS', 300, 60, 3_600),
+      }),
+      sessionAbsoluteSeconds,
+      sessionIdleSeconds,
+    }),
     database: getDatabaseConfig(environment),
     environment: runtime,
     http: Object.freeze({

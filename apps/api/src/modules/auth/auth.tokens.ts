@@ -1,0 +1,5 @@
+export const ADMIN_IDENTITY_PROVIDER = Symbol('ADMIN_IDENTITY_PROVIDER');
+export const ADMIN_SESSION_STORE = Symbol('ADMIN_SESSION_STORE');
+export const AUTH_AUDIT = Symbol('AUTH_AUDIT');
+export const LOGIN_RATE_LIMITER = Symbol('LOGIN_RATE_LIMITER');
+export const PASSWORD_HASHER = Symbol('PASSWORD_HASHER');

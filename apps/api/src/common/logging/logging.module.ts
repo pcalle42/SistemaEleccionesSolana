@@ -100,7 +100,9 @@ export function successfulRequestLog(
             paths: [
               'req.headers.authorization',
               'req.headers.cookie',
+              'req.headers.x-csrf-token',
               'req.headers.proxy-authorization',
+              'res.headers.set-cookie',
               'DATABASE_URL',
               'VALKEY_URL',
               '*.password',
