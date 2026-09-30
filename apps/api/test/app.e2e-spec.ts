@@ -207,6 +207,10 @@ describe('NestJS HTTP foundation', () => {
     expect(document.paths['/health/ready']).toBeDefined();
     expect(document.paths['/api/v1/admin/auth/login']).toBeDefined();
     expect(document.paths['/api/v1/admin/auth/logout']).toBeDefined();
+    expect(document.paths['/api/v1/admin/elections']).toBeDefined();
+    expect(document.paths['/api/v1/admin/elections/{id}/ready']).toBeDefined();
+    expect(document.paths['/api/v1/admin/elections/{id}/open']).toBeDefined();
+    expect(document.paths['/api/v1/admin/elections/{id}/close']).toBeDefined();
     expect(serialized).not.toContain('DATABASE_URL');
     expect(serialized).not.toContain('VALKEY_URL');
     expect(serialized).not.toContain('not-logged');

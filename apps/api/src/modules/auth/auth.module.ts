@@ -27,7 +27,13 @@ import { CsrfGuard } from './http/csrf.guard.js';
 
 @Module({
   controllers: [AuthController],
-  exports: [AdminAuthService, ADMIN_SESSION_STORE, AdminAuthGuard, CsrfGuard],
+  exports: [
+    AdminAuthService,
+    ADMIN_SESSION_STORE,
+    AdminAuthGuard,
+    CsrfGuard,
+    AdminNoStoreInterceptor,
+  ],
   providers: [
     {
       inject: [DATABASE_CLIENT],

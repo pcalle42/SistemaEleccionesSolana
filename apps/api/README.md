@@ -125,6 +125,13 @@ persistente. Consulte
 [`src/modules/auth/README.md`](src/modules/auth/README.md) para endpoints,
 configuración, revocación y recuperación operacional.
 
+## Dominio electoral
+
+Las elecciones son aggregates versionados con máquina de estados explícita, snapshots de
+configuración y concurrencia optimista respaldada por PostgreSQL. Consulte
+[`src/modules/elections/README.md`](src/modules/elections/README.md) para invariantes, endpoints y
+boundaries diferidos de elegibilidad y ZK.
+
 ## Tests y build
 
 ```bash

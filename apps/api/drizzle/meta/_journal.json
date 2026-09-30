@@ -15,6 +15,13 @@
       "when": 1790271724015,
       "tag": "0001_careful_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790784418684,
+      "tag": "0002_same_jack_power",
+      "breakpoints": true
     }
   ]
 }

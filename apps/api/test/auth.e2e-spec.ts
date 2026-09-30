@@ -23,9 +23,12 @@ import {
   PASSWORD_HASHER,
 } from '../src/modules/auth/auth.tokens.js';
 import { ValkeyAdminSessionStore } from '../src/modules/auth/infrastructure/session-store/valkey-admin-session-store.js';
+import type { Clock } from '../src/modules/elections/domain/clock.js';
+import { ELECTION_CLOCK, ELECTION_REPOSITORY } from '../src/modules/elections/elections.tokens.js';
 import { ValkeyKeyFactory } from '../src/valkey/key-factory.js';
 import { ValkeyLifecycleService } from '../src/valkey/valkey-lifecycle.service.js';
 import { MemoryValkey } from './support/memory-valkey.js';
+import { MemoryElectionRepository } from './support/memory-election-repository.js';
 
 const config = getAppConfig({
   DATABASE_URL: 'postgresql://runtime:not-logged@127.0.0.1:5432/test',
@@ -80,6 +83,8 @@ const rateLimiter = {
   ),
 } as unknown as LoginRateLimiter;
 const audit = { record: vi.fn().mockResolvedValue(undefined) } as unknown as AuthAudit;
+const electionRepository = new MemoryElectionRepository();
+const electionClock: Clock = { now: () => new Date('2030-01-01T12:00:00.000Z') };
 const databaseLifecycle = {
   health: vi.fn(),
   onApplicationShutdown: vi.fn(),
@@ -137,6 +142,10 @@ describe('administrative authentication HTTP flow', () => {
       .useValue(rateLimiter)
       .overrideProvider(AUTH_AUDIT)
       .useValue(audit)
+      .overrideProvider(ELECTION_REPOSITORY)
+      .useValue(electionRepository)
+      .overrideProvider(ELECTION_CLOCK)
+      .useValue(electionClock)
       .overrideProvider(DatabaseLifecycleService)
       .useValue(databaseLifecycle)
       .overrideProvider(ValkeyLifecycleService)
@@ -244,5 +253,85 @@ describe('administrative authentication HTTP flow', () => {
     limiterState.limited = false;
     expect(limited.body).toMatchObject({ error: { code: 'ADMIN_LOGIN_RATE_LIMITED' } });
     expect(verifyPassword.mock.calls).toHaveLength(priorVerifications);
+  });
+
+  it('enforces the administrative election lifecycle and frozen configuration', async () => {
+    const login = await request(httpServer)
+      .post('/api/v1/admin/auth/login')
+      .send({ password: 'correct-password-value', username: 'administrator' })
+      .expect(200);
+    const cookie = cookieFrom(login.get('set-cookie'));
+    const csrf = csrfToken(login.text);
+    const mutation = () => ({ Cookie: cookie, 'x-csrf-token': csrf });
+
+    const created = await request(httpServer)
+      .post('/api/v1/admin/elections')
+      .set(mutation())
+      .send({
+        closesAt: '2030-01-01T13:00:00.000Z',
+        opensAt: '2030-01-01T11:00:00.000Z',
+        title: 'E2E election',
+      })
+      .expect(201);
+    const electionId = (created.body as { id: string }).id;
+    expect(created.body).toMatchObject({ status: 'DRAFT', votingMethod: 'SINGLE_CHOICE' });
+
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/ready`)
+      .set(mutation())
+      .expect(409);
+
+    const configured = await request(httpServer)
+      .patch(`/api/v1/admin/elections/${electionId}`)
+      .set(mutation())
+      .send({
+        circuitVersion: 'circuit-v1',
+        eligibilityConfigurationRef: 'eligibility-v1',
+        options: [
+          { displayOrder: 0, label: 'Option A' },
+          { displayOrder: 1, label: 'Option B' },
+        ],
+        protocolVersion: 'protocol-v1',
+      })
+      .expect(200);
+    expect((configured.body as { options: unknown[] }).options).toHaveLength(2);
+
+    const ready = await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/ready`)
+      .set(mutation())
+      .expect(200);
+    expect(ready.body).toMatchObject({ configurationVersion: 1, status: 'READY' });
+
+    await request(httpServer)
+      .patch(`/api/v1/admin/elections/${electionId}`)
+      .set(mutation())
+      .send({ title: 'Forbidden edit' })
+      .expect(409);
+    await request(httpServer)
+      .patch(`/api/v1/admin/elections/${electionId}`)
+      .set(mutation())
+      .send({ status: 'OPEN' })
+      .expect(400);
+
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/open`)
+      .set(mutation())
+      .expect(200)
+      .expect(({ body }) => expect(body).toMatchObject({ status: 'OPEN' }));
+    await request(httpServer)
+      .patch(`/api/v1/admin/elections/${electionId}`)
+      .set(mutation())
+      .send({ options: [{ displayOrder: 0, label: 'Changed' }] })
+      .expect(409);
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/close`)
+      .set(mutation())
+      .expect(200)
+      .expect(({ body }) => expect(body).toMatchObject({ status: 'CLOSED' }));
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/reopen-draft`)
+      .set(mutation())
+      .send({ reason: 'Cannot reopen closed election' })
+      .expect(409);
   });
 });

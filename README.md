@@ -126,6 +126,7 @@ namespaces, TTLs y políticas ante indisponibilidad.
 6. [`docs/05-valkey-cache-coordinacion.md`](docs/05-valkey-cache-coordinacion.md)
 7. [`docs/06-backend-nestjs-base.md`](docs/06-backend-nestjs-base.md)
 8. [`docs/07-autenticacion-administrativa.md`](docs/07-autenticacion-administrativa.md)
+9. [`docs/08-dominio-electoral.md`](docs/08-dominio-electoral.md)
 
 ## Seguridad
 
