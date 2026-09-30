@@ -127,6 +127,7 @@ namespaces, TTLs y políticas ante indisponibilidad.
 7. [`docs/06-backend-nestjs-base.md`](docs/06-backend-nestjs-base.md)
 8. [`docs/07-autenticacion-administrativa.md`](docs/07-autenticacion-administrativa.md)
 9. [`docs/08-dominio-electoral.md`](docs/08-dominio-electoral.md)
+10. [`docs/09-elegibilidad-identidad-electoral.md`](docs/09-elegibilidad-identidad-electoral.md)
 
 ## Seguridad
 

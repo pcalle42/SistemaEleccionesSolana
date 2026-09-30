@@ -132,6 +132,12 @@ configuración y concurrencia optimista respaldada por PostgreSQL. Consulte
 [`src/modules/elections/README.md`](src/modules/elections/README.md) para invariantes, endpoints y
 boundaries diferidos de elegibilidad y ZK.
 
+## Elegibilidad
+
+El padrón, las credenciales seudónimas y los snapshots congelados están separados del futuro
+boundary de voto. Consulte [`src/modules/eligibility/README.md`](src/modules/eligibility/README.md)
+para privacidad, provisioning, freeze atómico y el port criptográfico que completará la etapa 10.
+
 ## Tests y build
 
 ```bash

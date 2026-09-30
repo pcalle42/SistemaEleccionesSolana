@@ -24,11 +24,28 @@ import {
 } from '../src/modules/auth/auth.tokens.js';
 import { ValkeyAdminSessionStore } from '../src/modules/auth/infrastructure/session-store/valkey-admin-session-store.js';
 import type { Clock } from '../src/modules/elections/domain/clock.js';
-import { ELECTION_CLOCK, ELECTION_REPOSITORY } from '../src/modules/elections/elections.tokens.js';
+import {
+  ELECTION_CLOCK,
+  ELECTION_READINESS,
+  ELECTION_REPOSITORY,
+} from '../src/modules/elections/elections.tokens.js';
+import {
+  ELECTORAL_CREDENTIAL_REPOSITORY,
+  ELIGIBILITY_SNAPSHOT_REPOSITORY,
+  ELIGIBLE_VOTER_REPOSITORY,
+  MERKLE_TREE_BUILDER,
+} from '../src/modules/eligibility/eligibility.tokens.js';
 import { ValkeyKeyFactory } from '../src/valkey/key-factory.js';
 import { ValkeyLifecycleService } from '../src/valkey/valkey-lifecycle.service.js';
 import { MemoryValkey } from './support/memory-valkey.js';
 import { MemoryElectionRepository } from './support/memory-election-repository.js';
+import {
+  FixtureMerkleTreeBuilder,
+  MemoryElectionReadinessVerifier,
+  MemoryElectoralCredentialRepository,
+  MemoryEligibilitySnapshotRepository,
+  MemoryEligibleVoterRepository,
+} from './support/memory-eligibility.js';
 
 const config = getAppConfig({
   DATABASE_URL: 'postgresql://runtime:not-logged@127.0.0.1:5432/test',
@@ -85,6 +102,11 @@ const rateLimiter = {
 const audit = { record: vi.fn().mockResolvedValue(undefined) } as unknown as AuthAudit;
 const electionRepository = new MemoryElectionRepository();
 const electionClock: Clock = { now: () => new Date('2030-01-01T12:00:00.000Z') };
+const voterRepository = new MemoryEligibleVoterRepository();
+const credentialRepository = new MemoryElectoralCredentialRepository();
+const snapshotRepository = new MemoryEligibilitySnapshotRepository(electionRepository);
+const merkleBuilder = new FixtureMerkleTreeBuilder();
+const electionReadiness = new MemoryElectionReadinessVerifier(snapshotRepository);
 const databaseLifecycle = {
   health: vi.fn(),
   onApplicationShutdown: vi.fn(),
@@ -146,6 +168,16 @@ describe('administrative authentication HTTP flow', () => {
       .useValue(electionRepository)
       .overrideProvider(ELECTION_CLOCK)
       .useValue(electionClock)
+      .overrideProvider(ELECTION_READINESS)
+      .useValue(electionReadiness)
+      .overrideProvider(ELIGIBLE_VOTER_REPOSITORY)
+      .useValue(voterRepository)
+      .overrideProvider(ELECTORAL_CREDENTIAL_REPOSITORY)
+      .useValue(credentialRepository)
+      .overrideProvider(ELIGIBILITY_SNAPSHOT_REPOSITORY)
+      .useValue(snapshotRepository)
+      .overrideProvider(MERKLE_TREE_BUILDER)
+      .useValue(merkleBuilder)
       .overrideProvider(DatabaseLifecycleService)
       .useValue(databaseLifecycle)
       .overrideProvider(ValkeyLifecycleService)
@@ -286,7 +318,6 @@ describe('administrative authentication HTTP flow', () => {
       .set(mutation())
       .send({
         circuitVersion: 'circuit-v1',
-        eligibilityConfigurationRef: 'eligibility-v1',
         options: [
           { displayOrder: 0, label: 'Option A' },
           { displayOrder: 1, label: 'Option B' },
@@ -295,6 +326,90 @@ describe('administrative authentication HTTP flow', () => {
       })
       .expect(200);
     expect((configured.body as { options: unknown[] }).options).toHaveLength(2);
+
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/ready`)
+      .set(mutation())
+      .expect(409);
+
+    const rejectedSecret = await request(httpServer)
+      .post('/api/v1/admin/eligible-voters')
+      .set(mutation())
+      .send({ externalReference: 'PADRON-SECRET', voterSecret: 'must-never-be-accepted' })
+      .expect(400);
+    expect(rejectedSecret.text).not.toContain('must-never-be-accepted');
+
+    const firstVoter = await request(httpServer)
+      .post('/api/v1/admin/eligible-voters')
+      .set(mutation())
+      .send({ displayName: 'Voter A', externalReference: 'PADRON-001' })
+      .expect(201);
+    const secondVoter = await request(httpServer)
+      .post('/api/v1/admin/eligible-voters')
+      .set(mutation())
+      .send({ displayName: 'Voter B', externalReference: 'PADRON-002' })
+      .expect(201);
+    const firstVoterId = (firstVoter.body as { id: string }).id;
+    const secondVoterId = (secondVoter.body as { id: string }).id;
+
+    await request(httpServer)
+      .post('/api/v1/admin/eligible-voters/import')
+      .set(mutation())
+      .send({
+        dryRun: true,
+        records: [{ externalReference: 'PADRON-DRY-001' }, { externalReference: 'PADRON-DRY-002' }],
+      })
+      .expect(200, { created: 0, updated: 0, validated: 2 });
+    await request(httpServer)
+      .post('/api/v1/admin/eligible-voters/import')
+      .set(mutation())
+      .send({
+        records: [
+          { externalReference: ' PADRON-DUPLICATE ' },
+          { externalReference: 'PADRON-DUPLICATE' },
+        ],
+      })
+      .expect(400);
+
+    await request(httpServer)
+      .post('/api/v1/admin/electoral-credentials')
+      .set(mutation())
+      .send({
+        eligibleVoterId: firstVoterId,
+        identityCommitment: 'commitment-a',
+        schemeVersion: 'scheme-v1',
+      })
+      .expect(201);
+    await request(httpServer)
+      .post('/api/v1/admin/electoral-credentials')
+      .set(mutation())
+      .send({
+        eligibleVoterId: secondVoterId,
+        identityCommitment: 'commitment-a',
+        schemeVersion: 'scheme-v1',
+      })
+      .expect(409);
+    await request(httpServer)
+      .post('/api/v1/admin/electoral-credentials')
+      .set(mutation())
+      .send({
+        eligibleVoterId: secondVoterId,
+        identityCommitment: 'commitment-b',
+        schemeVersion: 'scheme-v1',
+      })
+      .expect(201);
+
+    const built = await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/eligibility-snapshots`)
+      .set(mutation())
+      .expect(201);
+    const snapshotId = (built.body as { id: string }).id;
+    expect(built.body).toMatchObject({ leafCount: 2, status: 'BUILDING', version: 1 });
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/eligibility-snapshots/${snapshotId}/freeze`)
+      .set(mutation())
+      .expect(200)
+      .expect(({ body }) => expect(body).toMatchObject({ status: 'FROZEN' }));
 
     const ready = await request(httpServer)
       .post(`/api/v1/admin/elections/${electionId}/ready`)
@@ -312,6 +427,52 @@ describe('administrative authentication HTTP flow', () => {
       .set(mutation())
       .send({ status: 'OPEN' })
       .expect(400);
+
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/eligibility-snapshots/${snapshotId}/freeze`)
+      .set(mutation())
+      .expect(409);
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/reopen-draft`)
+      .set(mutation())
+      .send({ reason: 'Eligibility set changed before opening' })
+      .expect(200)
+      .expect(({ body }) => expect(body).toMatchObject({ status: 'DRAFT' }));
+
+    const thirdVoter = await request(httpServer)
+      .post('/api/v1/admin/eligible-voters')
+      .set(mutation())
+      .send({ externalReference: 'PADRON-003' })
+      .expect(201);
+    await request(httpServer)
+      .post('/api/v1/admin/electoral-credentials')
+      .set(mutation())
+      .send({
+        eligibleVoterId: (thirdVoter.body as { id: string }).id,
+        identityCommitment: 'commitment-c',
+        schemeVersion: 'scheme-v1',
+      })
+      .expect(201);
+    const rebuilt = await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/eligibility-snapshots`)
+      .set(mutation())
+      .expect(201);
+    const rebuiltId = (rebuilt.body as { id: string }).id;
+    expect(rebuilt.body).toMatchObject({ configurationVersion: 2, leafCount: 3 });
+    expect((rebuilt.body as { merkleRoot: string }).merkleRoot).not.toBe(
+      (built.body as { merkleRoot: string }).merkleRoot,
+    );
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/eligibility-snapshots/${rebuiltId}/freeze`)
+      .set(mutation())
+      .expect(200);
+    await request(httpServer)
+      .post(`/api/v1/admin/elections/${electionId}/ready`)
+      .set(mutation())
+      .expect(200)
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ configurationVersion: 2, status: 'READY' }),
+      );
 
     await request(httpServer)
       .post(`/api/v1/admin/elections/${electionId}/open`)

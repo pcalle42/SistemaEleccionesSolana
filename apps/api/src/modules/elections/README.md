@@ -16,10 +16,10 @@ This module owns the election aggregate and administrative lifecycle specified b
 
 ## Boundaries for later stages
 
-`ElectionReadinessVerifier` is the explicit seam for eligibility and ZK/protocol checks. Its stage-08
-adapter only verifies that opaque references exist; stages 09 and 10 must replace that provisional
-adapter with real verification. The aggregate contains no voter identity, proof, nullifier, vote, or
-result rows.
+`ElectionReadinessVerifier` is the explicit seam for eligibility and ZK/protocol checks. Stage 09
+now verifies a compatible frozen eligibility snapshot in PostgreSQL; the protocol/circuit check
+remains provisional until stage 10. The aggregate contains no voter identity, proof, nullifier,
+vote, or result rows.
 
 The domain exposes `assertCanAcceptVote(clock)` for stage 11. It checks state and time only; it does
 not authorize a vote by itself.

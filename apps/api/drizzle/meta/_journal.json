@@ -22,6 +22,13 @@
       "when": 1790784418684,
       "tag": "0002_same_jack_power",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790787551392,
+      "tag": "0003_glorious_synch",
+      "breakpoints": true
     }
   ]
 }

@@ -7,12 +7,12 @@ import { ElectionsService } from './application/elections.service.js';
 import { SystemClock } from './domain/clock.js';
 import { ELECTION_CLOCK, ELECTION_READINESS, ELECTION_REPOSITORY } from './elections.tokens.js';
 import { ElectionsController } from './http/elections.controller.js';
-import { ConfiguredReferencesReadinessVerifier } from './infrastructure/configured-references-readiness.js';
+import { DrizzleElectionReadinessVerifier } from '../eligibility/infrastructure/persistence/drizzle-election-readiness-verifier.js';
 import { DrizzleElectionRepository } from './infrastructure/persistence/drizzle-election.repository.js';
 
 @Module({
   controllers: [ElectionsController],
-  exports: [ElectionsService, ELECTION_REPOSITORY],
+  exports: [ElectionsService, ELECTION_CLOCK, ELECTION_REPOSITORY],
   imports: [AuthModule],
   providers: [
     {
@@ -20,7 +20,11 @@ import { DrizzleElectionRepository } from './infrastructure/persistence/drizzle-
       provide: ELECTION_REPOSITORY,
       useFactory: (database: Database) => new DrizzleElectionRepository(database),
     },
-    { provide: ELECTION_READINESS, useClass: ConfiguredReferencesReadinessVerifier },
+    {
+      inject: [DATABASE_CLIENT],
+      provide: ELECTION_READINESS,
+      useFactory: (database: Database) => new DrizzleElectionReadinessVerifier(database),
+    },
     { provide: ELECTION_CLOCK, useClass: SystemClock },
     ElectionsService,
   ],

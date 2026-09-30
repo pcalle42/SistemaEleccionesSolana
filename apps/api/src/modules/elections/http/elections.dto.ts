@@ -64,12 +64,6 @@ export class CreateElectionDto {
   @IsIn(['SINGLE_CHOICE'])
   votingMethod?: 'SINGLE_CHOICE';
 
-  @ApiPropertyOptional({ maxLength: 128 })
-  @IsOptional()
-  @IsString()
-  @MaxLength(128)
-  eligibilityConfigurationRef?: string;
-
   @ApiPropertyOptional({ maxLength: 64 })
   @IsOptional()
   @IsString()
@@ -118,12 +112,6 @@ export class UpdateDraftElectionDto {
   @IsOptional()
   @IsIn(['SINGLE_CHOICE'])
   votingMethod?: 'SINGLE_CHOICE';
-
-  @ApiPropertyOptional({ maxLength: 128, nullable: true })
-  @IsOptional()
-  @IsString()
-  @MaxLength(128)
-  eligibilityConfigurationRef?: string | null;
 
   @ApiPropertyOptional({ maxLength: 64, nullable: true })
   @IsOptional()

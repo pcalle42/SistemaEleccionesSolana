@@ -57,9 +57,6 @@ function referenceInputs(
 ): Partial<ElectionConfigurationReferences> {
   return {
     ...(body.circuitVersion !== undefined ? { circuitVersion: body.circuitVersion } : {}),
-    ...(body.eligibilityConfigurationRef !== undefined
-      ? { eligibilityConfigurationRef: body.eligibilityConfigurationRef }
-      : {}),
     ...(body.protocolVersion !== undefined ? { protocolVersion: body.protocolVersion } : {}),
   };
 }

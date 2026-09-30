@@ -211,11 +211,18 @@ describe('NestJS HTTP foundation', () => {
     expect(document.paths['/api/v1/admin/elections/{id}/ready']).toBeDefined();
     expect(document.paths['/api/v1/admin/elections/{id}/open']).toBeDefined();
     expect(document.paths['/api/v1/admin/elections/{id}/close']).toBeDefined();
+    expect(document.paths['/api/v1/admin/eligible-voters']).toBeDefined();
+    expect(document.paths['/api/v1/admin/electoral-credentials']).toBeDefined();
+    expect(
+      document.paths['/api/v1/admin/elections/{id}/eligibility-snapshots/{snapshotId}/freeze'],
+    ).toBeDefined();
     expect(serialized).not.toContain('DATABASE_URL');
     expect(serialized).not.toContain('VALKEY_URL');
     expect(serialized).not.toContain('not-logged');
     expect(serialized).not.toContain('passwordHash');
     expect(serialized).not.toContain('sessionToken');
+    expect(serialized).not.toContain('voterSecret');
+    expect(serialized).not.toContain('hasVoted');
   });
 
   it('does not expose Swagger UI when disabled', async () => {
