@@ -1,8 +1,7 @@
 # API NestJS
 
-Base HTTP del sistema Votaciones. Esta etapa integra NestJS con PostgreSQL y
-Valkey e incluye autenticación administrativa local. No contiene todavía lógica
-electoral ni procesamiento ZK.
+Backend NestJS del sistema Votaciones con PostgreSQL, Valkey, administración,
+dominio electoral, elegibilidad, verificación ZK V1 y aceptación atómica del voto.
 
 ## Requisitos
 
@@ -19,15 +18,18 @@ ruta. Los entornos admitidos son `local`, `test`, `devnet` y `production`.
 La configuración se valida antes de arrancar y se expone internamente mediante
 inyección de dependencias. Las variables propias del servidor son:
 
-| Variable                  | Valor local                 | Descripción                                 |
-| ------------------------- | --------------------------- | ------------------------------------------- |
-| `APP_HOST`                | `127.0.0.1`                 | Interfaz de escucha                         |
-| `APP_PORT`                | `3000`                      | Puerto HTTP                                 |
-| `HTTP_BODY_LIMIT_BYTES`   | `262144`                    | Límite global de body, entre 1 KiB y 2 MiB  |
-| `HTTP_REQUEST_TIMEOUT_MS` | `15000`                     | Timeout HTTP, entre 1 s y 120 s             |
-| `HTTP_CORS_ORIGINS`       | orígenes locales explícitos | Allowlist separada por comas; no admite `*` |
-| `LOG_LEVEL`               | `debug`                     | Nivel Pino                                  |
-| `OPENAPI_ENABLED`         | `true`                      | Swagger UI y documento OpenAPI              |
+| Variable                         | Valor local                 | Descripción                                   |
+| -------------------------------- | --------------------------- | --------------------------------------------- |
+| `APP_HOST`                       | `127.0.0.1`                 | Interfaz de escucha                           |
+| `APP_PORT`                       | `3000`                      | Puerto HTTP                                   |
+| `HTTP_BODY_LIMIT_BYTES`          | `262144`                    | Límite global de body, entre 1 KiB y 2 MiB    |
+| `HTTP_REQUEST_TIMEOUT_MS`        | `15000`                     | Timeout HTTP, entre 1 s y 120 s               |
+| `HTTP_CORS_ORIGINS`              | orígenes locales explícitos | Allowlist separada por comas; no admite `*`   |
+| `LOG_LEVEL`                      | `debug`                     | Nivel Pino                                    |
+| `OPENAPI_ENABLED`                | `true`                      | Swagger UI y documento OpenAPI                |
+| `VOTE_RATE_LIMIT_WINDOW_SECONDS` | `60`                        | Ventana operacional para submissions públicas |
+| `VOTE_RATE_LIMIT_MAXIMUM`        | `30`                        | Máximo por digest de red y ventana            |
+| `VOTE_MAXIMUM_CONCURRENT_PROOFS` | `2`                         | Pairings simultáneos por proceso              |
 
 Producción exige una allowlist CORS no vacía y no habilita OpenAPI por defecto.
 Las variables de PostgreSQL y Valkey están en las plantillas de `infra/`. Nunca
@@ -136,7 +138,23 @@ boundaries diferidos de elegibilidad y ZK.
 
 El padrón, las credenciales seudónimas y los snapshots congelados están separados del futuro
 boundary de voto. Consulte [`src/modules/eligibility/README.md`](src/modules/eligibility/README.md)
-para privacidad, provisioning, freeze atómico y el port criptográfico que completará la etapa 10.
+para privacidad, provisioning, freeze atómico y el árbol Poseidon V1.
+
+## Zero-knowledge
+
+`ZkModule` expone el port `VoteProofVerifier`; snarkjs permanece encapsulado en
+infraestructura. El registry solo carga la verification key trusted del paquete
+`@votaciones/zk-protocol` y valida su digest. Root, election context y encoding
+se verifican antes del pairing. Consulte
+[`src/modules/zk/README.md`](src/modules/zk/README.md).
+
+## Votación
+
+`POST /api/v1/elections/:electionId/votes` acepta un proof anónimo sin sesión. PostgreSQL revalida
+la configuración y ventana bajo lock, impone la unicidad del nullifier e inserta voto y evidencia
+atómicamente. Los retries lógicos recuperan el mismo receipt. Consulte
+[`src/modules/voting/README.md`](src/modules/voting/README.md) para atomicidad, privacidad, errores y
+límites operacionales.
 
 ## Tests y build
 

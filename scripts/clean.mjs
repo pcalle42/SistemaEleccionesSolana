@@ -2,7 +2,7 @@ import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const generatedDirectoryNames = new Set(['dist', 'build', 'coverage', '.cache', '.vite']);
-const workspaceRoots = ['apps', 'packages', 'zk'];
+const workspaceRoots = ['apps', 'packages'];
 
 async function removeGeneratedDirectories(root) {
   const { readdir } = await import('node:fs/promises');

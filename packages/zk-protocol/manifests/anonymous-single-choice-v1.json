@@ -1,0 +1,22 @@
+{
+  "$schema": "./protocol-manifest.schema.json",
+  "protocolVersion": "anonymous-single-choice-v1",
+  "circuitId": "AnonymousSingleChoiceVoteV1",
+  "circuitVersion": "1.0.0",
+  "provingSystem": "groth16",
+  "curve": "bn128",
+  "treeDepth": 20,
+  "commitmentSchemeVersion": "poseidon-bn254-v1",
+  "nullifierSchemeVersion": "poseidon-election-v1",
+  "voteEncodingVersion": "single-choice-index-v1",
+  "publicSignals": ["merkleRoot", "nullifier", "electionContext", "voteChoice", "optionCount"],
+  "environment": "DEVNET / NOT FOR PRODUCTION",
+  "artifactDigests": {
+    "powersOfTauSha256": "4604f7befd830cdcb12248c65a4d1ee886d1a95bdcb463573c70788de8f78460",
+    "r1csSha256": "098465c9bcab5eda909fb5b2993b08042671714ed103edb50117b077974e0c6b",
+    "setupTranscriptSha256": "b11c4594b4d5edb63ab4a27f834624502d39408170c60956c8d955bff2850c7c",
+    "wasmSha256": "6302410aa95c391cb2895e923a77095a2f89a95edbec7dda84da8bcf897d725d",
+    "zkeySha256": "0ec5be294b43109fae4d9c3d875ab93af2e1a87af81d8ffbe72859139f8ea61c",
+    "verificationKeySha256": "9ae0f83182a1492f69844091d20d493725f68a4aacf3f4880ed4e28f8a551a47"
+  }
+}

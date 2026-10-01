@@ -13,7 +13,11 @@
     "onlyBuiltDependencies": [
       "argon2",
       "esbuild"
-    ]
+    ],
+    "overrides": {
+      "underscore@<=1.13.7": "1.13.8",
+      "ws@>=8.0.0 <8.21.0": "8.21.0"
+    }
   },
   "scripts": {
     "admin:create": "pnpm --filter @votaciones/api admin:create",
@@ -50,6 +54,12 @@
     "typecheck": "pnpm build && pnpm --recursive --if-present typecheck",
     "valkey:health": "pnpm --filter @votaciones/api valkey:health",
     "valkey:verify:loss": "bash infra/scripts/verify-valkey-loss.sh local",
+    "zk:compile": "pnpm --filter @votaciones/zk-protocol zk:compile",
+    "zk:benchmark": "pnpm --filter @votaciones/zk-protocol zk:benchmark",
+    "zk:inspect": "pnpm --filter @votaciones/zk-protocol zk:inspect",
+    "zk:setup": "pnpm --filter @votaciones/zk-protocol zk:setup",
+    "zk:test": "pnpm --filter @votaciones/zk-protocol zk:test",
+    "zk:verify-artifacts": "pnpm --filter @votaciones/zk-protocol zk:verify-artifacts",
     "devnet:config": "bash infra/scripts/config.sh devnet",
     "devnet:down": "bash infra/scripts/down.sh devnet",
     "devnet:logs": "bash infra/scripts/logs.sh devnet",

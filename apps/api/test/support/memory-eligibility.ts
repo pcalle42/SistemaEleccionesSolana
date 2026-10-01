@@ -8,11 +8,6 @@ import type {
   EligibilityAuditContext,
   EligibleVoterRepository,
 } from '../../src/modules/eligibility/application/ports/eligible-voter-repository.port.js';
-import type {
-  MerkleArtifact,
-  MerkleBuildInput,
-  MerkleTreeBuilder,
-} from '../../src/modules/eligibility/application/ports/merkle-tree-builder.port.js';
 import { ElectoralCredential } from '../../src/modules/eligibility/domain/electoral-credential.js';
 import { EligibleVoter } from '../../src/modules/eligibility/domain/eligible-voter.js';
 import type {
@@ -22,23 +17,6 @@ import type {
 } from '../../src/modules/eligibility/domain/eligibility-id.js';
 import { EligibilityDomainError } from '../../src/modules/eligibility/domain/eligibility-errors.js';
 import { EligibilitySnapshot } from '../../src/modules/eligibility/domain/eligibility-snapshot.js';
-
-export class FixtureMerkleTreeBuilder implements MerkleTreeBuilder {
-  build(input: MerkleBuildInput): Promise<MerkleArtifact> {
-    const leafValues = input.identityCommitments.map((value) => `fixture-leaf:${value}`);
-    return Promise.resolve({
-      leafValues,
-      merkleRoot: `fixture-root:${input.schemeVersion}:${leafValues.join('|')}`,
-      treeDepth: Math.max(1, Math.ceil(Math.log2(leafValues.length))),
-    });
-  }
-
-  verify(schemeVersion: string, artifact: MerkleArtifact): Promise<boolean> {
-    return Promise.resolve(
-      artifact.merkleRoot === `fixture-root:${schemeVersion}:${artifact.leafValues.join('|')}`,
-    );
-  }
-}
 
 export class MemoryEligibleVoterRepository implements EligibleVoterRepository {
   private readonly entries = new Map<EligibleVoterId, EligibleVoter>();

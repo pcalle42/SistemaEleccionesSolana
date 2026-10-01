@@ -12,7 +12,7 @@ import {
   MERKLE_TREE_BUILDER,
 } from './eligibility.tokens.js';
 import { EligibilityController } from './http/eligibility.controller.js';
-import { DeferredMerkleTreeBuilder } from './infrastructure/merkle/deferred-merkle-tree-builder.js';
+import { PoseidonMerkleTreeBuilder } from './infrastructure/merkle/poseidon-merkle-tree-builder.js';
 import { DrizzleElectoralCredentialRepository } from './infrastructure/persistence/drizzle-electoral-credential.repository.js';
 import { DrizzleEligibilitySnapshotRepository } from './infrastructure/persistence/drizzle-eligibility-snapshot.repository.js';
 import { DrizzleEligibleVoterRepository } from './infrastructure/persistence/drizzle-eligible-voter.repository.js';
@@ -37,7 +37,7 @@ import { DrizzleEligibleVoterRepository } from './infrastructure/persistence/dri
       provide: ELIGIBILITY_SNAPSHOT_REPOSITORY,
       useFactory: (database: Database) => new DrizzleEligibilitySnapshotRepository(database),
     },
-    { provide: MERKLE_TREE_BUILDER, useClass: DeferredMerkleTreeBuilder },
+    { provide: MERKLE_TREE_BUILDER, useClass: PoseidonMerkleTreeBuilder },
     EligibilityService,
   ],
 })

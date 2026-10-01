@@ -1,0 +1,28 @@
+{
+  "protocolVersion": "anonymous-single-choice-v1",
+  "measuredAt": "2026-09-30T21:08:45.891Z",
+  "environment": {
+    "architecture": "arm64",
+    "node": "v22.22.2",
+    "operatingSystem": "darwin 27.0.0"
+  },
+  "circuit": {
+    "constraints": 5843,
+    "privateInputs": 41,
+    "publicInputs": 5,
+    "wires": 5864
+  },
+  "durationsMs": {
+    "proof": 741.33,
+    "verification": 15.1,
+    "witness": 41.4
+  },
+  "sizesBytes": {
+    "proofJson": 723,
+    "r1cs": 2808032,
+    "wasm": 2210634,
+    "zkey": 3649198
+  },
+  "peakRssBytes": 351076352,
+  "warning": "Single local development measurement; not a production SLA."
+}

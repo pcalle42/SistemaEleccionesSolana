@@ -1,4 +1,10 @@
 import { and, eq } from 'drizzle-orm';
+import {
+  CIRCUIT_VERSION_V1,
+  COMMITMENT_SCHEME_VERSION_V1,
+  PROTOCOL_VERSION_V1,
+  TREE_DEPTH_V1,
+} from '@votaciones/zk-protocol';
 
 import type { Database } from '../../../../database/client.js';
 import { eligibilitySnapshots } from '../../../../database/schema/eligibility.js';
@@ -19,7 +25,11 @@ export class DrizzleElectionReadinessVerifier implements ElectionReadinessVerifi
         : election.configurationVersion;
     const rows = reference
       ? await this.database
-          .select({ id: eligibilitySnapshots.id })
+          .select({
+            commitmentSchemeVersion: eligibilitySnapshots.commitmentSchemeVersion,
+            id: eligibilitySnapshots.id,
+            treeDepth: eligibilitySnapshots.treeDepth,
+          })
           .from(eligibilitySnapshots)
           .where(
             and(
@@ -32,10 +42,13 @@ export class DrizzleElectionReadinessVerifier implements ElectionReadinessVerifi
           .limit(1)
       : [];
     return {
-      eligibilityPrepared: rows.length === 1,
-      protocolCompatible: Boolean(
-        election.references.protocolVersion && election.references.circuitVersion,
-      ),
+      eligibilityPrepared:
+        rows.length === 1 &&
+        rows[0]!.commitmentSchemeVersion === COMMITMENT_SCHEME_VERSION_V1 &&
+        rows[0]!.treeDepth === TREE_DEPTH_V1,
+      protocolCompatible:
+        election.references.protocolVersion === PROTOCOL_VERSION_V1 &&
+        election.references.circuitVersion === CIRCUIT_VERSION_V1,
     };
   }
 }

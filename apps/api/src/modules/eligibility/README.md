@@ -7,7 +7,8 @@ una marca identificada `has_voted`.
 ## Custodia y privacidad
 
 - El backend nunca recibe ni persiste `voterSecret`.
-- `identityCommitment` es un valor opaco y versionado; no se deriva aquí desde PII ni passwords.
+- `identityCommitment` es un field element BN254 decimal canónico bajo
+  `poseidon-bn254-v1`; no se deriva aquí desde PII ni passwords.
 - El padrón conserva únicamente una referencia externa y un nombre de visualización opcionales.
 - Los miembros del snapshot son administrativos y no se publican en la API.
 - Los logs HTTP no serializan bodies y la redacción incluye secretos, material de recuperación,
@@ -31,10 +32,11 @@ conteos desde el rol runtime; un trigger impide modificar members fuera de `BUIL
 
 ## Boundary criptográfico
 
-La etapa 09 no elige hash, field, encoding, depth ni zero values. El adapter productivo
-`DeferredMerkleTreeBuilder` falla explícitamente con `ELIGIBILITY_CRYPTOGRAPHY_NOT_CONFIGURED`.
-La etapa 10 debe sustituirlo por el builder Circom/snarkjs versionado. Los builders deterministas
-presentes en tests son fixtures y nunca código productivo.
+`PoseidonMerkleTreeBuilder` implementa `poseidon-bn254-v1` usando el paquete
+compartido. Normaliza field elements, ordena numéricamente, rechaza duplicados y
+construye un árbol binario depth-20 con zero values versionados. `READY` exige
+un snapshot compatible con este scheme/depth y las versiones exactas del
+protocolo/circuito. Los builders simples de E2E siguen siendo fixtures aislados.
 
 ## API administrativa
 

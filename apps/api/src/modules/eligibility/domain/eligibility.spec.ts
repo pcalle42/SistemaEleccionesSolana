@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import { getTableColumns } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
+import { COMMITMENT_SCHEME_VERSION_V1 } from '@votaciones/zk-protocol';
 
 import {
   electoralCredentials,
@@ -20,7 +21,7 @@ import {
   newEligibleVoterId,
 } from './eligibility-id.js';
 import { EligibilitySnapshot } from './eligibility-snapshot.js';
-import { DeferredMerkleTreeBuilder } from '../infrastructure/merkle/deferred-merkle-tree-builder.js';
+import { PoseidonMerkleTreeBuilder } from '../infrastructure/merkle/poseidon-merkle-tree-builder.js';
 
 const clock: Clock = { now: () => new Date('2030-01-01T00:00:00.000Z') };
 
@@ -48,8 +49,8 @@ describe('eligibility domain', () => {
     const revoked = ElectoralCredential.createPending(
       newElectoralCredentialId(),
       voterId,
-      'opaque-commitment-1',
-      'scheme-v1',
+      '1',
+      COMMITMENT_SCHEME_VERSION_V1,
       clock,
     );
     expect(revoked.snapshot().status).toBe('PENDING');
@@ -60,8 +61,8 @@ describe('eligibility domain', () => {
     const rotated = ElectoralCredential.createPending(
       newElectoralCredentialId(),
       voterId,
-      'opaque-commitment-2',
-      'scheme-v1',
+      '2',
+      COMMITMENT_SCHEME_VERSION_V1,
       clock,
     );
     rotated.activate(clock);
@@ -137,10 +138,16 @@ describe('eligibility domain', () => {
     }
   });
 
-  it('does not invent Merkle cryptography before stage 10', async () => {
-    const builder = new DeferredMerkleTreeBuilder();
+  it('uses the protocol V1 Poseidon tree and rejects unsupported schemes', async () => {
+    const builder = new PoseidonMerkleTreeBuilder();
+    const artifact = await builder.build({
+      identityCommitments: ['2', '1'],
+      schemeVersion: COMMITMENT_SCHEME_VERSION_V1,
+    });
+    expect(artifact).toMatchObject({ leafValues: ['1', '2'], treeDepth: 20 });
+    await expect(builder.verify(COMMITMENT_SCHEME_VERSION_V1, artifact)).resolves.toBe(true);
     await expect(
-      builder.build({ identityCommitments: ['opaque-commitment'], schemeVersion: 'scheme-v1' }),
-    ).rejects.toMatchObject({ code: 'ELIGIBILITY_CRYPTOGRAPHY_NOT_CONFIGURED' });
+      builder.build({ identityCommitments: ['1'], schemeVersion: 'unsupported' }),
+    ).rejects.toMatchObject({ code: 'INVALID_IDENTITY_COMMITMENT' });
   });
 });

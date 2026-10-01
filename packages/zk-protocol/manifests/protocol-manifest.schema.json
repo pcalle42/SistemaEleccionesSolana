@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.invalid/schemas/zk-protocol-manifest-v1.json",
+  "title": "Votaciones ZK protocol manifest V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "protocolVersion",
+    "circuitId",
+    "circuitVersion",
+    "provingSystem",
+    "curve",
+    "treeDepth",
+    "commitmentSchemeVersion",
+    "nullifierSchemeVersion",
+    "voteEncodingVersion",
+    "publicSignals",
+    "environment",
+    "artifactDigests"
+  ],
+  "properties": {
+    "$schema": { "const": "./protocol-manifest.schema.json" },
+    "protocolVersion": { "const": "anonymous-single-choice-v1" },
+    "circuitId": { "const": "AnonymousSingleChoiceVoteV1" },
+    "circuitVersion": { "const": "1.0.0" },
+    "provingSystem": { "const": "groth16" },
+    "curve": { "const": "bn128" },
+    "treeDepth": { "const": 20 },
+    "commitmentSchemeVersion": { "const": "poseidon-bn254-v1" },
+    "nullifierSchemeVersion": { "const": "poseidon-election-v1" },
+    "voteEncodingVersion": { "const": "single-choice-index-v1" },
+    "publicSignals": {
+      "const": ["merkleRoot", "nullifier", "electionContext", "voteChoice", "optionCount"]
+    },
+    "environment": { "const": "DEVNET / NOT FOR PRODUCTION" },
+    "artifactDigests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "powersOfTauSha256",
+        "r1csSha256",
+        "setupTranscriptSha256",
+        "wasmSha256",
+        "zkeySha256",
+        "verificationKeySha256"
+      ],
+      "properties": {
+        "powersOfTauSha256": { "$ref": "#/$defs/sha256" },
+        "r1csSha256": { "$ref": "#/$defs/sha256" },
+        "setupTranscriptSha256": { "$ref": "#/$defs/sha256" },
+        "wasmSha256": { "$ref": "#/$defs/sha256" },
+        "zkeySha256": { "$ref": "#/$defs/sha256" },
+        "verificationKeySha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

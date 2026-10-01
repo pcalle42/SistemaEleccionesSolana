@@ -4,6 +4,21 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from 'nestjs-pino';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import {
+  buildMerkleTreeV1,
+  CIRCUIT_ID_V1,
+  CIRCUIT_VERSION_V1,
+  COMMITMENT_SCHEME_VERSION_V1,
+  deriveElectionContextV1,
+  deriveIdentityCommitmentV1,
+  deriveNullifierV1,
+  NULLIFIER_SCHEME_VERSION_V1,
+  PROTOCOL_VERSION_V1,
+  protocolArtifactLocationsV1,
+  TREE_DEPTH_V1,
+  VOTE_ENCODING_VERSION_V1,
+} from '@votaciones/zk-protocol';
+import { groth16 } from 'snarkjs';
 
 import { AppModule } from '../src/app.module.js';
 import { configureApplication } from '../src/bootstrap.js';
@@ -35,12 +50,14 @@ import {
   ELIGIBLE_VOTER_REPOSITORY,
   MERKLE_TREE_BUILDER,
 } from '../src/modules/eligibility/eligibility.tokens.js';
+import { PoseidonMerkleTreeBuilder } from '../src/modules/eligibility/infrastructure/merkle/poseidon-merkle-tree-builder.js';
+import type { VoteProofVerifier } from '../src/modules/zk/application/ports/vote-proof-verifier.port.js';
+import { VOTE_PROOF_VERIFIER } from '../src/modules/zk/zk.tokens.js';
 import { ValkeyKeyFactory } from '../src/valkey/key-factory.js';
 import { ValkeyLifecycleService } from '../src/valkey/valkey-lifecycle.service.js';
 import { MemoryValkey } from './support/memory-valkey.js';
 import { MemoryElectionRepository } from './support/memory-election-repository.js';
 import {
-  FixtureMerkleTreeBuilder,
   MemoryElectionReadinessVerifier,
   MemoryElectoralCredentialRepository,
   MemoryEligibilitySnapshotRepository,
@@ -105,7 +122,7 @@ const electionClock: Clock = { now: () => new Date('2030-01-01T12:00:00.000Z') }
 const voterRepository = new MemoryEligibleVoterRepository();
 const credentialRepository = new MemoryElectoralCredentialRepository();
 const snapshotRepository = new MemoryEligibilitySnapshotRepository(electionRepository);
-const merkleBuilder = new FixtureMerkleTreeBuilder();
+const merkleBuilder = new PoseidonMerkleTreeBuilder();
 const electionReadiness = new MemoryElectionReadinessVerifier(snapshotRepository);
 const databaseLifecycle = {
   health: vi.fn(),
@@ -288,6 +305,12 @@ describe('administrative authentication HTTP flow', () => {
   });
 
   it('enforces the administrative election lifecycle and frozen configuration', async () => {
+    const firstSecret = '111111111111111111111111111111111111111';
+    const secondSecret = '222222222222222222222222222222222222222';
+    const thirdSecret = '333333333333333333333333333333333333333';
+    const firstCommitment = await deriveIdentityCommitmentV1(firstSecret);
+    const secondCommitment = await deriveIdentityCommitmentV1(secondSecret);
+    const thirdCommitment = await deriveIdentityCommitmentV1(thirdSecret);
     const login = await request(httpServer)
       .post('/api/v1/admin/auth/login')
       .send({ password: 'correct-password-value', username: 'administrator' })
@@ -317,12 +340,12 @@ describe('administrative authentication HTTP flow', () => {
       .patch(`/api/v1/admin/elections/${electionId}`)
       .set(mutation())
       .send({
-        circuitVersion: 'circuit-v1',
+        circuitVersion: CIRCUIT_VERSION_V1,
         options: [
           { displayOrder: 0, label: 'Option A' },
           { displayOrder: 1, label: 'Option B' },
         ],
-        protocolVersion: 'protocol-v1',
+        protocolVersion: PROTOCOL_VERSION_V1,
       })
       .expect(200);
     expect((configured.body as { options: unknown[] }).options).toHaveLength(2);
@@ -376,8 +399,8 @@ describe('administrative authentication HTTP flow', () => {
       .set(mutation())
       .send({
         eligibleVoterId: firstVoterId,
-        identityCommitment: 'commitment-a',
-        schemeVersion: 'scheme-v1',
+        identityCommitment: firstCommitment,
+        schemeVersion: COMMITMENT_SCHEME_VERSION_V1,
       })
       .expect(201);
     await request(httpServer)
@@ -385,8 +408,8 @@ describe('administrative authentication HTTP flow', () => {
       .set(mutation())
       .send({
         eligibleVoterId: secondVoterId,
-        identityCommitment: 'commitment-a',
-        schemeVersion: 'scheme-v1',
+        identityCommitment: firstCommitment,
+        schemeVersion: COMMITMENT_SCHEME_VERSION_V1,
       })
       .expect(409);
     await request(httpServer)
@@ -394,8 +417,8 @@ describe('administrative authentication HTTP flow', () => {
       .set(mutation())
       .send({
         eligibleVoterId: secondVoterId,
-        identityCommitment: 'commitment-b',
-        schemeVersion: 'scheme-v1',
+        identityCommitment: secondCommitment,
+        schemeVersion: COMMITMENT_SCHEME_VERSION_V1,
       })
       .expect(201);
 
@@ -416,6 +439,54 @@ describe('administrative authentication HTTP flow', () => {
       .set(mutation())
       .expect(200);
     expect(ready.body).toMatchObject({ configurationVersion: 1, status: 'READY' });
+
+    const tree = await buildMerkleTreeV1([firstCommitment, secondCommitment]);
+    expect((built.body as { merkleRoot: string }).merkleRoot).toBe(tree.root);
+    const options = (configured.body as { options: { id: string }[] }).options;
+    const electionContext = deriveElectionContextV1({
+      circuitId: CIRCUIT_ID_V1,
+      circuitVersion: CIRCUIT_VERSION_V1,
+      commitmentSchemeVersion: COMMITMENT_SCHEME_VERSION_V1,
+      configurationVersion: 1,
+      electionId,
+      nullifierSchemeVersion: NULLIFIER_SCHEME_VERSION_V1,
+      options: options.map((option, index) => ({ id: option.id, index })),
+      protocolVersion: PROTOCOL_VERSION_V1,
+      treeDepth: TREE_DEPTH_V1,
+      voteEncodingVersion: VOTE_ENCODING_VERSION_V1,
+    });
+    const membership = tree.proof(tree.leaves.indexOf(firstCommitment));
+    const artifacts = protocolArtifactLocationsV1();
+    const proofResult = await groth16.fullProve(
+      {
+        electionContext,
+        merklePathElements: [...membership.pathElements],
+        merklePathIndices: [...membership.pathIndices],
+        merkleRoot: tree.root,
+        nullifier: await deriveNullifierV1(firstSecret, electionContext),
+        optionCount: options.length,
+        voteChoice: 0,
+        voterSecret: firstSecret,
+      },
+      artifacts.wasm.pathname,
+      artifacts.zkey.pathname,
+    );
+    const proofVerifier = app.get<VoteProofVerifier>(VOTE_PROOF_VERIFIER);
+    await expect(
+      proofVerifier.verify(
+        {
+          proof: proofResult.proof,
+          protocolVersion: PROTOCOL_VERSION_V1,
+          publicSignals: proofResult.publicSignals,
+        },
+        {
+          circuitVersion: CIRCUIT_VERSION_V1,
+          electionContext,
+          merkleRoot: tree.root,
+          optionCount: options.length,
+        },
+      ),
+    ).resolves.toMatchObject({ publicSignals: { voteChoice: 0 } });
 
     await request(httpServer)
       .patch(`/api/v1/admin/elections/${electionId}`)
@@ -449,8 +520,8 @@ describe('administrative authentication HTTP flow', () => {
       .set(mutation())
       .send({
         eligibleVoterId: (thirdVoter.body as { id: string }).id,
-        identityCommitment: 'commitment-c',
-        schemeVersion: 'scheme-v1',
+        identityCommitment: thirdCommitment,
+        schemeVersion: COMMITMENT_SCHEME_VERSION_V1,
       })
       .expect(201);
     const rebuilt = await request(httpServer)

@@ -29,6 +29,20 @@
       "when": 1790787551392,
       "tag": "0003_glorious_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790865338712,
+      "tag": "0004_fat_warbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790869000000,
+      "tag": "0005_immutable_votes",
+      "breakpoints": true
     }
   ]
 }

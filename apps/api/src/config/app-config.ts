@@ -42,6 +42,11 @@ export interface AppConfig {
     readonly path: string;
   };
   readonly valkey: ValkeyConfig;
+  readonly voting: {
+    readonly maximumConcurrentProofs: number;
+    readonly rateLimitMaximum: number;
+    readonly rateLimitWindowSeconds: number;
+  };
 }
 
 const environments = new Set<RuntimeEnvironment>(['local', 'test', 'devnet', 'production']);
@@ -202,5 +207,10 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
       path: 'docs',
     }),
     valkey: getValkeyConfig(environment),
+    voting: Object.freeze({
+      maximumConcurrentProofs: integer(environment, 'VOTE_MAXIMUM_CONCURRENT_PROOFS', 2, 1, 32),
+      rateLimitMaximum: integer(environment, 'VOTE_RATE_LIMIT_MAXIMUM', 30, 1, 1_000),
+      rateLimitWindowSeconds: integer(environment, 'VOTE_RATE_LIMIT_WINDOW_SECONDS', 60, 1, 3_600),
+    }),
   });
 }

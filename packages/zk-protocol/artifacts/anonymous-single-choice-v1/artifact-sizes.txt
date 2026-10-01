@@ -1,0 +1,3 @@
+ 2808032 anonymous-single-choice-v1.r1cs
+ 2210634 anonymous-single-choice-v1.wasm
+ 5018666 total

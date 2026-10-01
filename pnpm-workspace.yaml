@@ -1,7 +1,6 @@
 packages:
   - apps/*
   - packages/*
-  - zk
 
 catalog:
   '@types/node': 22.20.1

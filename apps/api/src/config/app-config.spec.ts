@@ -15,6 +15,11 @@ describe('application configuration', () => {
       http: { bodyLimitBytes: 262_144, host: '127.0.0.1', port: 3_000 },
       logging: { level: 'silent', service: 'votaciones-api' },
       openApi: { enabled: false, path: 'docs' },
+      voting: {
+        maximumConcurrentProofs: 2,
+        rateLimitMaximum: 30,
+        rateLimitWindowSeconds: 60,
+      },
     });
   });
 
@@ -52,6 +57,15 @@ describe('application configuration', () => {
     ).toThrow('must exceed');
     expect(() => getAppConfig({ ...validEnvironment, ADMIN_ARGON2_MEMORY_KIB: '1024' })).toThrow(
       'ADMIN_ARGON2_MEMORY_KIB',
+    );
+  });
+
+  it('validates public voting operational limits', () => {
+    expect(() =>
+      getAppConfig({ ...validEnvironment, VOTE_MAXIMUM_CONCURRENT_PROOFS: '0' }),
+    ).toThrow('VOTE_MAXIMUM_CONCURRENT_PROOFS');
+    expect(() => getAppConfig({ ...validEnvironment, VOTE_RATE_LIMIT_MAXIMUM: '0' })).toThrow(
+      'VOTE_RATE_LIMIT_MAXIMUM',
     );
   });
 });

@@ -32,12 +32,13 @@ temp/
 *keypair*.json
 
 # Zero-knowledge private or generated artifacts
-zk/artifacts/*
-!zk/artifacts/README.md
+packages/zk-protocol/.cache/
 **/*.wtns
 **/*.proof.json
 **/*.zkey
 **/pot*.ptau
+!packages/zk-protocol/artifacts/anonymous-single-choice-v1/devnet-final.zkey
+!packages/zk-protocol/artifacts/anonymous-single-choice-v1/devnet-pot14-final.ptau
 
 # Rust, Solana, and Anchor local output
 target/

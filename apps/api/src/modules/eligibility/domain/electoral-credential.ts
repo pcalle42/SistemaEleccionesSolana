@@ -18,20 +18,24 @@ export interface ElectoralCredentialState {
 }
 
 function validateOpaqueCommitment(value: string): string {
-  const normalized = value.trim();
-  if (normalized.length === 0 || normalized.length > 256 || /\s/u.test(normalized)) {
+  try {
+    return encodeFieldElement(parseFieldElement(value, 'identityCommitment'));
+  } catch (error: unknown) {
+    if (!(error instanceof ZkProtocolError)) throw error;
     throw new EligibilityDomainError(
       'INVALID_IDENTITY_COMMITMENT',
-      'Identity commitment must be an opaque, non-empty value.',
+      'Identity commitment must be a canonical BN254 field element.',
     );
   }
-  return normalized;
 }
 
 function validateSchemeVersion(value: string): string {
   const normalized = value.trim();
-  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/u.test(normalized)) {
-    throw new EligibilityDomainError('INVALID_IDENTITY_COMMITMENT', 'Scheme version is invalid.');
+  if (normalized !== COMMITMENT_SCHEME_VERSION_V1) {
+    throw new EligibilityDomainError(
+      'INVALID_IDENTITY_COMMITMENT',
+      'Identity commitment scheme is unsupported.',
+    );
   }
   return normalized;
 }
@@ -101,3 +105,9 @@ export class ElectoralCredential {
     this.state = { ...this.state, revokedAt: new Date(clock.now()), status: 'ROTATED' };
   }
 }
+import {
+  COMMITMENT_SCHEME_VERSION_V1,
+  encodeFieldElement,
+  parseFieldElement,
+  ZkProtocolError,
+} from '@votaciones/zk-protocol';

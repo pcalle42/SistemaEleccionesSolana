@@ -1,0 +1,19 @@
+{
+  "environment": "DEVNET / NOT FOR PRODUCTION",
+  "setupPolicy": "single-party development setup; operating-system CSPRNG mixed with public labels",
+  "circom": {
+    "version": "2.2.3",
+    "linuxAmd64Sha256": "85342c7ff332d948df7c0c50ecf201e6129349aef550ce873f3c811b79fe53a3"
+  },
+  "snarkjs": "0.7.6",
+  "circomlib": "2.0.5",
+  "powersOfTau": {
+    "curve": "bn128",
+    "power": 14,
+    "sha256": "4604f7befd830cdcb12248c65a4d1ee886d1a95bdcb463573c70788de8f78460"
+  },
+  "phase2": {
+    "circuitR1csSha256": "098465c9bcab5eda909fb5b2993b08042671714ed103edb50117b077974e0c6b",
+    "finalZkeySha256": "0ec5be294b43109fae4d9c3d875ab93af2e1a87af81d8ffbe72859139f8ea61c"
+  }
+}

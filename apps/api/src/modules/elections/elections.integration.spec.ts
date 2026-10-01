@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { CIRCUIT_VERSION_V1, PROTOCOL_VERSION_V1 } from '@votaciones/zk-protocol';
 
 import { createDatabase } from '../../database/client.js';
 import { createDatabasePool } from '../../database/pool.js';
@@ -27,9 +28,9 @@ function aggregate(): Election {
         { displayOrder: 1, id: electionOptionId(randomUUID()), label: 'Option B' },
       ],
       references: {
-        circuitVersion: 'circuit-v1',
+        circuitVersion: CIRCUIT_VERSION_V1,
         eligibilityConfigurationRef: 'eligibility-v1',
-        protocolVersion: 'protocol-v1',
+        protocolVersion: PROTOCOL_VERSION_V1,
       },
       title: 'Integration election',
     },
@@ -38,6 +39,8 @@ function aggregate(): Election {
 }
 
 beforeAll(async () => {
+  await migrationPool.query('DELETE FROM voting.vote_proof_evidence');
+  await migrationPool.query('DELETE FROM voting.accepted_votes');
   await migrationPool.query('DELETE FROM election.election_state_event');
   await migrationPool.query('DELETE FROM election.election_configuration_versions');
   await migrationPool.query('DELETE FROM election.election_options');
@@ -52,6 +55,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await migrationPool.query('DELETE FROM voting.vote_proof_evidence');
+  await migrationPool.query('DELETE FROM voting.accepted_votes');
   await migrationPool.query('DELETE FROM election.election_state_event');
   await migrationPool.query('DELETE FROM election.election_configuration_versions');
   await migrationPool.query('DELETE FROM election.election_options');
@@ -104,15 +109,32 @@ describe('Drizzle election repository', () => {
       'second-ready-request',
     );
 
-    const versionRows = await migrationPool.query(
-      'SELECT version FROM election.election_configuration_versions WHERE election_id = $1 ORDER BY version',
+    const versionRows = await migrationPool.query<{
+      cryptographicConfiguration: { electionContext: string; optionMapping: unknown[] };
+      version: number;
+    }>(
+      `SELECT version,
+              snapshot->'cryptographicConfiguration' AS "cryptographicConfiguration"
+       FROM election.election_configuration_versions
+       WHERE election_id = $1 ORDER BY version`,
       [election.snapshot().id],
     );
     const eventRows = await migrationPool.query(
       'SELECT previous_state, new_state FROM election.election_state_event WHERE election_id = $1',
       [election.snapshot().id],
     );
-    expect(versionRows.rows).toEqual([{ version: 1 }, { version: 2 }]);
+    expect(versionRows.rows.map(({ version }) => ({ version }))).toEqual([
+      { version: 1 },
+      { version: 2 },
+    ]);
+    expect(versionRows.rows[0]?.cryptographicConfiguration.optionMapping).toEqual([
+      expect.objectContaining({ index: 0 }),
+      expect.objectContaining({ index: 1 }),
+    ]);
+    expect(versionRows.rows[0]?.cryptographicConfiguration.electionContext).toMatch(/^[0-9]+$/u);
+    expect(versionRows.rows[1]?.cryptographicConfiguration.electionContext).not.toBe(
+      versionRows.rows[0]?.cryptographicConfiguration.electionContext,
+    );
     expect(eventRows.rows).toHaveLength(3);
     expect(eventRows.rows).toEqual(
       expect.arrayContaining([

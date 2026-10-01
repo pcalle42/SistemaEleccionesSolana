@@ -257,6 +257,12 @@ export class EligibilityService {
         (credential) => credential.snapshot().identityCommitment,
       );
       const artifact = await this.merkle.build({ identityCommitments, schemeVersion });
+      const credentialByCommitment = new Map(
+        activeCredentials.map((credential) => [
+          credential.snapshot().identityCommitment,
+          credential.snapshot().id,
+        ]),
+      );
       const electionState = election.snapshot();
       const snapshot = await this.snapshots.createForElection(
         electionState.id,
@@ -271,7 +277,7 @@ export class EligibilityService {
               id: newEligibilitySnapshotId(),
               leafCount: artifact.leafValues.length,
               members: artifact.leafValues.map((leafValue, leafIndex) => ({
-                credentialId: activeCredentials[leafIndex]!.snapshot().id,
+                credentialId: credentialByCommitment.get(leafValue)!,
                 leafIndex,
                 leafValue,
               })),

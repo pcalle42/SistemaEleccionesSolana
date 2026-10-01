@@ -4,4 +4,4 @@ build
 coverage
 pnpm-lock.yaml
 docs/**/*.md
-zk/artifacts
+packages/zk-protocol/artifacts

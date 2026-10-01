@@ -1,6 +1,7 @@
 import { RequestMethod, ValidationPipe, type INestApplication } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { json } from 'express';
 import type { Server } from 'node:http';
 import { Logger } from 'nestjs-pino';
 
@@ -30,6 +31,7 @@ export function configureApplication(app: NestExpressApplication, config: AppCon
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     origin: [...config.http.corsOrigins],
   });
+  app.use('/api/v1/elections/:electionId/votes', json({ limit: 64 * 1024, strict: true }));
   app.useBodyParser('json', { limit: config.http.bodyLimitBytes, strict: true });
   app.useBodyParser('urlencoded', {
     extended: false,

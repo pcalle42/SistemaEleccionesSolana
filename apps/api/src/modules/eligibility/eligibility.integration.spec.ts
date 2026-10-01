@@ -1,6 +1,11 @@
 import { randomUUID } from 'node:crypto';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import {
+  CIRCUIT_VERSION_V1,
+  COMMITMENT_SCHEME_VERSION_V1,
+  PROTOCOL_VERSION_V1,
+} from '@votaciones/zk-protocol';
 
 import { createDatabase } from '../../database/client.js';
 import { createDatabasePool } from '../../database/pool.js';
@@ -34,6 +39,8 @@ const clock: Clock = { now: () => new Date('2030-01-01T12:00:00.000Z') };
 const audit = { actorAdminId: adminId, requestId: 'eligibility-integration' };
 
 async function clearEligibilityData(): Promise<void> {
+  await migrationPool.query('DELETE FROM voting.vote_proof_evidence');
+  await migrationPool.query('DELETE FROM voting.accepted_votes');
   await migrationPool.query('DELETE FROM audit.eligibility_event');
   await migrationPool.query("UPDATE eligibility.eligibility_snapshots SET status = 'BUILDING'");
   await migrationPool.query('DELETE FROM eligibility.eligibility_snapshot_members');
@@ -52,7 +59,7 @@ async function createElection(): Promise<Election> {
       closesAt: new Date('2030-01-01T13:00:00.000Z'),
       id: electionId(randomUUID()),
       opensAt: new Date('2030-01-01T11:00:00.000Z'),
-      references: { circuitVersion: 'circuit-v1', protocolVersion: 'protocol-v1' },
+      references: { circuitVersion: CIRCUIT_VERSION_V1, protocolVersion: PROTOCOL_VERSION_V1 },
       title: 'Eligibility integration election',
     },
     clock,
@@ -68,7 +75,7 @@ async function createActiveCredential(reference: string, commitment: string) {
     newElectoralCredentialId(),
     voter.snapshot().id,
     commitment,
-    'scheme-v1',
+    COMMITMENT_SCHEME_VERSION_V1,
     clock,
   );
   credential.activate(clock);
@@ -84,7 +91,7 @@ function snapshotFactory(
   return (version: number) =>
     EligibilitySnapshot.build(
       {
-        commitmentSchemeVersion: 'scheme-v1',
+        commitmentSchemeVersion: COMMITMENT_SCHEME_VERSION_V1,
         configurationVersion: election.snapshot().configurationVersion + 1,
         electionId: election.snapshot().id,
         id: newEligibilitySnapshotId(),
@@ -95,7 +102,7 @@ function snapshotFactory(
           leafValue,
         })),
         merkleRoot: `fixture-root-${leafValues.join('-')}`,
-        treeDepth: 2,
+        treeDepth: 20,
         version,
       },
       clock,
@@ -122,15 +129,12 @@ afterAll(async () => {
 
 describe('eligibility PostgreSQL persistence', () => {
   it('rotates credentials while preserving exactly one active credential per voter', async () => {
-    const { credential: first, voter } = await createActiveCredential(
-      'ROTATE-001',
-      'commitment-old',
-    );
+    const { credential: first, voter } = await createActiveCredential('ROTATE-001', '101');
     const replacement = ElectoralCredential.createPending(
       newElectoralCredentialId(),
       voter.snapshot().id,
-      'commitment-new',
-      'scheme-v1',
+      '102',
+      COMMITMENT_SCHEME_VERSION_V1,
       clock,
     );
     replacement.activate(clock);
@@ -144,8 +148,8 @@ describe('eligibility PostgreSQL persistence', () => {
 
   it('builds, links, freezes, and makes a compatible snapshot authoritative for readiness', async () => {
     const election = await createElection();
-    const first = await createActiveCredential('SNAPSHOT-001', 'commitment-a');
-    const second = await createActiveCredential('SNAPSHOT-002', 'commitment-b');
+    const first = await createActiveCredential('SNAPSHOT-001', '201');
+    const second = await createActiveCredential('SNAPSHOT-002', '202');
     const created = await snapshots.createForElection(
       election.snapshot().id,
       1,
@@ -195,7 +199,7 @@ describe('eligibility PostgreSQL persistence', () => {
 
   it('rejects stale concurrent snapshot builds and rolls back mandatory audit failure', async () => {
     const election = await createElection();
-    const entry = await createActiveCredential('CONCURRENT-001', 'commitment-concurrent');
+    const entry = await createActiveCredential('CONCURRENT-001', '301');
     const factory = snapshotFactory(
       election,
       [entry.credential.snapshot().id],
@@ -221,7 +225,7 @@ describe('eligibility PostgreSQL persistence', () => {
 
   it('versions replacement builds and audits the superseded snapshot', async () => {
     const election = await createElection();
-    const entry = await createActiveCredential('VERSION-001', 'commitment-versioned');
+    const entry = await createActiveCredential('VERSION-001', '401');
     const factory = snapshotFactory(election, [entry.credential.snapshot().id], ['leaf-versioned']);
     const first = await snapshots.createForElection(election.snapshot().id, 1, 0, factory, audit);
     const linked = await elections.findById(election.snapshot().id);

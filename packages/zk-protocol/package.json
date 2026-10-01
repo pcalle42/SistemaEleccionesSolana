@@ -1,0 +1,41 @@
+{
+  "name": "@votaciones/zk-protocol",
+  "version": "1.0.0-devnet.1",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-static.mjs",
+    "pretest": "pnpm build && pnpm zk:verify-artifacts",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "zk:compile": "bash scripts/compile.sh",
+    "zk:benchmark": "node scripts/benchmark.mjs",
+    "zk:inspect": "bash scripts/inspect.sh",
+    "zk:setup": "bash scripts/setup-devnet.sh",
+    "zk:test": "bash scripts/test-zk.sh",
+    "zk:verify-artifacts": "node scripts/verify-artifacts.mjs"
+  },
+  "dependencies": {
+    "@noble/hashes": "2.4.0",
+    "circomlibjs": "0.1.7"
+  },
+  "devDependencies": {
+    "@types/circomlibjs": "0.1.6",
+    "@types/node": "catalog:",
+    "@types/snarkjs": "0.7.9",
+    "@votaciones/config-typescript": "workspace:*",
+    "circomlib": "2.0.5",
+    "prettier": "3.9.6",
+    "snarkjs": "0.7.6",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

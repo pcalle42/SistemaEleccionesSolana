@@ -3,9 +3,9 @@
 Monorepo en construcción para una plataforma electoral verificable con
 separación entre identidad y voto.
 
-> Estado: infraestructura local/devnet, plataforma backend NestJS y autenticación
-> administrativa inicial con PostgreSQL y Valkey. Todavía no existe un flujo
-> electoral funcional ni este repositorio debe utilizarse en producción.
+> Estado: infraestructura local/devnet, backend electoral, elegibilidad,
+> protocolo ZK Groth16 V1 y aceptación atómica de votos anónimos. Los artifacts
+> ZK actuales son de devnet y este repositorio no debe utilizarse en producción.
 
 ## Requisitos
 
@@ -13,8 +13,8 @@ separación entre identidad y voto.
 - pnpm 10.9.0
 - Git
 
-Docker es necesario para ejecutar la infraestructura. Circom y Solana se
-incorporarán y documentarán en sus etapas correspondientes.
+Docker es necesario para la infraestructura y para compilar Circom de forma
+reproducible. Solana se incorporará en sus etapas posteriores.
 
 ## Instalación
 
@@ -53,7 +53,7 @@ pnpm db:migrate
 pnpm api:dev
 ```
 
-Expone liveness/readiness y OpenAPI; todavía no expone operaciones electorales.
+Expone liveness/readiness, OpenAPI, operaciones administrativas y el endpoint público de voto.
 Consulte [`apps/api/README.md`](apps/api/README.md) para configuración, contratos,
 tests y troubleshooting.
 
@@ -111,7 +111,7 @@ namespaces, TTLs y políticas ante indisponibilidad.
 
 - `apps/`: procesos desplegables futuros: API, administración y votación.
 - `packages/`: configuración y código estrictamente compartido.
-- `zk/`: circuitos, scripts, artefactos y pruebas ZK.
+- `packages/zk-protocol/`: protocolo, circuito, scripts, artefactos y pruebas ZK.
 - `infra/`: infraestructura de local y devnet.
 - `tests/`: escenarios transversales y fixtures ficticios.
 - `docs/`: arquitectura, construcción, seguridad, operación y ADRs.
@@ -128,6 +128,30 @@ namespaces, TTLs y políticas ante indisponibilidad.
 8. [`docs/07-autenticacion-administrativa.md`](docs/07-autenticacion-administrativa.md)
 9. [`docs/08-dominio-electoral.md`](docs/08-dominio-electoral.md)
 10. [`docs/09-elegibilidad-identidad-electoral.md`](docs/09-elegibilidad-identidad-electoral.md)
+11. [`docs/10-zk-circom-snarkjs.md`](docs/10-zk-circom-snarkjs.md)
+12. [`docs/11-protocolo-voto-nullifier-atomicidad.md`](docs/11-protocolo-voto-nullifier-atomicidad.md)
+
+## Zero-knowledge
+
+El protocolo `anonymous-single-choice-v1` usa Groth16/BN254, Poseidon y un árbol
+depth-20. Los artefactos actuales son exclusivamente de devnet y proceden de un
+setup de una sola parte.
+
+```bash
+pnpm zk:verify-artifacts
+pnpm --filter @votaciones/zk-protocol test
+pnpm zk:benchmark
+```
+
+Consulte [`packages/zk-protocol/README.md`](packages/zk-protocol/README.md) para
+el protocolo, privacidad, build y trusted setup.
+
+## Votación anónima
+
+La aceptación de voto combina el proof con el contexto congelado, la ventana autoritativa de
+PostgreSQL y un `INSERT` con nullifier único. Voto y evidencia hacen commit atómico; un retry
+equivalente recupera el mismo receipt. Consulte
+[`apps/api/src/modules/voting/README.md`](apps/api/src/modules/voting/README.md).
 
 ## Seguridad
 

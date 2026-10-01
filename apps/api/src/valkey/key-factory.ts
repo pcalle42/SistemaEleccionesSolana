@@ -44,6 +44,10 @@ export class ValkeyKeyFactory {
     return this.#key('cache', 'election-public', segment(electionId, 'election ID'));
   }
 
+  publicVoteRateNetwork(subjectDigest: string): ValkeyKey {
+    return this.#key('voting', 'rate-network', validatedSubjectDigest(subjectDigest));
+  }
+
   temporaryChallenge(challengeId: string): ValkeyKey {
     return this.#key('challenge', 'temporary', segment(challengeId, 'challenge ID'));
   }

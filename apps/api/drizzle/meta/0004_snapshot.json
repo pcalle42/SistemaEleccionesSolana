@@ -1,0 +1,1549 @@
+{
+  "id": "4a49448a-7c57-450f-a0db-397df1636da2",
+  "prevId": "03f644d9-2764-4cb2-b83b-f8f9595344fc",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "voting.accepted_votes": {
+      "name": "accepted_votes",
+      "schema": "voting",
+      "columns": {
+        "accepted_at": {
+          "name": "accepted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "circuit_version": {
+          "name": "circuit_version",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "configuration_version": {
+          "name": "configuration_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "election_id": {
+          "name": "election_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nullifier": {
+          "name": "nullifier",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protocol_version": {
+          "name": "protocol_version",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receipt_commitment": {
+          "name": "receipt_commitment",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receipt_version": {
+          "name": "receipt_version",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submission_fingerprint": {
+          "name": "submission_fingerprint",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vote_encoding": {
+          "name": "vote_encoding",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "accepted_votes_election_protocol_nullifier_unique": {
+          "name": "accepted_votes_election_protocol_nullifier_unique",
+          "columns": [
+            {
+              "expression": "election_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "protocol_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "nullifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "accepted_votes_election_configuration_idx": {
+          "name": "accepted_votes_election_configuration_idx",
+          "columns": [
+            {
+              "expression": "election_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "configuration_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "accepted_votes_election_id_elections_id_fk": {
+          "name": "accepted_votes_election_id_elections_id_fk",
+          "tableFrom": "accepted_votes",
+          "tableTo": "elections",
+          "schemaTo": "election",
+          "columnsFrom": ["election_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "accepted_votes_configuration_version_check": {
+          "name": "accepted_votes_configuration_version_check",
+          "value": "\"voting\".\"accepted_votes\".\"configuration_version\" > 0"
+        },
+        "accepted_votes_vote_encoding_check": {
+          "name": "accepted_votes_vote_encoding_check",
+          "value": "\"voting\".\"accepted_votes\".\"vote_encoding\" >= 0"
+        },
+        "accepted_votes_nullifier_canonical_check": {
+          "name": "accepted_votes_nullifier_canonical_check",
+          "value": "\"voting\".\"accepted_votes\".\"nullifier\" ~ '^(0|[1-9][0-9]{0,76})$'"
+        },
+        "accepted_votes_submission_fingerprint_check": {
+          "name": "accepted_votes_submission_fingerprint_check",
+          "value": "\"voting\".\"accepted_votes\".\"submission_fingerprint\" ~ '^[0-9a-f]{64}$'"
+        },
+        "accepted_votes_receipt_commitment_check": {
+          "name": "accepted_votes_receipt_commitment_check",
+          "value": "\"voting\".\"accepted_votes\".\"receipt_commitment\" ~ '^[0-9a-f]{64}$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "admin.admin_account": {
+      "name": "admin_account",
+      "schema": "admin",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "password_changed_at": {
+          "name": "password_changed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "singleton_key": {
+          "name": "singleton_key",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "admin_account_singleton_key_unique": {
+          "name": "admin_account_singleton_key_unique",
+          "columns": [
+            {
+              "expression": "singleton_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "admin_account_username_unique": {
+          "name": "admin_account_username_unique",
+          "columns": [
+            {
+              "expression": "username",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "admin_account_singleton_key_check": {
+          "name": "admin_account_singleton_key_check",
+          "value": "\"admin\".\"admin_account\".\"singleton_key\" = true"
+        },
+        "admin_account_status_check": {
+          "name": "admin_account_status_check",
+          "value": "\"admin\".\"admin_account\".\"status\" IN ('active', 'inactive')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "audit.admin_auth_event": {
+      "name": "admin_auth_event",
+      "schema": "audit",
+      "columns": {
+        "admin_id": {
+          "name": "admin_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "event": {
+          "name": "event",
+          "type": "varchar(48)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "outcome": {
+          "name": "outcome",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "admin_auth_event_admin_time_idx": {
+          "name": "admin_auth_event_admin_time_idx",
+          "columns": [
+            {
+              "expression": "admin_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "occurred_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "admin_auth_event_event_time_idx": {
+          "name": "admin_auth_event_event_time_idx",
+          "columns": [
+            {
+              "expression": "event",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "occurred_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "admin_auth_event_admin_id_admin_account_id_fk": {
+          "name": "admin_auth_event_admin_id_admin_account_id_fk",
+          "tableFrom": "admin_auth_event",
+          "tableTo": "admin_account",
+          "schemaTo": "admin",
+          "columnsFrom": ["admin_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "election.election_configuration_versions": {
+      "name": "election_configuration_versions",
+      "schema": "election",
+      "columns": {
+        "election_id": {
+          "name": "election_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frozen_at": {
+          "name": "frozen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "election_configuration_versions_election_id_elections_id_fk": {
+          "name": "election_configuration_versions_election_id_elections_id_fk",
+          "tableFrom": "election_configuration_versions",
+          "tableTo": "elections",
+          "schemaTo": "election",
+          "columnsFrom": ["election_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "election_configuration_versions_election_id_version_pk": {
+          "name": "election_configuration_versions_election_id_version_pk",
+          "columns": ["election_id", "version"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "election_configuration_versions_version_check": {
+          "name": "election_configuration_versions_version_check",
+          "value": "\"election\".\"election_configuration_versions\".\"version\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "election.election_options": {
+      "name": "election_options",
+      "schema": "election",
+      "columns": {
+        "description": {
+          "name": "description",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_order": {
+          "name": "display_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "election_id": {
+          "name": "election_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "election_options_election_order_unique": {
+          "name": "election_options_election_order_unique",
+          "columns": [
+            {
+              "expression": "election_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "display_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "election_options_election_idx": {
+          "name": "election_options_election_idx",
+          "columns": [
+            {
+              "expression": "election_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "election_options_election_id_elections_id_fk": {
+          "name": "election_options_election_id_elections_id_fk",
+          "tableFrom": "election_options",
+          "tableTo": "elections",
+          "schemaTo": "election",
+          "columnsFrom": ["election_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "election_options_display_order_check": {
+          "name": "election_options_display_order_check",
+          "value": "\"election\".\"election_options\".\"display_order\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "election.election_state_event": {
+      "name": "election_state_event",
+      "schema": "election",
+      "columns": {
+        "actor_admin_id": {
+          "name": "actor_admin_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "configuration_version": {
+          "name": "configuration_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "election_id": {
+          "name": "election_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "new_state": {
+          "name": "new_state",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "previous_state": {
+          "name": "previous_state",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "election_state_event_election_time_idx": {
+          "name": "election_state_event_election_time_idx",
+          "columns": [
+            {
+              "expression": "election_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "occurred_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "election_state_event_actor_admin_id_admin_account_id_fk": {
+          "name": "election_state_event_actor_admin_id_admin_account_id_fk",
+          "tableFrom": "election_state_event",
+          "tableTo": "admin_account",
+          "schemaTo": "admin",
+          "columnsFrom": ["actor_admin_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "election_state_event_election_id_elections_id_fk": {
+          "name": "election_state_event_election_id_elections_id_fk",
+          "tableFrom": "election_state_event",
+          "tableTo": "elections",
+          "schemaTo": "election",
+          "columnsFrom": ["election_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "election.elections": {
+      "name": "elections",
+      "schema": "election",
+      "columns": {
+        "cancellation_reason": {
+          "name": "cancellation_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "circuit_version": {
+          "name": "circuit_version",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "closes_at": {
+          "name": "closes_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "configuration_version": {
+          "name": "configuration_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(2000)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "eligibility_configuration_ref": {
+          "name": "eligibility_configuration_ref",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "opens_at": {
+          "name": "opens_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protocol_version": {
+          "name": "protocol_version",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "row_version": {
+          "name": "row_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DRAFT'"
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "voting_method": {
+          "name": "voting_method",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'SINGLE_CHOICE'"
+        }
+      },
+      "indexes": {
+        "elections_status_time_idx": {
+          "name": "elections_status_time_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "opens_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "closes_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "elections_voting_window_check": {
+          "name": "elections_voting_window_check",
+          "value": "\"election\".\"elections\".\"opens_at\" < \"election\".\"elections\".\"closes_at\""
+        },
+        "elections_configuration_version_check": {
+          "name": "elections_configuration_version_check",
+          "value": "\"election\".\"elections\".\"configuration_version\" >= 0"
+        },
+        "elections_row_version_check": {
+          "name": "elections_row_version_check",
+          "value": "\"election\".\"elections\".\"row_version\" >= 0"
+        },
+        "elections_status_check": {
+          "name": "elections_status_check",
+          "value": "\"election\".\"elections\".\"status\" IN ('DRAFT', 'READY', 'OPEN', 'CLOSED', 'COUNTING', 'RESULTS_PUBLISHED', 'CANCELLED')"
+        },
+        "elections_voting_method_check": {
+          "name": "elections_voting_method_check",
+          "value": "\"election\".\"elections\".\"voting_method\" = 'SINGLE_CHOICE'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "eligibility.electoral_credentials": {
+      "name": "electoral_credentials",
+      "schema": "eligibility",
+      "columns": {
+        "activated_at": {
+          "name": "activated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eligible_voter_id": {
+          "name": "eligible_voter_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "identity_commitment": {
+          "name": "identity_commitment",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "row_version": {
+          "name": "row_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "scheme_version": {
+          "name": "scheme_version",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        }
+      },
+      "indexes": {
+        "electoral_credentials_commitment_scheme_unique": {
+          "name": "electoral_credentials_commitment_scheme_unique",
+          "columns": [
+            {
+              "expression": "identity_commitment",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "scheme_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "electoral_credentials_one_active_per_voter": {
+          "name": "electoral_credentials_one_active_per_voter",
+          "columns": [
+            {
+              "expression": "eligible_voter_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"eligibility\".\"electoral_credentials\".\"status\" = 'ACTIVE'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "electoral_credentials_status_commitment_idx": {
+          "name": "electoral_credentials_status_commitment_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "scheme_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "identity_commitment",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "electoral_credentials_eligible_voter_id_eligible_voters_id_fk": {
+          "name": "electoral_credentials_eligible_voter_id_eligible_voters_id_fk",
+          "tableFrom": "electoral_credentials",
+          "tableTo": "eligible_voters",
+          "schemaTo": "eligibility",
+          "columnsFrom": ["eligible_voter_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "electoral_credentials_row_version_check": {
+          "name": "electoral_credentials_row_version_check",
+          "value": "\"eligibility\".\"electoral_credentials\".\"row_version\" >= 0"
+        },
+        "electoral_credentials_status_check": {
+          "name": "electoral_credentials_status_check",
+          "value": "\"eligibility\".\"electoral_credentials\".\"status\" IN ('PENDING', 'ACTIVE', 'REVOKED', 'ROTATED')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "audit.eligibility_event": {
+      "name": "eligibility_event",
+      "schema": "audit",
+      "columns": {
+        "actor_admin_id": {
+          "name": "actor_admin_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_type": {
+          "name": "entity_type",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event": {
+          "name": "event",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "eligibility_event_entity_time_idx": {
+          "name": "eligibility_event_entity_time_idx",
+          "columns": [
+            {
+              "expression": "entity_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entity_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "occurred_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "eligibility_event_actor_admin_id_admin_account_id_fk": {
+          "name": "eligibility_event_actor_admin_id_admin_account_id_fk",
+          "tableFrom": "eligibility_event",
+          "tableTo": "admin_account",
+          "schemaTo": "admin",
+          "columnsFrom": ["actor_admin_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "eligibility.eligibility_snapshot_members": {
+      "name": "eligibility_snapshot_members",
+      "schema": "eligibility",
+      "columns": {
+        "credential_id": {
+          "name": "credential_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leaf_index": {
+          "name": "leaf_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leaf_value": {
+          "name": "leaf_value",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "eligibility_snapshot_members_leaf_index_unique": {
+          "name": "eligibility_snapshot_members_leaf_index_unique",
+          "columns": [
+            {
+              "expression": "snapshot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "leaf_index",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "eligibility_snapshot_members_leaf_value_unique": {
+          "name": "eligibility_snapshot_members_leaf_value_unique",
+          "columns": [
+            {
+              "expression": "snapshot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "leaf_value",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "eligibility_snapshot_members_credential_id_electoral_credentials_id_fk": {
+          "name": "eligibility_snapshot_members_credential_id_electoral_credentials_id_fk",
+          "tableFrom": "eligibility_snapshot_members",
+          "tableTo": "electoral_credentials",
+          "schemaTo": "eligibility",
+          "columnsFrom": ["credential_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "eligibility_snapshot_members_snapshot_id_eligibility_snapshots_id_fk": {
+          "name": "eligibility_snapshot_members_snapshot_id_eligibility_snapshots_id_fk",
+          "tableFrom": "eligibility_snapshot_members",
+          "tableTo": "eligibility_snapshots",
+          "schemaTo": "eligibility",
+          "columnsFrom": ["snapshot_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "eligibility_snapshot_members_snapshot_id_credential_id_pk": {
+          "name": "eligibility_snapshot_members_snapshot_id_credential_id_pk",
+          "columns": ["snapshot_id", "credential_id"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "eligibility_snapshot_members_leaf_index_check": {
+          "name": "eligibility_snapshot_members_leaf_index_check",
+          "value": "\"eligibility\".\"eligibility_snapshot_members\".\"leaf_index\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "eligibility.eligibility_snapshots": {
+      "name": "eligibility_snapshots",
+      "schema": "eligibility",
+      "columns": {
+        "commitment_scheme_version": {
+          "name": "commitment_scheme_version",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "configuration_version": {
+          "name": "configuration_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "election_id": {
+          "name": "election_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frozen_at": {
+          "name": "frozen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "leaf_count": {
+          "name": "leaf_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "merkle_root": {
+          "name": "merkle_root",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "row_version": {
+          "name": "row_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'BUILDING'"
+        },
+        "tree_depth": {
+          "name": "tree_depth",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "eligibility_snapshots_election_config_version_unique": {
+          "name": "eligibility_snapshots_election_config_version_unique",
+          "columns": [
+            {
+              "expression": "election_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "configuration_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "eligibility_snapshots_one_frozen_per_config": {
+          "name": "eligibility_snapshots_one_frozen_per_config",
+          "columns": [
+            {
+              "expression": "election_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "configuration_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"eligibility\".\"eligibility_snapshots\".\"status\" = 'FROZEN'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "eligibility_snapshots_election_status_idx": {
+          "name": "eligibility_snapshots_election_status_idx",
+          "columns": [
+            {
+              "expression": "election_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "eligibility_snapshots_election_id_elections_id_fk": {
+          "name": "eligibility_snapshots_election_id_elections_id_fk",
+          "tableFrom": "eligibility_snapshots",
+          "tableTo": "elections",
+          "schemaTo": "election",
+          "columnsFrom": ["election_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "eligibility_snapshots_configuration_version_check": {
+          "name": "eligibility_snapshots_configuration_version_check",
+          "value": "\"eligibility\".\"eligibility_snapshots\".\"configuration_version\" > 0"
+        },
+        "eligibility_snapshots_version_check": {
+          "name": "eligibility_snapshots_version_check",
+          "value": "\"eligibility\".\"eligibility_snapshots\".\"version\" > 0"
+        },
+        "eligibility_snapshots_leaf_count_check": {
+          "name": "eligibility_snapshots_leaf_count_check",
+          "value": "\"eligibility\".\"eligibility_snapshots\".\"leaf_count\" > 0"
+        },
+        "eligibility_snapshots_tree_depth_check": {
+          "name": "eligibility_snapshots_tree_depth_check",
+          "value": "\"eligibility\".\"eligibility_snapshots\".\"tree_depth\" > 0"
+        },
+        "eligibility_snapshots_row_version_check": {
+          "name": "eligibility_snapshots_row_version_check",
+          "value": "\"eligibility\".\"eligibility_snapshots\".\"row_version\" >= 0"
+        },
+        "eligibility_snapshots_status_check": {
+          "name": "eligibility_snapshots_status_check",
+          "value": "\"eligibility\".\"eligibility_snapshots\".\"status\" IN ('BUILDING', 'FROZEN', 'SUPERSEDED')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "eligibility.eligible_voters": {
+      "name": "eligible_voters",
+      "schema": "eligibility",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "external_reference": {
+          "name": "external_reference",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "row_version": {
+          "name": "row_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ACTIVE'"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "eligible_voters_external_reference_unique": {
+          "name": "eligible_voters_external_reference_unique",
+          "columns": [
+            {
+              "expression": "external_reference",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"eligibility\".\"eligible_voters\".\"external_reference\" IS NOT NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "eligible_voters_status_idx": {
+          "name": "eligible_voters_status_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "eligible_voters_row_version_check": {
+          "name": "eligible_voters_row_version_check",
+          "value": "\"eligibility\".\"eligible_voters\".\"row_version\" >= 0"
+        },
+        "eligible_voters_status_check": {
+          "name": "eligible_voters_status_check",
+          "value": "\"eligibility\".\"eligible_voters\".\"status\" IN ('ACTIVE', 'INACTIVE', 'REVOKED')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "voting.vote_proof_evidence": {
+      "name": "vote_proof_evidence",
+      "schema": "voting",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "proof": {
+          "name": "proof",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "proof_digest": {
+          "name": "proof_digest",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "public_signals": {
+          "name": "public_signals",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "public_signals_digest": {
+          "name": "public_signals_digest",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "schema_version": {
+          "name": "schema_version",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vote_id": {
+          "name": "vote_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "vote_proof_evidence_vote_id_accepted_votes_id_fk": {
+          "name": "vote_proof_evidence_vote_id_accepted_votes_id_fk",
+          "tableFrom": "vote_proof_evidence",
+          "tableTo": "accepted_votes",
+          "schemaTo": "voting",
+          "columnsFrom": ["vote_id"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "vote_proof_evidence_proof_digest_check": {
+          "name": "vote_proof_evidence_proof_digest_check",
+          "value": "\"voting\".\"vote_proof_evidence\".\"proof_digest\" ~ '^[0-9a-f]{64}$'"
+        },
+        "vote_proof_evidence_public_signals_digest_check": {
+          "name": "vote_proof_evidence_public_signals_digest_check",
+          "value": "\"voting\".\"vote_proof_evidence\".\"public_signals_digest\" ~ '^[0-9a-f]{64}$'"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {
+    "admin": "admin",
+    "app": "app",
+    "audit": "audit",
+    "election": "election",
+    "eligibility": "eligibility",
+    "identity": "identity",
+    "result": "result",
+    "voting": "voting"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

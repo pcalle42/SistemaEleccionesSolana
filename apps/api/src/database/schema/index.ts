@@ -17,4 +17,4 @@ export {
 } from './eligibility.js';
 export { identitySchema } from './identity.js';
 export { resultSchema } from './result.js';
-export { votingSchema } from './voting.js';
+export { acceptedVotes, voteProofEvidence, votingSchema } from './voting.js';

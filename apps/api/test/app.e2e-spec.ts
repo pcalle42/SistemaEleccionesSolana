@@ -211,6 +211,7 @@ describe('NestJS HTTP foundation', () => {
     expect(document.paths['/api/v1/admin/elections/{id}/ready']).toBeDefined();
     expect(document.paths['/api/v1/admin/elections/{id}/open']).toBeDefined();
     expect(document.paths['/api/v1/admin/elections/{id}/close']).toBeDefined();
+    expect(document.paths['/api/v1/elections/{electionId}/votes']).toBeDefined();
     expect(document.paths['/api/v1/admin/eligible-voters']).toBeDefined();
     expect(document.paths['/api/v1/admin/electoral-credentials']).toBeDefined();
     expect(

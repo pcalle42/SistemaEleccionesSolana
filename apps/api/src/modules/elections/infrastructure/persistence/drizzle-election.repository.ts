@@ -13,6 +13,7 @@ import { electionId, electionOptionId, type ElectionId } from '../../domain/elec
 import { ElectionDomainError } from '../../domain/election-errors.js';
 import type { ElectionStatus } from '../../domain/election-status.js';
 import type { VotingMethod } from '../../domain/voting-method.js';
+import { freezeCryptographicConfigurationV1 } from '../../../zk/application/election-context-v1.js';
 
 type ElectionRow = typeof elections.$inferSelect;
 type OptionRow = typeof electionOptions.$inferSelect;
@@ -193,6 +194,7 @@ export class DrizzleElectionRepository implements ElectionRepository {
         throw concurrencyError();
       }
       if (event.newState === 'READY') {
+        const cryptographicConfiguration = freezeCryptographicConfigurationV1(state);
         await transaction.insert(electionConfigurationVersions).values({
           electionId: state.id,
           frozenAt: event.timestamp,
@@ -201,6 +203,7 @@ export class DrizzleElectionRepository implements ElectionRepository {
             description: state.description,
             opensAt: state.opensAt.toISOString(),
             options: state.options,
+            cryptographicConfiguration,
             references: state.references,
             title: state.title,
             votingMethod: state.votingMethod,
