@@ -79,28 +79,3 @@ export function createVoteReceiptV1(material: ReceiptMaterialV1): VoteReceiptV1 
     receiptVersion: RECEIPT_VERSION_V1,
   };
 }
-
-function canonicalJson(value: unknown): string {
-  if (value === null || typeof value === 'boolean' || typeof value === 'string') {
-    return JSON.stringify(value);
-  }
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) throw new TypeError('Evidence contains a non-finite number.');
-    return JSON.stringify(value);
-  }
-  if (Array.isArray(value)) {
-    return `[${value.map(canonicalJson).join(',')}]`;
-  }
-  if (typeof value === 'object') {
-    const record = value as Record<string, unknown>;
-    return `{${Object.keys(record)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`)
-      .join(',')}}`;
-  }
-  throw new TypeError('Evidence is not canonically serializable.');
-}
-
-export function evidenceDigestV1(kind: 'proof' | 'public-signals', value: unknown): string {
-  return digest(`votaciones/${kind}/v1`, [canonicalJson(value)]);
-}

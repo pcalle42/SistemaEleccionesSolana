@@ -1,0 +1,35 @@
+{
+  "name": "@votaciones/verification-protocol",
+  "version": "1.0.0-devnet.1",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "bin": {
+    "verify-election": "./dist/src/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-static.mjs",
+    "pretest": "pnpm build",
+    "pretest:unit": "pnpm --filter @votaciones/zk-protocol build && pnpm build",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@votaciones/zk-protocol": "workspace:*",
+    "snarkjs": "0.7.6"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/snarkjs": "0.7.9",
+    "@votaciones/config-typescript": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

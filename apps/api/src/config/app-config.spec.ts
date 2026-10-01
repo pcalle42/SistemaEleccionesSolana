@@ -10,7 +10,8 @@ const validEnvironment = {
 
 describe('application configuration', () => {
   it('validates all runtime boundaries centrally', () => {
-    expect(getAppConfig(validEnvironment)).toMatchObject({
+    const config = getAppConfig(validEnvironment);
+    expect(config).toMatchObject({
       environment: 'test',
       http: { bodyLimitBytes: 262_144, host: '127.0.0.1', port: 3_000 },
       logging: { level: 'silent', service: 'votaciones-api' },
@@ -21,6 +22,7 @@ describe('application configuration', () => {
         rateLimitWindowSeconds: 60,
       },
     });
+    expect(config.verification.artifactDirectory).toContain('.artifacts/verification-packages');
   });
 
   it('rejects unknown environments and wildcard CORS', () => {

@@ -95,16 +95,23 @@ export class ElectionsController {
   @ApiOperation({ summary: 'Create a draft election' })
   @ApiCreatedResponse({ type: ElectionResponseDto })
   @ApiBadRequestResponse({ type: ErrorResponseDto })
-  async create(@Body() body: CreateElectionDto): Promise<ElectionResponseDto> {
-    const state = await this.elections.create({
-      closesAt: new Date(body.closesAt),
-      ...(body.description !== undefined ? { description: body.description } : {}),
-      opensAt: new Date(body.opensAt),
-      ...(body.options ? { options: optionInputs(body.options) } : {}),
-      references: referenceInputs(body),
-      title: body.title,
-      ...(body.votingMethod ? { votingMethod: body.votingMethod } : {}),
-    });
+  async create(
+    @Body() body: CreateElectionDto,
+    @Req() request: AdminRequest,
+  ): Promise<ElectionResponseDto> {
+    const state = await this.elections.create(
+      {
+        closesAt: new Date(body.closesAt),
+        ...(body.description !== undefined ? { description: body.description } : {}),
+        opensAt: new Date(body.opensAt),
+        ...(body.options ? { options: optionInputs(body.options) } : {}),
+        references: referenceInputs(body),
+        title: body.title,
+        ...(body.votingMethod ? { votingMethod: body.votingMethod } : {}),
+      },
+      request.adminPrincipal,
+      request.id,
+    );
     return response(state);
   }
 
@@ -129,6 +136,7 @@ export class ElectionsController {
   async updateDraft(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: UpdateDraftElectionDto,
+    @Req() request: AdminRequest,
   ): Promise<ElectionResponseDto> {
     const changes: DraftElectionChanges = {
       ...(body.closesAt ? { closesAt: new Date(body.closesAt) } : {}),
@@ -139,7 +147,9 @@ export class ElectionsController {
       ...(body.title !== undefined ? { title: body.title } : {}),
       ...(body.votingMethod ? { votingMethod: body.votingMethod } : {}),
     };
-    return response(await this.elections.updateDraft(id, changes));
+    return response(
+      await this.elections.updateDraft(id, changes, request.adminPrincipal, request.id),
+    );
   }
 
   @Post(':id/ready')

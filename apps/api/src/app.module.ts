@@ -9,6 +9,7 @@ import { ElectionsModule } from './modules/elections/elections.module.js';
 import { EligibilityModule } from './modules/eligibility/eligibility.module.js';
 import { ZkModule } from './modules/zk/zk.module.js';
 import { VotingModule } from './modules/voting/voting.module.js';
+import { VerificationModule } from './modules/verification/verification.module.js';
 import { ValkeyNestModule } from './valkey/valkey-nest.module.js';
 
 @Module({
@@ -23,6 +24,7 @@ import { ValkeyNestModule } from './valkey/valkey-nest.module.js';
     EligibilityModule,
     ZkModule,
     VotingModule,
+    VerificationModule,
   ],
 })
 export class AppModule {}

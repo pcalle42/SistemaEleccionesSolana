@@ -1,5 +1,6 @@
 import { getDatabaseConfig, type DatabaseConfig } from '../database/config/database-config.js';
 import { getValkeyConfig, type ValkeyConfig } from '../valkey/valkey.config.js';
+import { resolve } from 'node:path';
 
 export type RuntimeEnvironment = 'local' | 'test' | 'devnet' | 'production';
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'silent';
@@ -46,6 +47,9 @@ export interface AppConfig {
     readonly maximumConcurrentProofs: number;
     readonly rateLimitMaximum: number;
     readonly rateLimitWindowSeconds: number;
+  };
+  readonly verification: {
+    readonly artifactDirectory: string;
   };
 }
 
@@ -207,6 +211,11 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
       path: 'docs',
     }),
     valkey: getValkeyConfig(environment),
+    verification: Object.freeze({
+      artifactDirectory: resolve(
+        environment['VERIFICATION_ARTIFACT_DIRECTORY'] ?? '.artifacts/verification-packages',
+      ),
+    }),
     voting: Object.freeze({
       maximumConcurrentProofs: integer(environment, 'VOTE_MAXIMUM_CONCURRENT_PROOFS', 2, 1, 32),
       rateLimitMaximum: integer(environment, 'VOTE_RATE_LIMIT_MAXIMUM', 30, 1, 1_000),

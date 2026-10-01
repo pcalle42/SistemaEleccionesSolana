@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.example/schemas/public-accepted-vote-v1.schema.json",
+  "title": "PublicAcceptedVoteV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "recordVersion",
+    "electionId",
+    "configurationVersion",
+    "protocolVersion",
+    "circuitVersion",
+    "electionContext",
+    "merkleRoot",
+    "nullifier",
+    "voteEncoding",
+    "proof",
+    "proofDigest",
+    "publicSignals",
+    "publicSignalsDigest",
+    "receiptCommitment"
+  ],
+  "properties": {
+    "recordVersion": { "const": "public-accepted-vote-v1" },
+    "electionId": { "type": "string", "format": "uuid" },
+    "configurationVersion": { "type": "integer", "minimum": 1 },
+    "protocolVersion": { "type": "string" },
+    "circuitVersion": { "type": "string" },
+    "electionContext": { "type": "string", "pattern": "^[0-9]+$" },
+    "merkleRoot": { "type": "string", "pattern": "^[0-9]+$" },
+    "nullifier": { "type": "string", "pattern": "^[0-9]+$" },
+    "voteEncoding": { "type": "integer", "minimum": 0 },
+    "proof": { "type": "object" },
+    "proofDigest": { "$ref": "#/$defs/digest" },
+    "publicSignals": { "type": "array", "items": { "type": "string" } },
+    "publicSignalsDigest": { "$ref": "#/$defs/digest" },
+    "receiptCommitment": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": { "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+}

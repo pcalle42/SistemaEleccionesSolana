@@ -3,10 +3,15 @@ import type { ElectionId } from '../../domain/election-id.js';
 import type { ElectionStateChanged } from '../../domain/election.js';
 
 export interface ElectionRepository {
-  create(election: Election): Promise<void>;
+  create(election: Election, actorAdminId?: string, requestId?: string): Promise<void>;
   findById(id: ElectionId): Promise<Election | null>;
   list(): Promise<readonly Election[]>;
-  saveDraftChanges(election: Election, expectedRowVersion: number): Promise<void>;
+  saveDraftChanges(
+    election: Election,
+    expectedRowVersion: number,
+    actorAdminId?: string,
+    requestId?: string,
+  ): Promise<void>;
   transitionState(
     election: Election,
     event: ElectionStateChanged,

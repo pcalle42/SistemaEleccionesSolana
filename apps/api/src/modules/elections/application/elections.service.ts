@@ -43,10 +43,14 @@ export class ElectionsService {
     @Inject(ELECTION_CLOCK) private readonly clock: Clock,
   ) {}
 
-  async create(command: CreateElectionCommand): Promise<ElectionState> {
+  async create(
+    command: CreateElectionCommand,
+    principal?: AdminPrincipal,
+    requestId?: string,
+  ): Promise<ElectionState> {
     try {
       const election = Election.create({ ...command, id: newElectionId() }, this.clock);
-      await this.repository.create(election);
+      await this.repository.create(election, principal?.adminId, requestId);
       return election.snapshot();
     } catch (error: unknown) {
       return applicationError(error);
@@ -61,12 +65,22 @@ export class ElectionsService {
     return (await this.load(id)).snapshot();
   }
 
-  async updateDraft(id: string, changes: DraftElectionChanges): Promise<ElectionState> {
+  async updateDraft(
+    id: string,
+    changes: DraftElectionChanges,
+    principal?: AdminPrincipal,
+    requestId?: string,
+  ): Promise<ElectionState> {
     const election = await this.load(id);
     const expectedRowVersion = election.snapshot().rowVersion;
     try {
       election.updateDraft(changes, this.clock);
-      await this.repository.saveDraftChanges(election, expectedRowVersion);
+      await this.repository.saveDraftChanges(
+        election,
+        expectedRowVersion,
+        principal?.adminId,
+        requestId,
+      );
       return election.snapshot();
     } catch (error: unknown) {
       return applicationError(error);

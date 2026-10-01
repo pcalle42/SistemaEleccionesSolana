@@ -39,6 +39,13 @@ const clock: Clock = { now: () => new Date('2030-01-01T12:00:00.000Z') };
 const audit = { actorAdminId: adminId, requestId: 'eligibility-integration' };
 
 async function clearEligibilityData(): Promise<void> {
+  await migrationPool.query('DELETE FROM result.verification_packages');
+  await migrationPool.query('DELETE FROM result.tally_manifests');
+  await migrationPool.query('DELETE FROM result.accepted_vote_set_snapshots');
+  await migrationPool.query('DELETE FROM result.election_manifests');
+  await migrationPool.query('DELETE FROM audit.audit_checkpoint');
+  await migrationPool.query('DELETE FROM audit.audit_event');
+  await migrationPool.query('DELETE FROM audit.audit_chain_head');
   await migrationPool.query('DELETE FROM voting.vote_proof_evidence');
   await migrationPool.query('DELETE FROM voting.accepted_votes');
   await migrationPool.query('DELETE FROM audit.eligibility_event');

@@ -1,10 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
+import { canonicalDigestV1, type CanonicalValue } from '@votaciones/verification-protocol';
 
+import { appendAuditEventPg } from '../../../audit/infrastructure/persistence/audit-functions.js';
 import type { AcceptedVoteRecord, VoteAcceptanceContext } from '../../domain/accepted-vote.js';
 import {
   createVoteReceiptV1,
-  evidenceDigestV1,
   PROOF_EVIDENCE_SCHEMA_V1,
   type VoteReceiptV1,
 } from '../../domain/vote-receipt.js';
@@ -199,8 +200,11 @@ export class PostgresVoteRepository implements VoteRepository {
   }
 
   async accept(command: AcceptVerifiedVote): Promise<VoteAcceptanceResult> {
-    const proofDigest = evidenceDigestV1('proof', command.proof);
-    const publicSignalsDigest = evidenceDigestV1('public-signals', command.publicSignals);
+    const proofDigest = canonicalDigestV1('votaciones/proof/v1', command.proof as CanonicalValue);
+    const publicSignalsDigest = canonicalDigestV1(
+      'votaciones/public-signals/v1',
+      command.publicSignals,
+    );
     let client: pg.PoolClient;
     try {
       client = await this.pool.connect();
@@ -271,6 +275,20 @@ export class PostgresVoteRepository implements VoteRepository {
             voteId,
           ],
         );
+        await appendAuditEventPg(client, {
+          actorType: 'ANONYMOUS',
+          aggregateId: locked.electionId,
+          aggregateType: 'election',
+          eventType: 'vote_accepted',
+          eventVersion: 1,
+          payload: {
+            configurationVersion: locked.configurationVersion,
+            electionId: locked.electionId,
+            protocolVersion: locked.protocolVersion,
+            receiptCommitment: receipt.receiptCommitment,
+          },
+          streamId: `election:${locked.electionId}`,
+        });
         await client.query('COMMIT');
         return { idempotentRetry: false, receipt };
       }

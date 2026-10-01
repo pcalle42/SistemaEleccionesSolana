@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.example/schemas/tally-manifest-v1.schema.json",
+  "title": "TallyManifestV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tallyVersion",
+    "electionId",
+    "configurationVersion",
+    "protocolVersion",
+    "acceptedVoteSetDigest",
+    "acceptedVoteCount",
+    "invalidAcceptedVoteCount",
+    "totalsByOption",
+    "computedAt"
+  ],
+  "properties": {
+    "tallyVersion": { "const": "single-choice-tally-v1" },
+    "electionId": { "type": "string", "format": "uuid" },
+    "configurationVersion": { "type": "integer", "minimum": 1 },
+    "protocolVersion": { "type": "string" },
+    "acceptedVoteSetDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "acceptedVoteCount": { "type": "integer", "minimum": 0 },
+    "invalidAcceptedVoteCount": { "const": 0 },
+    "computedAt": { "type": "string", "format": "date-time" },
+    "totalsByOption": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["encoding", "optionId", "count"],
+        "properties": {
+          "encoding": { "type": "integer", "minimum": 0 },
+          "optionId": { "type": "string", "format": "uuid" },
+          "count": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

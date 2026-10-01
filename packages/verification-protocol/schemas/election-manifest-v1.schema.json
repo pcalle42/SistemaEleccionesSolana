@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.example/schemas/election-manifest-v1.schema.json",
+  "title": "ElectionManifestV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion",
+    "electionId",
+    "electionConfigurationVersion",
+    "protocolVersion",
+    "circuitVersion",
+    "electionContext",
+    "merkleRoot",
+    "leafCount",
+    "treeDepth",
+    "options",
+    "artifactDigests",
+    "verificationKeyDigest",
+    "createdAt",
+    "opensAt",
+    "closesAt",
+    "votingMethod",
+    "optionEncoding",
+    "commitmentSchemeVersion",
+    "nullifierSchemeVersion",
+    "voteEncodingVersion",
+    "eligibilitySnapshotVersion",
+    "title"
+  ],
+  "properties": {
+    "manifestVersion": { "const": "election-manifest-v1" },
+    "electionId": { "type": "string", "format": "uuid" },
+    "electionConfigurationVersion": { "type": "integer", "minimum": 1 },
+    "protocolVersion": { "type": "string", "minLength": 1 },
+    "circuitVersion": { "type": "string", "minLength": 1 },
+    "electionContext": { "type": "string", "pattern": "^[0-9]+$" },
+    "merkleRoot": { "type": "string", "pattern": "^[0-9]+$" },
+    "leafCount": { "type": "integer", "minimum": 0 },
+    "treeDepth": { "type": "integer", "minimum": 1 },
+    "eligibilitySnapshotVersion": { "type": "integer", "minimum": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "opensAt": { "type": "string", "format": "date-time" },
+    "closesAt": { "type": "string", "format": "date-time" },
+    "votingMethod": { "const": "SINGLE_CHOICE" },
+    "optionEncoding": { "type": "string", "minLength": 1 },
+    "commitmentSchemeVersion": { "type": "string", "minLength": 1 },
+    "nullifierSchemeVersion": { "type": "string", "minLength": 1 },
+    "voteEncodingVersion": { "type": "string", "minLength": 1 },
+    "verificationKeyDigest": { "$ref": "#/$defs/digest" },
+    "artifactDigests": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/digest" }
+    },
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["encoding", "id", "label"],
+        "properties": {
+          "encoding": { "type": "integer", "minimum": 0 },
+          "id": { "type": "string", "format": "uuid" },
+          "label": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": { "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+}

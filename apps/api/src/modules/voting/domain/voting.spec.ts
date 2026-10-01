@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { createVoteReceiptV1, evidenceDigestV1, submissionFingerprintV1 } from './vote-receipt.js';
+import { canonicalDigestV1 } from '@votaciones/verification-protocol';
+
+import { createVoteReceiptV1, submissionFingerprintV1 } from './vote-receipt.js';
 import { mapVotingPublicSignalsV1 } from './vote-public-signals.js';
 
 describe('voting protocol value objects', () => {
@@ -38,8 +40,8 @@ describe('voting protocol value objects', () => {
   });
 
   it('canonicalizes proof evidence independent of object key insertion order', () => {
-    expect(evidenceDigestV1('proof', { a: 1, b: ['2'] })).toBe(
-      evidenceDigestV1('proof', { b: ['2'], a: 1 }),
+    expect(canonicalDigestV1('votaciones/proof/v1', { a: 1, b: ['2'] })).toBe(
+      canonicalDigestV1('votaciones/proof/v1', { b: ['2'], a: 1 }),
     );
   });
 });

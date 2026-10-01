@@ -7,6 +7,13 @@ import {
   elections,
   electionStateEvent,
 } from '../../../../database/schema/election.js';
+import { eligibilitySnapshots } from '../../../../database/schema/eligibility.js';
+import { electionManifests } from '../../../../database/schema/result.js';
+import {
+  appendAuditEventDrizzle,
+  createCheckpointDrizzle,
+} from '../../../audit/infrastructure/persistence/audit-functions.js';
+import { buildElectionManifestV1 } from '../../../verification/domain/election-manifest.js';
 import type { ElectionRepository } from '../../application/ports/election-repository.port.js';
 import { Election, type ElectionState, type ElectionStateChanged } from '../../domain/election.js';
 import { electionId, electionOptionId, type ElectionId } from '../../domain/election-id.js';
@@ -87,7 +94,7 @@ function concurrencyError(): ElectionDomainError {
 export class DrizzleElectionRepository implements ElectionRepository {
   constructor(private readonly database: Database) {}
 
-  async create(election: Election): Promise<void> {
+  async create(election: Election, actorAdminId?: string): Promise<void> {
     const state = election.snapshot();
     await this.database.transaction(async (transaction) => {
       await transaction.insert(elections).values(electionValues(state));
@@ -95,6 +102,20 @@ export class DrizzleElectionRepository implements ElectionRepository {
       if (options.length > 0) {
         await transaction.insert(electionOptions).values(options);
       }
+      await appendAuditEventDrizzle(transaction, {
+        ...(actorAdminId ? { actorId: actorAdminId } : {}),
+        actorType: actorAdminId ? 'ADMIN' : 'SYSTEM',
+        aggregateId: state.id,
+        aggregateType: 'election',
+        eventType: 'election_created',
+        eventVersion: 1,
+        payload: {
+          electionId: state.id,
+          status: state.status,
+          votingMethod: state.votingMethod,
+        },
+        streamId: `election:${state.id}`,
+      });
     });
   }
 
@@ -129,7 +150,11 @@ export class DrizzleElectionRepository implements ElectionRepository {
     );
   }
 
-  async saveDraftChanges(election: Election, expectedRowVersion: number): Promise<void> {
+  async saveDraftChanges(
+    election: Election,
+    expectedRowVersion: number,
+    actorAdminId?: string,
+  ): Promise<void> {
     const state = election.snapshot();
     await this.database.transaction(async (transaction) => {
       const updated = await transaction
@@ -162,6 +187,20 @@ export class DrizzleElectionRepository implements ElectionRepository {
       if (options.length > 0) {
         await transaction.insert(electionOptions).values(options);
       }
+      await appendAuditEventDrizzle(transaction, {
+        ...(actorAdminId ? { actorId: actorAdminId } : {}),
+        actorType: actorAdminId ? 'ADMIN' : 'SYSTEM',
+        aggregateId: state.id,
+        aggregateType: 'election',
+        eventType: 'election_configuration_changed',
+        eventVersion: 1,
+        payload: {
+          electionId: state.id,
+          optionCount: state.options.length,
+          rowVersion: expectedRowVersion + 1,
+        },
+        streamId: `election:${state.id}`,
+      });
     });
   }
 
@@ -210,6 +249,39 @@ export class DrizzleElectionRepository implements ElectionRepository {
           },
           version: state.configurationVersion,
         });
+        const snapshots = await transaction
+          .select({
+            leafCount: eligibilitySnapshots.leafCount,
+            merkleRoot: eligibilitySnapshots.merkleRoot,
+            treeDepth: eligibilitySnapshots.treeDepth,
+            version: eligibilitySnapshots.version,
+          })
+          .from(eligibilitySnapshots)
+          .where(
+            and(
+              eq(eligibilitySnapshots.electionId, state.id),
+              eq(eligibilitySnapshots.configurationVersion, state.configurationVersion),
+              eq(eligibilitySnapshots.status, 'FROZEN'),
+            ),
+          )
+          .limit(1);
+        const eligibility = snapshots[0];
+        if (!eligibility) throw new Error('FROZEN_ELIGIBILITY_SNAPSHOT_MISSING');
+        const envelope = buildElectionManifestV1(
+          state,
+          cryptographicConfiguration,
+          eligibility,
+          event.timestamp,
+        );
+        await transaction.insert(electionManifests).values({
+          configurationVersion: state.configurationVersion,
+          createdAt: event.timestamp,
+          electionId: state.id,
+          manifest: envelope.manifest,
+          manifestDigest: envelope.manifestDigest,
+          manifestVersion: envelope.manifest.manifestVersion,
+          publicationState: 'PUBLISHED',
+        });
       }
       await transaction.insert(electionStateEvent).values({
         actorAdminId: event.actorAdminId,
@@ -221,6 +293,25 @@ export class DrizzleElectionRepository implements ElectionRepository {
         reason: event.reason,
         requestId,
       });
+      await appendAuditEventDrizzle(transaction, {
+        actorId: event.actorAdminId,
+        actorType: 'ADMIN',
+        aggregateId: state.id,
+        aggregateType: 'election',
+        eventType: event.newState === 'CANCELLED' ? 'election_cancelled' : 'election_transitioned',
+        eventVersion: 1,
+        payload: {
+          configurationVersion: state.configurationVersion,
+          electionId: state.id,
+          newState: event.newState,
+          previousState: event.previousState,
+          ...(event.reason ? { reason: event.reason } : {}),
+        },
+        streamId: `election:${state.id}`,
+      });
+      if (['READY', 'OPEN', 'CLOSED', 'CANCELLED', 'RESULTS_PUBLISHED'].includes(event.newState)) {
+        await createCheckpointDrizzle(transaction, `election:${state.id}`);
+      }
     });
   }
 }

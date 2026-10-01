@@ -65,3 +65,4 @@ package-lock.json
 yarn.lock
 bun.lock
 bun.lockb
+.artifacts/

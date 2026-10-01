@@ -38,13 +38,43 @@ function aggregate(): Election {
   );
 }
 
-beforeAll(async () => {
+async function seedFrozenEligibility(electionIdValue: string, configurationVersion: number) {
+  await migrationPool.query(
+    `INSERT INTO eligibility.eligibility_snapshots
+      (commitment_scheme_version, configuration_version, created_at, election_id, frozen_at,
+       id, leaf_count, merkle_root, status, tree_depth, version)
+     VALUES ($1,$2,$3,$4,$3,$5,1,$6,'FROZEN',20,1)`,
+    [
+      'poseidon-bn254-v1',
+      configurationVersion,
+      fixedNow,
+      electionIdValue,
+      randomUUID(),
+      String(configurationVersion + 100),
+    ],
+  );
+}
+
+async function clearElectionData() {
+  await migrationPool.query('DELETE FROM result.verification_packages');
+  await migrationPool.query('DELETE FROM result.tally_manifests');
+  await migrationPool.query('DELETE FROM result.accepted_vote_set_snapshots');
+  await migrationPool.query('DELETE FROM result.election_manifests');
+  await migrationPool.query('DELETE FROM audit.audit_checkpoint');
+  await migrationPool.query('DELETE FROM audit.audit_event');
+  await migrationPool.query('DELETE FROM audit.audit_chain_head');
+  await migrationPool.query('DELETE FROM eligibility.eligibility_snapshot_members');
+  await migrationPool.query('DELETE FROM eligibility.eligibility_snapshots');
   await migrationPool.query('DELETE FROM voting.vote_proof_evidence');
   await migrationPool.query('DELETE FROM voting.accepted_votes');
   await migrationPool.query('DELETE FROM election.election_state_event');
   await migrationPool.query('DELETE FROM election.election_configuration_versions');
   await migrationPool.query('DELETE FROM election.election_options');
   await migrationPool.query('DELETE FROM election.elections');
+}
+
+beforeAll(async () => {
+  await clearElectionData();
   await migrationPool.query('DELETE FROM audit.admin_auth_event');
   await migrationPool.query('DELETE FROM admin.admin_account');
   await migrationPool.query(
@@ -55,12 +85,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await migrationPool.query('DELETE FROM voting.vote_proof_evidence');
-  await migrationPool.query('DELETE FROM voting.accepted_votes');
-  await migrationPool.query('DELETE FROM election.election_state_event');
-  await migrationPool.query('DELETE FROM election.election_configuration_versions');
-  await migrationPool.query('DELETE FROM election.election_options');
-  await migrationPool.query('DELETE FROM election.elections');
+  await clearElectionData();
   await migrationPool.query('DELETE FROM admin.admin_account WHERE id = $1', [adminId]);
   await runtimePool.end();
   await migrationPool.end();
@@ -79,6 +104,7 @@ describe('Drizzle election repository', () => {
     await repository.saveDraftChanges(loaded!, rowVersion);
 
     const prepared = await repository.findById(election.snapshot().id);
+    await seedFrozenEligibility(election.snapshot().id, 1);
     const expectedVersion = prepared!.snapshot().rowVersion;
     const event = prepared!.prepare(adminId, clock);
     await repository.transitionState(prepared!, event, expectedVersion, 'integration-request');
@@ -101,6 +127,7 @@ describe('Drizzle election repository', () => {
     reopened!.updateDraft({ description: 'Second configuration' }, clock);
     await repository.saveDraftChanges(reopened!, draftVersion);
     const secondDraft = await repository.findById(election.snapshot().id);
+    await seedFrozenEligibility(election.snapshot().id, 2);
     const secondReady = secondDraft!.prepare(adminId, clock);
     await repository.transitionState(
       secondDraft!,
@@ -149,6 +176,7 @@ describe('Drizzle election repository', () => {
     await repository.create(election);
     const first = await repository.findById(election.snapshot().id);
     const second = await repository.findById(election.snapshot().id);
+    await seedFrozenEligibility(election.snapshot().id, 1);
     const firstEvent = first!.prepare(adminId, clock);
     const secondEvent = second!.prepare(adminId, clock);
     await repository.transitionState(first!, firstEvent, 0);
@@ -171,6 +199,7 @@ describe('Drizzle election repository', () => {
   it('rolls back the state update and snapshot when mandatory audit persistence fails', async () => {
     const election = aggregate();
     await repository.create(election);
+    await seedFrozenEligibility(election.snapshot().id, 1);
     const event = election.prepare(randomUUID(), clock);
 
     await expect(repository.transitionState(election, event, 0)).rejects.toMatchObject({

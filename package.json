@@ -52,6 +52,7 @@
     "test:integration": "pnpm --filter @votaciones/api test:integration",
     "test:unit": "pnpm build && pnpm --recursive --if-present test:unit",
     "typecheck": "pnpm build && pnpm --recursive --if-present typecheck",
+    "verify:election": "pnpm --filter @votaciones/verification-protocol build && node packages/verification-protocol/dist/src/cli.js",
     "valkey:health": "pnpm --filter @votaciones/api valkey:health",
     "valkey:verify:loss": "bash infra/scripts/verify-valkey-loss.sh local",
     "zk:compile": "pnpm --filter @votaciones/zk-protocol zk:compile",

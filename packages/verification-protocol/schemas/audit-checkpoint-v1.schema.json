@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.example/schemas/audit-checkpoint-v1.schema.json",
+  "title": "AuditCheckpointV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "checkpointVersion",
+    "id",
+    "streamId",
+    "fromSequence",
+    "toSequence",
+    "headHash",
+    "createdAt"
+  ],
+  "properties": {
+    "checkpointVersion": { "const": "audit-checkpoint-v1" },
+    "id": { "type": "string", "format": "uuid" },
+    "streamId": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "fromSequence": { "type": "integer", "minimum": 1 },
+    "toSequence": { "type": "integer", "minimum": 1 },
+    "headHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}
