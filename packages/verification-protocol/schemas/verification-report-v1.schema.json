@@ -16,6 +16,7 @@
     "proofsValid",
     "nullifiersUnique",
     "tallyValid",
+    "resultValid",
     "checkpointsValid",
     "errors"
   ],
@@ -31,6 +32,7 @@
     "proofsValid": { "type": "boolean" },
     "nullifiersUnique": { "type": "boolean" },
     "tallyValid": { "type": "boolean" },
+    "resultValid": { "type": "boolean" },
     "checkpointsValid": { "type": "boolean" },
     "errors": { "type": "array", "items": { "type": "string" } }
   }

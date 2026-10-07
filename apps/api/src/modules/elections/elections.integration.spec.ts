@@ -56,7 +56,9 @@ async function seedFrozenEligibility(electionIdValue: string, configurationVersi
 }
 
 async function clearElectionData() {
+  await migrationPool.query('DELETE FROM result.result_publications');
   await migrationPool.query('DELETE FROM result.verification_packages');
+  await migrationPool.query('DELETE FROM result.election_results');
   await migrationPool.query('DELETE FROM result.tally_manifests');
   await migrationPool.query('DELETE FROM result.accepted_vote_set_snapshots');
   await migrationPool.query('DELETE FROM result.election_manifests');

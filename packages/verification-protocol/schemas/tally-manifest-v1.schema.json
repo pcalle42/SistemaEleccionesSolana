@@ -5,6 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "manifestVersion",
     "tallyVersion",
     "electionId",
     "configurationVersion",
@@ -13,9 +14,11 @@
     "acceptedVoteCount",
     "invalidAcceptedVoteCount",
     "totalsByOption",
-    "computedAt"
+    "computedAt",
+    "tallyDigest"
   ],
   "properties": {
+    "manifestVersion": { "const": "tally-manifest-v1" },
     "tallyVersion": { "const": "single-choice-tally-v1" },
     "electionId": { "type": "string", "format": "uuid" },
     "configurationVersion": { "type": "integer", "minimum": 1 },
@@ -24,6 +27,7 @@
     "acceptedVoteCount": { "type": "integer", "minimum": 0 },
     "invalidAcceptedVoteCount": { "const": 0 },
     "computedAt": { "type": "string", "format": "date-time" },
+    "tallyDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
     "totalsByOption": {
       "type": "array",
       "items": {

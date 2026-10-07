@@ -4,6 +4,8 @@ export const ELECTION_MANIFEST_VERSION_V1 = 'election-manifest-v1' as const;
 export const PUBLIC_VOTE_VERSION_V1 = 'public-accepted-vote-v1' as const;
 export const VOTE_SET_VERSION_V1 = 'accepted-vote-set-v1' as const;
 export const TALLY_VERSION_V1 = 'single-choice-tally-v1' as const;
+export const TALLY_MANIFEST_VERSION_V1 = 'tally-manifest-v1' as const;
+export const RESULT_SCHEMA_VERSION_V1 = 'election-result-v1' as const;
 export const CHECKPOINT_VERSION_V1 = 'audit-checkpoint-v1' as const;
 export const PACKAGE_VERSION_V1 = 'verification-package-v1' as const;
 export const VERIFICATION_REPORT_VERSION_V1 = 'verification-report-v1' as const;
@@ -83,13 +85,37 @@ export interface TallyManifestV1 {
   readonly configurationVersion: number;
   readonly electionId: string;
   readonly invalidAcceptedVoteCount: 0;
+  readonly manifestVersion: typeof TALLY_MANIFEST_VERSION_V1;
   readonly protocolVersion: string;
   readonly tallyVersion: typeof TALLY_VERSION_V1;
+  readonly tallyDigest: string;
   readonly totalsByOption: readonly {
     readonly count: number;
     readonly encoding: number;
     readonly optionId: string;
   }[];
+}
+
+export interface ElectionResultV1 {
+  readonly acceptedVoteSetDigest: string;
+  readonly configurationVersion: number;
+  readonly electionId: string;
+  readonly previousResultDigest: string | null;
+  readonly protocolVersion: string;
+  readonly publicationDigest: string;
+  readonly publishedAt: string;
+  readonly resultContentDigest: string;
+  readonly resultSchemaVersion: typeof RESULT_SCHEMA_VERSION_V1;
+  readonly resultVersion: number;
+  readonly tallyDigest: string;
+  readonly totalAcceptedVotes: number;
+  readonly totalsByOption: readonly {
+    readonly count: number;
+    readonly encoding: number;
+    readonly label: string;
+    readonly optionId: string;
+  }[];
+  readonly verificationPackageDigest: string;
 }
 
 export interface AuditCheckpointV1 {
@@ -119,10 +145,16 @@ export interface PublicAuditEventV1 {
 }
 
 export interface VerificationPackageManifestV1 {
-  readonly contentDigest: string;
+  readonly evidenceDigest: string;
   readonly electionId: string;
-  readonly files: Readonly<Record<string, string>>;
+  readonly files: readonly {
+    readonly logicalPath: string;
+    readonly sha256: string;
+    readonly size: number;
+  }[];
+  readonly packageContentDigest: string;
   readonly packageVersion: typeof PACKAGE_VERSION_V1;
+  readonly resultVersion: number;
 }
 
 export interface VerificationReportV1 {
@@ -136,6 +168,7 @@ export interface VerificationReportV1 {
   readonly packageVersion: string;
   readonly proofsValid: boolean;
   readonly tallyValid: boolean;
+  readonly resultValid: boolean;
   readonly valid: boolean;
   readonly verificationReportVersion: typeof VERIFICATION_REPORT_VERSION_V1;
   readonly voteSetDigestValid: boolean;

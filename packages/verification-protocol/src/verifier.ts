@@ -22,6 +22,7 @@ import {
   canonicalVoteJsonlV1,
   compareCanonicalNullifiers,
   computeTallyV1,
+  electionResultV1,
   electionManifestDigestV1,
   voteSetDigestV1,
 } from './records.js';
@@ -31,6 +32,7 @@ import {
   type AcceptedVoteSetSnapshotV1,
   type AuditCheckpointV1,
   type ElectionManifestEnvelopeV1,
+  type ElectionResultV1,
   type PublicAcceptedVoteV1,
   type PublicReceiptV1,
   type TallyManifestV1,
@@ -48,6 +50,7 @@ const REQUIRED_FILES = [
   'eligibility.json',
   'protocol-manifest.json',
   'receipts.jsonl',
+  'result.json',
   'tally.json',
   'verification_key.json',
 ] as const;
@@ -70,12 +73,18 @@ function parseJsonl<T>(text: string, label: string): T[] {
     .map((line, index) => parseJson<T>(line, `${label} line ${index + 1}`));
 }
 
-function packageContentDigest(files: Readonly<Record<string, string>>): string {
+function packageContentDigest(
+  files: readonly {
+    readonly logicalPath: string;
+    readonly sha256: string;
+    readonly size: number;
+  }[],
+): string {
   return canonicalDigestV1(
     'votaciones/verification-package-content/v1',
-    Object.keys(files)
-      .sort()
-      .map((name) => ({ digest: files[name]!, name })),
+    [...files].sort((left, right) =>
+      left.logicalPath < right.logicalPath ? -1 : left.logicalPath > right.logicalPath ? 1 : 0,
+    ),
   );
 }
 
@@ -87,32 +96,59 @@ export async function verifyElectionPackage(directory: string): Promise<Verifica
   let proofsValid = false;
   let nullifiersUnique = false;
   let tallyValid = false;
+  let resultValid = false;
   let checkpointsValid = false;
   let packageDigest = '';
   let packageContentDigestValue = '';
   let packageVersion = 'unknown';
 
   try {
-    const packageBytes = await readFile(join(directory, 'package-manifest.json'));
+    const packageBytes = await readFile(join(directory, 'verification-package-manifest.json'));
     packageDigest = sha256Hex(packageBytes);
     const packageManifest = parseJson<VerificationPackageManifestV1>(
       packageBytes.toString('utf8'),
-      'package-manifest.json',
+      'verification-package-manifest.json',
     );
     packageVersion = packageManifest.packageVersion;
-    packageContentDigestValue = packageManifest.contentDigest;
+    packageContentDigestValue = packageManifest.packageContentDigest;
     if (packageManifest.packageVersion !== PACKAGE_VERSION_V1) {
       errors.push('UNSUPPORTED_PACKAGE_VERSION');
     }
     if (
-      !REQUIRED_FILES.every(
-        (name) =>
-          typeof packageManifest.files[name] === 'string' &&
-          SHA256.test(packageManifest.files[name]),
+      packageManifest.files.length !== REQUIRED_FILES.length ||
+      !REQUIRED_FILES.every((name) =>
+        packageManifest.files.some(
+          (file) =>
+            file.logicalPath === name &&
+            SHA256.test(file.sha256) &&
+            Number.isSafeInteger(file.size) &&
+            file.size >= 0,
+        ),
       ) ||
-      packageManifest.contentDigest !== packageContentDigest(packageManifest.files)
+      new Set(packageManifest.files.map((file) => file.logicalPath)).size !==
+        packageManifest.files.length ||
+      canonicalizeV1(packageManifest.files) !==
+        canonicalizeV1(
+          [...packageManifest.files].sort((left, right) =>
+            left.logicalPath < right.logicalPath
+              ? -1
+              : left.logicalPath > right.logicalPath
+                ? 1
+                : 0,
+          ),
+        ) ||
+      packageManifest.packageContentDigest !== packageContentDigest(packageManifest.files)
     ) {
       errors.push('PACKAGE_MANIFEST_INVALID');
+    }
+    const fileManifest = new Map(
+      packageManifest.files.map((file) => [file.logicalPath, file] as const),
+    );
+    const evidenceFiles = packageManifest.files.filter(
+      (file) => file.logicalPath !== 'result.json',
+    );
+    if (packageManifest.evidenceDigest !== packageContentDigest(evidenceFiles)) {
+      errors.push('PACKAGE_EVIDENCE_DIGEST_MISMATCH');
     }
 
     const contents = new Map<string, Buffer>();
@@ -120,7 +156,8 @@ export async function verifyElectionPackage(directory: string): Promise<Verifica
       try {
         const bytes = await readFile(join(directory, name));
         contents.set(name, bytes);
-        if (sha256Hex(bytes) !== packageManifest.files[name]) {
+        const expected = fileManifest.get(name);
+        if (sha256Hex(bytes) !== expected?.sha256 || bytes.byteLength !== expected.size) {
           errors.push(`FILE_DIGEST_MISMATCH:${name}`);
         }
       } catch {
@@ -315,6 +352,25 @@ export async function verifyElectionPackage(directory: string): Promise<Verifica
       canonicalizeV1(expectedTally as unknown as CanonicalValue);
     if (!tallyValid) errors.push('TALLY_MISMATCH');
 
+    const publishedResult = parseJson<ElectionResultV1>(
+      contents.get('result.json')!.toString('utf8'),
+      'result.json',
+    );
+    const expectedResult = electionResultV1({
+      manifest: envelope.manifest,
+      previousResultDigest: publishedResult.previousResultDigest,
+      publishedAt: publishedResult.publishedAt,
+      resultVersion: publishedResult.resultVersion,
+      tally,
+      verificationPackageDigest: packageManifest.evidenceDigest,
+    });
+    resultValid =
+      publishedResult.resultVersion === packageManifest.resultVersion &&
+      packageManifest.electionId === publishedResult.electionId &&
+      canonicalizeV1(publishedResult as unknown as CanonicalValue) ===
+        canonicalizeV1(expectedResult as unknown as CanonicalValue);
+    if (!resultValid) errors.push('RESULT_DIGEST_MISMATCH');
+
     const checkpoints = parseJson<readonly AuditCheckpointV1[]>(
       contents.get('checkpoints.json')!.toString('utf8'),
       'checkpoints.json',
@@ -343,6 +399,7 @@ export async function verifyElectionPackage(directory: string): Promise<Verifica
     packageContentDigest: packageContentDigestValue,
     packageVersion,
     proofsValid,
+    resultValid,
     tallyValid,
     valid:
       uniqueErrors.length === 0 &&
@@ -352,6 +409,7 @@ export async function verifyElectionPackage(directory: string): Promise<Verifica
       proofsValid &&
       nullifiersUnique &&
       tallyValid &&
+      resultValid &&
       checkpointsValid,
     verificationReportVersion: VERIFICATION_REPORT_VERSION_V1,
     voteSetDigestValid,
@@ -359,7 +417,11 @@ export async function verifyElectionPackage(directory: string): Promise<Verifica
 }
 
 export function verificationPackageContentDigestV1(
-  files: Readonly<Record<string, string>>,
+  files: readonly {
+    readonly logicalPath: string;
+    readonly sha256: string;
+    readonly size: number;
+  }[],
 ): string {
   return packageContentDigest(files);
 }

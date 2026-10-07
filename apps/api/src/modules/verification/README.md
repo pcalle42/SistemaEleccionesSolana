@@ -5,10 +5,12 @@ Este módulo separa tres responsabilidades:
 1. `audit.audit_event` mantiene el registro interno append-only, encadenado por elección. Las
    escrituras pasan por funciones `SECURITY DEFINER` y participan en la transacción de dominio.
 2. `result.election_manifests`, el snapshot del conjunto aceptado y el tally son evidencia electoral
-   reproducible. El manifiesto se publica al entrar en `READY`; el conjunto se congela al pasar de
-   `CLOSED` a `COUNTING`.
-3. El paquete público se guarda por digest en filesystem para local/devnet. Sólo se publica el
-   resultado si el verificador offline vuelve a validar el paquete completo.
+   reproducible. El manifiesto se publica al entrar en `READY`; `EnterCounting` congela el conjunto
+   al pasar de `CLOSED` a `COUNTING` y `ComputeTally` valida después el conteo canónico contra un
+   agregado SQL independiente.
+3. `election_results` y `result_publications` preservan versiones y el workflow
+   `GENERATED/VERIFIED/PUBLISHING/PUBLISHED/FAILED`. El paquete se guarda bajo
+   `<election>/results/vN/<digest>` y sólo se publica si el verifier vuelve a validar los bytes.
 
 Los DTO públicos usan listas permitidas: no exportan nombres, referencias externas, credentials,
 commitments de identidad, IP, user-agent, request IDs ni timestamps individuales de aceptación. El

@@ -5,6 +5,7 @@ import {
   canonicalDigestV1,
   canonicalVoteJsonlV1,
   computeTallyV1,
+  electionResultV1,
   ELECTION_MANIFEST_VERSION_V1,
   PUBLIC_VOTE_VERSION_V1,
   type ElectionManifestV1,
@@ -86,5 +87,60 @@ describe('verification protocol records', () => {
       { count: 1, encoding: 0, optionId: manifest.options[0]!.id },
       { count: 2, encoding: 1, optionId: manifest.options[1]!.id },
     ]);
+  });
+
+  it('includes every option for a zero-vote election', () => {
+    const jsonl = canonicalVoteJsonlV1([]);
+    const snapshot = acceptedVoteSetSnapshotV1(manifest, jsonl, 0, '2030-01-01T03:00:00.000Z');
+    const tally = computeTallyV1(manifest, snapshot, []);
+    expect(tally.acceptedVoteCount).toBe(0);
+    expect(tally.totalsByOption.map(({ count }) => count)).toEqual([0, 0]);
+    expect(tally.totalsByOption.reduce((sum, option) => sum + option.count, 0)).toBe(0);
+  });
+
+  it('is invariant to input permutation and produces stable tally/result digests', () => {
+    const first = [vote('2', 0), vote('10', 1), vote('11', 1)];
+    const second = [first[2]!, first[0]!, first[1]!];
+    const jsonl = canonicalVoteJsonlV1(first);
+    const snapshot = acceptedVoteSetSnapshotV1(
+      manifest,
+      jsonl,
+      first.length,
+      '2030-01-01T03:00:00.000Z',
+    );
+    const firstTally = computeTallyV1(manifest, snapshot, first);
+    const secondTally = computeTallyV1(manifest, snapshot, second);
+    expect(secondTally.tallyDigest).toBe(firstTally.tallyDigest);
+    expect(
+      electionResultV1({
+        manifest,
+        previousResultDigest: null,
+        publishedAt: '2030-01-01T04:00:00.000Z',
+        resultVersion: 1,
+        tally: secondTally,
+        verificationPackageDigest: 'e'.repeat(64),
+      }).resultContentDigest,
+    ).toBe(
+      electionResultV1({
+        manifest,
+        previousResultDigest: null,
+        publishedAt: '2030-01-01T04:00:00.000Z',
+        resultVersion: 1,
+        tally: firstTally,
+        verificationPackageDigest: 'e'.repeat(64),
+      }).resultContentDigest,
+    );
+  });
+
+  it('rejects invalid accepted vote encodings and snapshot count mismatches', () => {
+    const invalid = vote('12', 2);
+    const jsonl = canonicalVoteJsonlV1([invalid]);
+    const snapshot = acceptedVoteSetSnapshotV1(manifest, jsonl, 1, '2030-01-01T03:00:00.000Z');
+    expect(() => computeTallyV1(manifest, snapshot, [invalid])).toThrow(
+      'Vote encoding is not in manifest',
+    );
+    expect(() => computeTallyV1(manifest, { ...snapshot, recordCount: 2 }, [vote('2', 0)])).toThrow(
+      'Vote count does not match snapshot',
+    );
   });
 });

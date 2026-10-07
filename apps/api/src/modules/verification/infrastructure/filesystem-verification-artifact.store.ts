@@ -18,11 +18,13 @@ export class FilesystemVerificationArtifactStore {
 
   async putImmutable(
     electionId: string,
+    resultVersion: number,
     contentDigest: string,
     files: Readonly<Record<string, string | Uint8Array>>,
   ): Promise<string> {
-    const electionDirectory = safeChild(this.root, electionId);
-    const destination = safeChild(this.root, electionId, contentDigest);
+    const version = `v${resultVersion}`;
+    const electionDirectory = safeChild(this.root, electionId, 'results', version);
+    const destination = safeChild(this.root, electionId, 'results', version, contentDigest);
     await mkdir(electionDirectory, { recursive: true });
     try {
       await access(destination, constants.R_OK);

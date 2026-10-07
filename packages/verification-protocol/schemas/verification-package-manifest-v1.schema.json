@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.example/schemas/verification-package-manifest-v1.schema.json",
+  "title": "VerificationPackageManifestV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "packageVersion",
+    "electionId",
+    "resultVersion",
+    "evidenceDigest",
+    "packageContentDigest",
+    "files"
+  ],
+  "properties": {
+    "packageVersion": { "const": "verification-package-v1" },
+    "electionId": { "type": "string", "format": "uuid" },
+    "resultVersion": { "type": "integer", "minimum": 1 },
+    "evidenceDigest": { "$ref": "#/$defs/digest" },
+    "packageContentDigest": { "$ref": "#/$defs/digest" },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["logicalPath", "sha256", "size"],
+        "properties": {
+          "logicalPath": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+          "sha256": { "$ref": "#/$defs/digest" },
+          "size": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  },
+  "$defs": { "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+}

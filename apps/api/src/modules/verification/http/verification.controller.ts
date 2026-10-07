@@ -84,6 +84,23 @@ export class PublicVerificationController {
     return this.verification.getResults(id);
   }
 
+  @Get(':id/results/:resultVersion')
+  @Header('Cache-Control', 'public, max-age=31536000, immutable')
+  @ApiOkResponse({ description: 'One immutable published result version' })
+  resultVersion(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('resultVersion') rawResultVersion: string,
+  ) {
+    if (!/^[1-9][0-9]*$/u.test(rawResultVersion)) {
+      throw new ApplicationError(
+        'INVALID_RESULT_VERSION',
+        'Result version is invalid.',
+        'validation',
+      );
+    }
+    return this.verification.getResults(id, Number(rawResultVersion));
+  }
+
   @Get(':id/verification/receipts/:receiptCommitment')
   @Header('Cache-Control', 'public, max-age=60')
   @ApiOkResponse({ description: 'Receipt membership in the frozen accepted vote set' })
@@ -119,7 +136,14 @@ export class AdminVerificationController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(CsrfGuard)
   computeTally(@Param('id', ParseUUIDPipe) id: string, @Req() request: AdminRequest) {
-    return this.verification.startCounting(id, request.adminPrincipal!);
+    return this.verification.computeTally(id, request.adminPrincipal!);
+  }
+
+  @Post(':id/enter-counting')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(CsrfGuard)
+  enterCounting(@Param('id', ParseUUIDPipe) id: string, @Req() request: AdminRequest) {
+    return this.verification.enterCounting(id, request.adminPrincipal!);
   }
 
   @Post(':id/verification-package')

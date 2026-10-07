@@ -9,11 +9,14 @@ import {
 import {
   ELECTION_MANIFEST_VERSION_V1,
   PUBLIC_VOTE_VERSION_V1,
+  RESULT_SCHEMA_VERSION_V1,
+  TALLY_MANIFEST_VERSION_V1,
   TALLY_VERSION_V1,
   VOTE_SET_VERSION_V1,
   type AcceptedVoteSetSnapshotV1,
   type ElectionManifestEnvelopeV1,
   type ElectionManifestV1,
+  type ElectionResultV1,
   type PublicAcceptedVoteV1,
   type TallyManifestV1,
 } from './types.js';
@@ -79,14 +82,53 @@ export function computeTallyV1(
   snapshot: AcceptedVoteSetSnapshotV1,
   votes: readonly PublicAcceptedVoteV1[],
 ): TallyManifestV1 {
+  if (
+    snapshot.electionId !== manifest.electionId ||
+    snapshot.configurationVersion !== manifest.electionConfigurationVersion ||
+    snapshot.protocolVersion !== manifest.protocolVersion
+  ) {
+    throw new VerificationProtocolError(
+      'TALLY_MISMATCH',
+      'Vote set snapshot does not match the election manifest.',
+    );
+  }
   if (snapshot.recordCount !== votes.length) {
     throw new VerificationProtocolError('TALLY_MISMATCH', 'Vote count does not match snapshot.');
   }
+  const canonicalVotes = canonicalVoteJsonlV1(votes);
+  if (voteSetDigestV1(canonicalVotes) !== snapshot.canonicalDigest) {
+    throw new VerificationProtocolError(
+      'TALLY_MISMATCH',
+      'Vote set digest does not match snapshot.',
+    );
+  }
   const counts = new Map(manifest.options.map((option) => [option.encoding, 0]));
   for (const vote of votes) {
+    if (
+      vote.electionId !== manifest.electionId ||
+      vote.configurationVersion !== manifest.electionConfigurationVersion ||
+      vote.protocolVersion !== manifest.protocolVersion ||
+      vote.circuitVersion !== manifest.circuitVersion ||
+      vote.electionContext !== manifest.electionContext ||
+      vote.merkleRoot !== manifest.merkleRoot
+    ) {
+      throw new VerificationProtocolError(
+        'INVALID_ACCEPTED_VOTE',
+        'Accepted vote does not match the frozen manifest.',
+      );
+    }
     const current = counts.get(vote.voteEncoding);
     if (current === undefined) {
-      throw new VerificationProtocolError('TALLY_MISMATCH', 'Vote encoding is not in manifest.');
+      throw new VerificationProtocolError(
+        'INVALID_ACCEPTED_VOTE',
+        'Vote encoding is not in manifest.',
+      );
+    }
+    if (!Number.isSafeInteger(current + 1)) {
+      throw new VerificationProtocolError(
+        'TALLY_MISMATCH',
+        'Vote count exceeds safe integer range.',
+      );
     }
     counts.set(vote.voteEncoding, current + 1);
   }
@@ -99,16 +141,68 @@ export function computeTallyV1(
   if (total !== votes.length) {
     throw new VerificationProtocolError('TALLY_MISMATCH', 'Tally sum invariant failed.');
   }
-  return {
+  const content = {
     acceptedVoteCount: votes.length,
     acceptedVoteSetDigest: snapshot.canonicalDigest,
-    computedAt: snapshot.frozenAt,
     configurationVersion: manifest.electionConfigurationVersion,
     electionId: manifest.electionId,
     invalidAcceptedVoteCount: 0,
+    manifestVersion: TALLY_MANIFEST_VERSION_V1,
     protocolVersion: manifest.protocolVersion,
     tallyVersion: TALLY_VERSION_V1,
     totalsByOption,
+  } as const;
+  return {
+    ...content,
+    computedAt: snapshot.frozenAt,
+    tallyDigest: canonicalDigestV1('votaciones/tally-content/v1', content),
+  };
+}
+
+export function electionResultV1(input: {
+  readonly manifest: ElectionManifestV1;
+  readonly previousResultDigest: string | null;
+  readonly publishedAt: string;
+  readonly resultVersion: number;
+  readonly tally: TallyManifestV1;
+  readonly verificationPackageDigest: string;
+}): ElectionResultV1 {
+  if (!Number.isInteger(input.resultVersion) || input.resultVersion < 1) {
+    throw new VerificationProtocolError('INVALID_RESULT_VERSION', 'Result version is invalid.');
+  }
+  const totalsByOption = input.manifest.options.map((option) => {
+    const total = input.tally.totalsByOption.find((item) => item.encoding === option.encoding);
+    if (!total || total.optionId !== option.id) {
+      throw new VerificationProtocolError('TALLY_MISMATCH', 'Tally option mapping is invalid.');
+    }
+    return { ...total, label: option.label };
+  });
+  const content = {
+    acceptedVoteSetDigest: input.tally.acceptedVoteSetDigest,
+    configurationVersion: input.manifest.electionConfigurationVersion,
+    electionId: input.manifest.electionId,
+    protocolVersion: input.manifest.protocolVersion,
+    resultSchemaVersion: RESULT_SCHEMA_VERSION_V1,
+    resultVersion: input.resultVersion,
+    tallyDigest: input.tally.tallyDigest,
+    totalAcceptedVotes: input.tally.acceptedVoteCount,
+    totalsByOption,
+  } as const;
+  const resultContentDigest = canonicalDigestV1('votaciones/result-content/v1', content);
+  const publication = {
+    previousResultDigest: input.previousResultDigest,
+    publishedAt: input.publishedAt,
+    resultContentDigest,
+    resultVersion: input.resultVersion,
+    verificationPackageDigest: input.verificationPackageDigest,
+  } as const;
+  return {
+    ...content,
+    previousResultDigest: input.previousResultDigest,
+    publicationDigest: canonicalDigestV1('votaciones/result-publication/v1', publication),
+    publishedAt: input.publishedAt,
+    resultContentDigest,
+    verificationPackageDigest: input.verificationPackageDigest,
   };
 }
 

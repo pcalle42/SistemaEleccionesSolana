@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.example/schemas/election-result-v1.schema.json",
+  "title": "ElectionResultV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "resultSchemaVersion",
+    "electionId",
+    "configurationVersion",
+    "protocolVersion",
+    "resultVersion",
+    "acceptedVoteSetDigest",
+    "totalAcceptedVotes",
+    "totalsByOption",
+    "tallyDigest",
+    "verificationPackageDigest",
+    "publishedAt",
+    "previousResultDigest",
+    "resultContentDigest",
+    "publicationDigest"
+  ],
+  "properties": {
+    "resultSchemaVersion": { "const": "election-result-v1" },
+    "electionId": { "type": "string", "format": "uuid" },
+    "configurationVersion": { "type": "integer", "minimum": 1 },
+    "protocolVersion": { "type": "string", "minLength": 1 },
+    "resultVersion": { "type": "integer", "minimum": 1 },
+    "acceptedVoteSetDigest": { "$ref": "#/$defs/digest" },
+    "totalAcceptedVotes": { "type": "integer", "minimum": 0 },
+    "tallyDigest": { "$ref": "#/$defs/digest" },
+    "verificationPackageDigest": { "$ref": "#/$defs/digest" },
+    "publishedAt": { "type": "string", "format": "date-time" },
+    "previousResultDigest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+    "resultContentDigest": { "$ref": "#/$defs/digest" },
+    "publicationDigest": { "$ref": "#/$defs/digest" },
+    "totalsByOption": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["encoding", "optionId", "label", "count"],
+        "properties": {
+          "encoding": { "type": "integer", "minimum": 0 },
+          "optionId": { "type": "string", "format": "uuid" },
+          "label": { "type": "string" },
+          "count": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  },
+  "$defs": { "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+}

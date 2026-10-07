@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { cp, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -26,7 +26,9 @@ let artifactDirectory = '';
 let service: VerificationService;
 
 async function clearData() {
+  await migrationPool.query('DELETE FROM result.result_publications');
   await migrationPool.query('DELETE FROM result.verification_packages');
+  await migrationPool.query('DELETE FROM result.election_results');
   await migrationPool.query('DELETE FROM result.tally_manifests');
   await migrationPool.query('DELETE FROM result.accepted_vote_set_snapshots');
   await migrationPool.query('DELETE FROM result.election_manifests');
@@ -108,16 +110,45 @@ describe('verifiable result lifecycle', () => {
     event = election.close(adminId, clock);
     await repository.transitionState(election, event, 2);
 
-    const tally = await service.startCounting(election.snapshot().id, {
-      adminId,
-      authSessionId: randomUUID(),
+    const principal = () => ({ adminId, authSessionId: randomUUID() });
+    const [firstSnapshot, retrySnapshot] = await Promise.all([
+      service.enterCounting(election.snapshot().id, principal()),
+      service.enterCounting(election.snapshot().id, principal()),
+    ]);
+    expect(retrySnapshot).toEqual(firstSnapshot);
+    const frozenRows = await migrationPool.query<{ count: number }>(
+      `SELECT count(*)::int AS count FROM result.accepted_vote_set_snapshots
+        WHERE election_id = $1`,
+      [election.snapshot().id],
+    );
+    expect(frozenRows.rows[0]?.count).toBe(1);
+    await expect(service.getResults(election.snapshot().id)).rejects.toMatchObject({
+      code: 'RESULTS_NOT_PUBLISHED',
     });
+
+    const [tally, retryTally] = await Promise.all([
+      service.computeTally(election.snapshot().id, principal()),
+      service.computeTally(election.snapshot().id, principal()),
+    ]);
+    expect(retryTally).toEqual(tally);
     expect(tally).toMatchObject({ acceptedVoteCount: 0, invalidAcceptedVoteCount: 0 });
+    expect(tally.totalsByOption).toEqual([
+      expect.objectContaining({ count: 0, encoding: 0 }),
+      expect.objectContaining({ count: 0, encoding: 1 }),
+    ]);
+    const tallyRows = await migrationPool.query<{ count: number }>(
+      `SELECT count(*)::int AS count FROM result.tally_manifests WHERE election_id = $1`,
+      [election.snapshot().id],
+    );
+    expect(tallyRows.rows[0]?.count).toBe(1);
     const generated = await service.generatePackage(election.snapshot().id, {
       adminId,
       authSessionId: randomUUID(),
     });
     expect(generated).toMatchObject({ report: { valid: true } });
+    await expect(service.getVerification(election.snapshot().id)).rejects.toMatchObject({
+      code: 'VERIFICATION_PACKAGE_NOT_FOUND',
+    });
     await expect(
       service.generatePackage(election.snapshot().id, {
         adminId,
@@ -138,26 +169,84 @@ describe('verifiable result lifecycle', () => {
     expect(publicPackageText).not.toContain('not-used');
     expect(publicPackageText).not.toContain(adminId);
     expect(publicPackageText).not.toContain('acceptedAt');
-    const tamperedDirectory = await mkdtemp(join(tmpdir(), 'votaciones-tampered-'));
-    await cp(stored.rows[0]!.package_path, tamperedDirectory, { recursive: true });
-    await writeFile(join(tamperedDirectory, 'tally.json'), '{}\n');
-    await expect(verifyElectionPackage(tamperedDirectory)).resolves.toMatchObject({
+    const tallyPath = join(stored.rows[0]!.package_path, 'tally.json');
+    const originalTally = await readFile(tallyPath);
+    await writeFile(tallyPath, '{}\n');
+    await expect(verifyElectionPackage(stored.rows[0]!.package_path)).resolves.toMatchObject({
       valid: false,
     });
-    await rm(tamperedDirectory, { force: true, recursive: true });
+    await expect(service.publishResults(election.snapshot().id, principal())).rejects.toMatchObject(
+      { code: 'RESULT_PUBLICATION_REJECTED' },
+    );
+    await expect(service.getResults(election.snapshot().id)).rejects.toMatchObject({
+      code: 'RESULTS_NOT_PUBLISHED',
+    });
+    await expect(
+      migrationPool.query(
+        `SELECT election.status, publication.status AS publication_status
+           FROM election.elections election
+           JOIN result.result_publications publication ON publication.election_id = election.id
+          WHERE election.id = $1`,
+        [election.snapshot().id],
+      ),
+    ).resolves.toMatchObject({
+      rows: [{ publication_status: 'FAILED', status: 'COUNTING' }],
+    });
+    await writeFile(tallyPath, originalTally);
     const published = await service.publishResults(election.snapshot().id, {
       adminId,
       authSessionId: randomUUID(),
     });
-    expect(published).toMatchObject({ acceptedVoteCount: 0 });
+    expect(published).toMatchObject({ resultVersion: 1, totalAcceptedVotes: 0 });
     await expect(
       service.publishResults(election.snapshot().id, {
         adminId,
         authSessionId: randomUUID(),
       }),
-    ).resolves.toMatchObject({ acceptedVoteCount: 0 });
+    ).resolves.toMatchObject({ resultVersion: 1, totalAcceptedVotes: 0 });
     await expect(service.getResults(election.snapshot().id)).resolves.toMatchObject({
-      acceptedVoteCount: 0,
+      resultVersion: 1,
+      totalAcceptedVotes: 0,
     });
+    await expect(service.getResults(election.snapshot().id, 1)).resolves.toMatchObject({
+      resultVersion: 1,
+    });
+    const persisted = await migrationPool.query<{
+      package_count: number;
+      publication_count: number;
+      result_count: number;
+      status: string;
+    }>(
+      `SELECT election.status,
+              (SELECT count(*)::int FROM result.verification_packages WHERE election_id = election.id) AS package_count,
+              (SELECT count(*)::int FROM result.result_publications WHERE election_id = election.id) AS publication_count,
+              (SELECT count(*)::int FROM result.election_results WHERE election_id = election.id) AS result_count
+         FROM election.elections election WHERE election.id = $1`,
+      [election.snapshot().id],
+    );
+    expect(persisted.rows[0]).toMatchObject({
+      package_count: 1,
+      publication_count: 1,
+      result_count: 1,
+      status: 'RESULTS_PUBLISHED',
+    });
+    const auditEvents = await migrationPool.query<{ event_type: string }>(
+      `SELECT event_type FROM audit.audit_event
+        WHERE stream_id = $1 ORDER BY sequence`,
+      [`election:${election.snapshot().id}`],
+    );
+    expect(auditEvents.rows.map(({ event_type: eventType }) => eventType)).toEqual(
+      expect.arrayContaining([
+        'accepted_vote_set_frozen',
+        'counting_started',
+        'tally_computed',
+        'tally_validated',
+        'verification_package_generated',
+        'verification_package_verified',
+        'result_publication_started',
+        'result_publication_failed',
+        'results_published',
+      ]),
+    );
   });
 });

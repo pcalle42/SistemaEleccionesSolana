@@ -12,6 +12,15 @@ de acceso a PostgreSQL. La especificación normativa de bytes es:
 - no se incluyen timestamps de aceptación, identidad, credential, commitment de identidad, IP,
   user-agent ni request IDs.
 
+El verifier comienza en `verification-package-manifest.json`. Su lista `files[]` está ordenada por
+`logicalPath` e incluye digest y tamaño. `evidenceDigest` identifica los archivos de evidencia sin
+`result.json`; de ese modo `result.json` puede referenciar la evidencia sin crear un hash circular.
+`packageContentDigest` identifica después el conjunto completo, incluido el resultado.
+
+`tallyDigest` excluye `computedAt`: mismo manifest y mismo conjunto congelado producen el mismo
+contenido electoral. `resultContentDigest` cubre counts, opciones congeladas, tally y versión;
+`publicationDigest` cubre además timestamp, referencia de evidencia y resultado anterior.
+
 ```bash
 pnpm verify:election --package ./path/to/verification-package
 ```

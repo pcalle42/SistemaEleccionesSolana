@@ -26,6 +26,8 @@ export { identitySchema } from './identity.js';
 export {
   acceptedVoteSetSnapshots,
   electionManifests,
+  electionResults,
+  resultPublications,
   resultSchema,
   tallyManifests,
   verificationPackages,
