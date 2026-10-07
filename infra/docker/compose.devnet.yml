@@ -1,4 +1,22 @@
 services:
+  admin-web:
+    labels:
+      votaciones.environment: devnet
+    networks:
+      - internal
+      - migration-access
+    ports:
+      - 127.0.0.1:${ADMIN_WEB_HOST_PORT:-3101}:3001
+
+  voter-web:
+    labels:
+      votaciones.environment: devnet
+    networks:
+      - internal
+      - migration-access
+    ports:
+      - 127.0.0.1:${VOTER_WEB_HOST_PORT:-3102}:3002
+
   postgres:
     labels:
       votaciones.environment: devnet

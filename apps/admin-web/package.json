@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite --host 127.0.0.1 --port 3001",
+    "preview": "vite preview --host 127.0.0.1 --port 3001",
     "pretest": "pnpm build",
     "test": "vitest run",
     "test:unit": "vitest run",
@@ -17,6 +19,7 @@
     "@votaciones/config-typescript": "workspace:*",
     "@votaciones/shared-testing": "workspace:*",
     "typescript": "catalog:",
+    "vite": "8.2.2",
     "vitest": "catalog:"
   }
 }

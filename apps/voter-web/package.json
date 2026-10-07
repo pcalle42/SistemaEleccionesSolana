@@ -4,19 +4,28 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "artifacts:prepare": "node scripts/prepare-artifacts.mjs",
+    "build": "pnpm artifacts:prepare && tsc --noEmit && vite build",
+    "dev": "pnpm artifacts:prepare && vite --host 127.0.0.1 --port 3002",
+    "preview": "vite preview --host 127.0.0.1 --port 3002",
     "pretest": "pnpm build",
     "test": "vitest run",
     "test:unit": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@votaciones/shared-types": "workspace:*"
+    "@votaciones/shared-types": "workspace:*",
+    "@votaciones/zk-protocol": "workspace:*",
+    "buffer": "6.0.3",
+    "events": "3.3.0",
+    "snarkjs": "0.7.6"
   },
   "devDependencies": {
     "@votaciones/config-typescript": "workspace:*",
     "@votaciones/shared-testing": "workspace:*",
+    "@types/snarkjs": "0.7.9",
     "typescript": "catalog:",
+    "vite": "8.2.2",
     "vitest": "catalog:"
   }
 }

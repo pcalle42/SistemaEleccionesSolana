@@ -1,4 +1,18 @@
 services:
+  admin-web:
+    networks:
+      - internal
+      - local-access
+    ports:
+      - 127.0.0.1:${ADMIN_WEB_HOST_PORT:-3001}:3001
+
+  voter-web:
+    networks:
+      - internal
+      - local-access
+    ports:
+      - 127.0.0.1:${VOTER_WEB_HOST_PORT:-3002}:3002
+
   postgres:
     networks:
       - internal

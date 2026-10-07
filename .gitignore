@@ -66,3 +66,4 @@ yarn.lock
 bun.lock
 bun.lockb
 .artifacts/
+apps/voter-web/public/artifacts/
