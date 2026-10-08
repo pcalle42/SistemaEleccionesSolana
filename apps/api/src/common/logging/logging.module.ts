@@ -39,7 +39,7 @@ function failedRequestLog(
   };
 }
 
-function serializedRequest(request: RequestWithId): Record<string, unknown> {
+export function safeRequestLogFields(request: RequestWithId): Record<string, unknown> {
   return {
     id: request.id,
     method: request.method,
@@ -120,7 +120,7 @@ export function successfulRequestLog(
           },
           serializers: {
             err: (error) => ({ type: errorName(error) }),
-            req: (request) => serializedRequest(asRequestWithId(request)),
+            req: (request) => safeRequestLogFields(asRequestWithId(request)),
             res: (response) => ({
               statusCode: (response as unknown as { statusCode?: number }).statusCode,
             }),

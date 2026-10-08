@@ -122,6 +122,7 @@ describe('anonymous voting HTTP protocol', () => {
   let publicSignalsChoice0: string[];
   let publicSignalsChoice1: string[];
   const votes = new MemoryVoteRepository();
+  const observedNetworkSignals: string[] = [];
 
   beforeAll(async () => {
     const secret = '987654321012345678909876543210123456789';
@@ -184,7 +185,12 @@ describe('anonymous voting HTTP protocol', () => {
       .overrideProvider(VOTE_REPOSITORY)
       .useValue(votes)
       .overrideProvider(VOTE_ADMISSION)
-      .useValue({ execute: (_network: string, work: () => Promise<unknown>) => work() })
+      .useValue({
+        execute: (network: string, work: () => Promise<unknown>) => {
+          observedNetworkSignals.push(network);
+          return work();
+        },
+      })
       .overrideProvider(DatabaseLifecycleService)
       .useValue({ health: vi.fn(), onApplicationShutdown: vi.fn() })
       .overrideProvider(ValkeyLifecycleService)
@@ -202,12 +208,14 @@ describe('anonymous voting HTTP protocol', () => {
   it('accepts a real proof and returns an anonymous reproducible receipt', async () => {
     const response = await request(httpServer)
       .post(`/api/v1/elections/${electionId}/votes`)
+      .set('x-forwarded-for', '198.51.100.99')
       .send({
         proof: proofChoice0,
         protocolVersion: PROTOCOL_VERSION_V1,
         publicSignals: publicSignalsChoice0,
       })
       .expect(201);
+    expect(observedNetworkSignals.at(-1)).not.toBe('198.51.100.99');
     const body = response.body as {
       receipt: {
         acceptedAt: string;

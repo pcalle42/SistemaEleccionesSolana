@@ -11,3 +11,8 @@ mediante migraciones versionadas en `apps/api/drizzle/`.
 `backups/` contiene archivos custom de `pg_dump` y está ignorado por Git. Use
 `pnpm db:backup` y `pnpm db:restore -- --force <archivo>`; un dump solo se
 considera válido después de restaurarlo y verificar sus datos.
+
+Producción mantiene PostgreSQL en red privada, separa credenciales migration/runtime mediante secret
+management y exige TLS si la conexión cruza un boundary no confiable. Antes de abrir una elección se
+documentan RPO/RTO, retención, cifrado/ACL del backup y la evidencia de un restore drill. WAL/PITR se
+decide con esos requisitos; no se presume configurado por los entornos locales.

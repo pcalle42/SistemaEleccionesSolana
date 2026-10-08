@@ -109,6 +109,7 @@ describe('NestJS HTTP foundation', () => {
     expect(response.headers['x-request-id']).toBe('client-request-123');
     expect(response.headers['x-content-type-options']).toBe('nosniff');
     expect(response.headers['x-powered-by']).toBeUndefined();
+    expect(response.headers['strict-transport-security']).toBeUndefined();
   });
 
   it('reports readiness and explicit Valkey degradation', async () => {

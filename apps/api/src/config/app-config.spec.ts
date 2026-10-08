@@ -13,7 +13,12 @@ describe('application configuration', () => {
     const config = getAppConfig(validEnvironment);
     expect(config).toMatchObject({
       environment: 'test',
-      http: { bodyLimitBytes: 262_144, host: '127.0.0.1', port: 3_000 },
+      http: {
+        bodyLimitBytes: 262_144,
+        host: '127.0.0.1',
+        port: 3_000,
+        trustedProxyAddresses: [],
+      },
       logging: { level: 'silent', service: 'votaciones-api' },
       openApi: { enabled: false, path: 'docs' },
       voting: {
@@ -69,5 +74,20 @@ describe('application configuration', () => {
     expect(() => getAppConfig({ ...validEnvironment, VOTE_RATE_LIMIT_MAXIMUM: '0' })).toThrow(
       'VOTE_RATE_LIMIT_MAXIMUM',
     );
+  });
+
+  it('accepts only explicit IP/CIDR proxy boundaries', () => {
+    expect(
+      getAppConfig({
+        ...validEnvironment,
+        HTTP_TRUST_PROXY_ADDRESSES: '127.0.0.1,10.20.0.0/16,::1',
+      }).http.trustedProxyAddresses,
+    ).toEqual(['127.0.0.1', '10.20.0.0/16', '::1']);
+    expect(() =>
+      getAppConfig({ ...validEnvironment, HTTP_TRUST_PROXY_ADDRESSES: 'loopback' }),
+    ).toThrow('HTTP_TRUST_PROXY_ADDRESSES');
+    expect(() =>
+      getAppConfig({ ...validEnvironment, HTTP_TRUST_PROXY_ADDRESSES: '10.0.0.0/99' }),
+    ).toThrow('HTTP_TRUST_PROXY_ADDRESSES');
   });
 });

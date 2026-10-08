@@ -1,5 +1,6 @@
 import { getDatabaseConfig, type DatabaseConfig } from '../database/config/database-config.js';
 import { getValkeyConfig, type ValkeyConfig } from '../valkey/valkey.config.js';
+import { isIP } from 'node:net';
 import { resolve } from 'node:path';
 
 export type RuntimeEnvironment = 'local' | 'test' | 'devnet' | 'production';
@@ -33,6 +34,7 @@ export interface AppConfig {
     readonly host: string;
     readonly port: number;
     readonly requestTimeoutMs: number;
+    readonly trustedProxyAddresses: readonly string[];
   };
   readonly logging: {
     readonly level: LogLevel;
@@ -130,6 +132,27 @@ function corsOrigins(environment: NodeJS.ProcessEnv, runtime: RuntimeEnvironment
   return origins;
 }
 
+function trustedProxyAddresses(environment: NodeJS.ProcessEnv): string[] {
+  const addresses = (environment['HTTP_TRUST_PROXY_ADDRESSES'] ?? '')
+    .split(',')
+    .map((address) => address.trim())
+    .filter(Boolean);
+  for (const address of addresses) {
+    const [host, prefix, ...extra] = address.split('/');
+    const family = isIP(host ?? '');
+    const maximumPrefix = family === 4 ? 32 : family === 6 ? 128 : 0;
+    if (
+      extra.length > 0 ||
+      family === 0 ||
+      (prefix !== undefined &&
+        (!/^\d+$/u.test(prefix) || Number(prefix) < 0 || Number(prefix) > maximumPrefix))
+    ) {
+      throw new Error('HTTP_TRUST_PROXY_ADDRESSES must contain only IP addresses or CIDRs');
+    }
+  }
+  return addresses;
+}
+
 function logLevel(environment: NodeJS.ProcessEnv, runtime: RuntimeEnvironment): LogLevel {
   const fallback: LogLevel = runtime === 'test' ? 'silent' : runtime === 'local' ? 'debug' : 'info';
   const value = environment['LOG_LEVEL'] ?? fallback;
@@ -201,6 +224,7 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
       host,
       port: integer(environment, 'APP_PORT', 3_000, 1, 65_535),
       requestTimeoutMs: integer(environment, 'HTTP_REQUEST_TIMEOUT_MS', 15_000, 1_000, 120_000),
+      trustedProxyAddresses: Object.freeze(trustedProxyAddresses(environment)),
     }),
     logging: Object.freeze({
       level: logLevel(environment, runtime),

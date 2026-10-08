@@ -14,6 +14,9 @@ import { loadEnvironment } from './config/environment.js';
 import { configureOpenApi } from './openapi/openapi.js';
 
 export function configureApplication(app: NestExpressApplication, config: AppConfig): void {
+  if (config.http.trustedProxyAddresses.length > 0) {
+    app.set('trust proxy', [...config.http.trustedProxyAddresses]);
+  }
   app.useSecurityHeaders({
     contentSecurityPolicy: config.openApi.enabled
       ? {
@@ -23,6 +26,10 @@ export function configureApplication(app: NestExpressApplication, config: AppCon
           },
         }
       : true,
+    strictTransportSecurity:
+      config.environment === 'production'
+        ? { includeSubDomains: true, maxAge: 31_536_000, preload: false }
+        : false,
   });
   app.use(requestIdMiddleware);
   app.enableCors({

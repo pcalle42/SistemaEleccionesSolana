@@ -1,0 +1,13 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Public ZK artifact digests in versioned manifests/transcripts"
+paths = [
+  '''packages/zk-protocol/artifacts/anonymous-single-choice-v1/setup-transcript\.json''',
+  '''packages/zk-protocol/manifests/anonymous-single-choice-v1\.json''',
+]
+
+[[allowlists]]
+description = "Pinned public container image references in infrastructure documentation"
+paths = ['''infra/README\.md''']

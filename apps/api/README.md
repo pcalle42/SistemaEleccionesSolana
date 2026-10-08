@@ -24,6 +24,7 @@ inyección de dependencias. Las variables propias del servidor son:
 | `APP_PORT`                       | `3000`                      | Puerto HTTP                                   |
 | `HTTP_BODY_LIMIT_BYTES`          | `262144`                    | Límite global de body, entre 1 KiB y 2 MiB    |
 | `HTTP_REQUEST_TIMEOUT_MS`        | `15000`                     | Timeout HTTP, entre 1 s y 120 s               |
+| `HTTP_TRUST_PROXY_ADDRESSES`     | vacío                       | IP/CIDR explícitos del proxy controlado       |
 | `HTTP_CORS_ORIGINS`              | orígenes locales explícitos | Allowlist separada por comas; no admite `*`   |
 | `LOG_LEVEL`                      | `debug`                     | Nivel Pino                                    |
 | `OPENAPI_ENABLED`                | `true`                      | Swagger UI y documento OpenAPI                |
@@ -31,7 +32,9 @@ inyección de dependencias. Las variables propias del servidor son:
 | `VOTE_RATE_LIMIT_MAXIMUM`        | `30`                        | Máximo por digest de red y ventana            |
 | `VOTE_MAXIMUM_CONCURRENT_PROOFS` | `2`                         | Pairings simultáneos por proceso              |
 
-Producción exige una allowlist CORS no vacía y no habilita OpenAPI por defecto.
+Producción exige una allowlist CORS no vacía y no habilita OpenAPI por defecto. Express ignora
+`X-Forwarded-*` salvo que se configure la allowlist de proxies; el acceso directo a la API debe
+quedar bloqueado cuando se habilita esa confianza.
 Las variables de PostgreSQL y Valkey están en las plantillas de `infra/`. Nunca
 se deben imprimir ni versionar URLs con credenciales.
 
