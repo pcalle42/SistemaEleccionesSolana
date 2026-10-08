@@ -10,6 +10,7 @@ export default [
       'apps/api/**/*.{js,mjs,ts}',
       'packages/**/*.{js,mjs,ts}',
       'scripts/**/*.{js,mjs,ts}',
+      'tests/scripts/**/*.{js,mjs,ts}',
     ],
     languageOptions: {
       globals: globals.node,

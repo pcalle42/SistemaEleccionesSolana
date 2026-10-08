@@ -180,7 +180,8 @@ export class AdminApiClient {
     }
     let response: Response;
     try {
-      response = await this.fetcher(`${this.baseUrl}${path}`, {
+      const fetcher = this.fetcher;
+      response = await fetcher(`${this.baseUrl}${path}`, {
         credentials: 'include',
         headers,
         method: init.method ?? 'GET',

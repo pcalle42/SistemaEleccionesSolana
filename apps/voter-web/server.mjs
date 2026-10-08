@@ -14,7 +14,7 @@ const types = {
   '.zkey': 'application/octet-stream',
 };
 const headers = {
-  'Content-Security-Policy': `default-src 'self'; connect-src 'self' ${apiOrigin}; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`,
+  'Content-Security-Policy': `default-src 'self'; connect-src 'self' blob: ${apiOrigin}; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`,
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
   'Referrer-Policy': 'no-referrer',
   'X-Content-Type-Options': 'nosniff',

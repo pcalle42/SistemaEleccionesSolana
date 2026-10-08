@@ -391,7 +391,11 @@ export class VerificationService {
       const expectedSqlTotals = tally.totalsByOption
         .filter((option) => option.count > 0)
         .map((option) => ({ count: option.count, vote_encoding: option.encoding }));
-      if (JSON.stringify(sqlTotals.rows) !== JSON.stringify(expectedSqlTotals)) {
+      const normalizedSqlTotals = sqlTotals.rows.map((row) => ({
+        count: Number(row.count),
+        vote_encoding: Number(row.vote_encoding),
+      }));
+      if (JSON.stringify(normalizedSqlTotals) !== JSON.stringify(expectedSqlTotals)) {
         throw fail('TALLY_INVARIANT_FAILED', 'SQL and canonical tally disagree.', 'conflict');
       }
       const existing = await client.query<{ tally: typeof tally; tally_digest: string }>(

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.example/schemas/cast-vote-v1.schema.json",
+  "title": "CastVoteV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "proof", "publicSignals"],
+  "properties": {
+    "protocolVersion": { "const": "anonymous-single-choice-v1" },
+    "proof": { "type": "object", "minProperties": 1 },
+    "publicSignals": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": { "type": "string", "pattern": "^(0|[1-9][0-9]{0,79})$" }
+    }
+  }
+}

@@ -18,8 +18,10 @@ tiene su propio entrypoint, configuración, cliente HTTP, Dockerfile y origen.
 
 `voter-web` ejecuta `snarkjs` en un Worker dedicado. Los artefactos devnet se copian durante el
 build y se sirven bajo una ruta versionada; el Worker verifica SHA-256 antes de usarlos. La CSP
-permite `worker-src 'self' blob:` y `script-src 'self' 'wasm-unsafe-eval'`, concesiones necesarias
-para Worker/WASM que no habilitan scripts inline ni `unsafe-eval` general.
+permite `worker-src 'self' blob:`, `connect-src blob:` y
+`script-src 'self' 'wasm-unsafe-eval'`, concesiones necesarias para Worker/WASM. `connect-src
+blob:` permite que `snarkjs` lea las copias locales cuyos SHA-256 ya fueron validados; no habilita
+un origen de red adicional. No se habilitan scripts inline ni `unsafe-eval` general.
 
 ## Consecuencias
 

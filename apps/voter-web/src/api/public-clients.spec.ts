@@ -20,7 +20,7 @@ describe('VotingApiClient privacy boundary', () => {
               receiptCommitment: 'a'.repeat(64),
               receiptVersion: 'vote-receipt-v1',
             },
-            status: 'ACCEPTED',
+            status: 'accepted',
           }),
           { status: 201, headers: { 'content-type': 'application/json' } },
         ),

@@ -431,11 +431,7 @@ export class VoterApp {
         publicSignals: this.generated.publicSignals,
       });
       this.state = transitionSubmission(this.state, 'ACCEPT');
-      this.setStatus(
-        this.receipt.status === 'ALREADY_ACCEPTED'
-          ? 'El servidor devolvió el receipt ya existente.'
-          : 'Voto aceptado. Guarda tu receipt público.',
-      );
+      this.setStatus('Voto aceptado. Guarda tu receipt público.');
     } catch (error: unknown) {
       if (error instanceof PublicApiError && error.code === 'NETWORK_ERROR') {
         this.state = transitionSubmission(this.state, 'TIMEOUT');

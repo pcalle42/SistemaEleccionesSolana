@@ -1,10 +1,16 @@
-import { deriveNullifierV1 } from '@votaciones/zk-protocol';
-import { groth16 } from 'snarkjs';
+import { Buffer } from 'buffer';
+import type { deriveNullifierV1 as DeriveNullifierV1 } from '@votaciones/zk-protocol';
+import type { groth16 as Groth16 } from 'snarkjs';
 import { sha256Hex } from '../../security/digest.js';
 import type { ProofWorkerRequest, ProofWorkerResponse, WorkerArtifacts } from './messages.js';
 
+const workerGlobal = globalThis as typeof globalThis & { Buffer?: typeof Buffer };
+workerGlobal.Buffer ??= Buffer;
+
 let artifactUrls: { wasm: string; zkey: string } | undefined;
 let verificationKey: unknown;
+let deriveNullifier: typeof DeriveNullifierV1 | undefined;
+let proofSystem: typeof Groth16 | undefined;
 interface WorkerScope {
   close(): void;
   onmessage: ((event: MessageEvent<ProofWorkerRequest>) => void) | null;
@@ -12,6 +18,19 @@ interface WorkerScope {
 }
 const scope = globalThis as unknown as WorkerScope;
 const send = (message: ProofWorkerResponse) => scope.postMessage(message);
+
+function errorCode(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof error.message === 'string'
+  )
+    return error.message;
+  return 'PROOF_WORKER_FAILED';
+}
 
 async function verifiedBlob(
   url: string,
@@ -27,6 +46,12 @@ async function verifiedBlob(
 
 async function initialize(artifacts: WorkerArtifacts): Promise<void> {
   send({ type: 'PROGRESS', stage: 'preparing' });
+  const [zkProtocol, snarkjs] = await Promise.all([
+    import('@votaciones/zk-protocol'),
+    import('snarkjs'),
+  ]);
+  deriveNullifier = zkProtocol.deriveNullifierV1;
+  proofSystem = snarkjs.groth16;
   const base = artifacts.baseUrl.replace(/\/$/u, '');
   const manifestResponse = await fetch(`${base}/protocol-manifest.json`, { credentials: 'omit' });
   if (!manifestResponse.ok) throw new Error('PROTOCOL_MANIFEST_DOWNLOAD_FAILED');
@@ -75,11 +100,12 @@ scope.onmessage = (event: MessageEvent<ProofWorkerRequest>) => {
       await initialize(event.data.artifacts);
       return;
     }
-    if (!artifactUrls || !verificationKey) throw new Error('WORKER_NOT_INITIALIZED');
+    if (!artifactUrls || !verificationKey || !deriveNullifier || !proofSystem)
+      throw new Error('WORKER_NOT_INITIALIZED');
     send({ type: 'PROGRESS', stage: 'generating' });
     const input = event.data.input;
-    const nullifier = await deriveNullifierV1(input.voterSecret, input.electionContext);
-    const result = await groth16.fullProve(
+    const nullifier = await deriveNullifier(input.voterSecret, input.electionContext);
+    const result = await proofSystem.fullProve(
       {
         ...input,
         nullifier,
@@ -90,14 +116,12 @@ scope.onmessage = (event: MessageEvent<ProofWorkerRequest>) => {
       artifactUrls.zkey,
     );
     send({ type: 'PROGRESS', stage: 'verifying locally' });
-    if (!(await groth16.verify(verificationKey, result.publicSignals, result.proof)))
+    if (!(await proofSystem.verify(verificationKey, result.publicSignals, result.proof)))
       throw new Error('LOCAL_PROOF_VERIFICATION_FAILED');
     send({
       type: 'PROOF_READY',
       proof: result.proof,
       publicSignals: result.publicSignals.map(String),
     });
-  })().catch((error: unknown) =>
-    send({ type: 'ERROR', code: error instanceof Error ? error.message : 'PROOF_WORKER_FAILED' }),
-  );
+  })().catch((error: unknown) => send({ type: 'ERROR', code: errorCode(error) }));
 };

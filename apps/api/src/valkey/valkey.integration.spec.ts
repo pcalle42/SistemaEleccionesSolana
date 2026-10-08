@@ -4,6 +4,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { VALKEY_TTL_SECONDS } from './valkey.constants.js';
+import { createValkeyClient } from './valkey.client.js';
 import { checkValkeyHealth } from './valkey.health.js';
 import { createValkeyModule } from './valkey.module.js';
 import { ValkeyUnavailableError } from './valkey.service.js';
@@ -100,25 +101,26 @@ describe('Valkey integration', () => {
 
   it('isolates namespaces for different environments', async () => {
     const identifier = randomUUID();
-    const localKey = valkey.keys.testProbe(identifier);
+    const primaryKey = valkey.keys.testProbe(identifier);
+    const alternateEnvironment = valkey.config.environment === 'test' ? 'local' : 'test';
     const isolated = createValkeyModule({
       VALKEY_HOST: valkey.config.host,
       VALKEY_PORT: String(valkey.config.port),
-      VOTACIONES_ENV: 'test',
+      VOTACIONES_ENV: alternateEnvironment,
     });
-    const testKey = isolated.keys.testProbe(identifier);
+    const alternateKey = isolated.keys.testProbe(identifier);
 
     try {
       await isolated.service.connect();
-      await valkey.service.setTemporary(localKey, 'local', VALKEY_TTL_SECONDS.testProbe);
-      await isolated.service.setTemporary(testKey, 'test', VALKEY_TTL_SECONDS.testProbe);
-      expect(await valkey.service.get(localKey)).toBe('local');
-      expect(await isolated.service.get(testKey)).toBe('test');
-      expect(await valkey.service.get(testKey)).toBe('test');
-      expect(testKey).not.toBe(localKey);
+      await valkey.service.setTemporary(primaryKey, 'primary', VALKEY_TTL_SECONDS.testProbe);
+      await isolated.service.setTemporary(alternateKey, 'alternate', VALKEY_TTL_SECONDS.testProbe);
+      expect(await valkey.service.get(primaryKey)).toBe('primary');
+      expect(await isolated.service.get(alternateKey)).toBe('alternate');
+      expect(await valkey.service.get(alternateKey)).toBe('alternate');
+      expect(alternateKey).not.toBe(primaryKey);
     } finally {
-      await valkey.service.delete(localKey);
-      await isolated.service.delete(testKey);
+      await valkey.service.delete(primaryKey);
+      await isolated.service.delete(alternateKey);
       await isolated.service.disconnect();
     }
   });
@@ -149,6 +151,38 @@ describe('Valkey integration', () => {
       ).rejects.toBeInstanceOf(ValkeyUnavailableError);
     } finally {
       await unavailable.service.disconnect();
+    }
+  });
+
+  it('reloads authoritative state after an isolated test-only flush', async () => {
+    if (
+      process.env['VOTACIONES_ENV'] !== 'test' ||
+      process.env['VALKEY_ALLOW_DESTRUCTIVE_TESTS'] !== 'true' ||
+      valkey.config.host !== '127.0.0.1'
+    ) {
+      throw new Error('Destructive Valkey test refused outside the guarded test environment.');
+    }
+    const raw = createValkeyClient(valkey.config);
+    const key = valkey.keys.testProbe(randomUUID());
+    let authoritativeLoads = 0;
+    try {
+      await raw.connect();
+      await valkey.service.setTemporary(key, 'stale', VALKEY_TTL_SECONDS.testProbe);
+      await raw.flushdb();
+      const recovered = await valkey.service.getOrLoadString(
+        key,
+        VALKEY_TTL_SECONDS.testProbe,
+        () => {
+          authoritativeLoads += 1;
+          return Promise.resolve('postgres-authoritative');
+        },
+        (value) => value === 'postgres-authoritative',
+      );
+      expect(recovered).toMatchObject({ source: 'authoritative', value: 'postgres-authoritative' });
+      expect(authoritativeLoads).toBe(1);
+    } finally {
+      await raw.quit();
+      await valkey.service.delete(key);
     }
   });
 });

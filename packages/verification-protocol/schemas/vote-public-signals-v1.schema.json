@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.example/schemas/vote-public-signals-v1.schema.json",
+  "title": "VotePublicSignalsV1",
+  "type": "array",
+  "minItems": 5,
+  "maxItems": 5,
+  "prefixItems": [
+    { "$ref": "#/$defs/field" },
+    { "$ref": "#/$defs/field" },
+    { "$ref": "#/$defs/field" },
+    { "$ref": "#/$defs/field" },
+    { "$ref": "#/$defs/field" }
+  ],
+  "items": false,
+  "$defs": {
+    "field": { "type": "string", "pattern": "^(0|[1-9][0-9]{0,79})$" }
+  }
+}

@@ -1,5 +1,9 @@
 import './styles.css';
+import { Buffer } from 'buffer';
 import { VoterApp } from './app/voter-app.js';
+
+const browserGlobal = globalThis as typeof globalThis & { Buffer?: typeof Buffer };
+browserGlobal.Buffer ??= Buffer;
 
 const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Application root is missing.');

@@ -4,8 +4,16 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { CIRCUIT_VERSION_V1, PROTOCOL_VERSION_V1 } from '@votaciones/zk-protocol';
+import {
+  buildMerkleTreeV1,
+  CIRCUIT_VERSION_V1,
+  deriveIdentityCommitmentV1,
+  deriveNullifierV1,
+  protocolArtifactLocationsV1,
+  PROTOCOL_VERSION_V1,
+} from '@votaciones/zk-protocol';
 import { verifyElectionPackage } from '@votaciones/verification-protocol';
+import { groth16 } from 'snarkjs';
 
 import { getAppConfig } from '../../config/app-config.js';
 import { createDatabase } from '../../database/client.js';
@@ -14,11 +22,14 @@ import type { Clock } from '../elections/domain/clock.js';
 import { Election } from '../elections/domain/election.js';
 import { electionId, electionOptionId } from '../elections/domain/election-id.js';
 import { DrizzleElectionRepository } from '../elections/infrastructure/persistence/drizzle-election.repository.js';
+import { submissionFingerprintV1 } from '../voting/domain/vote-receipt.js';
+import { PostgresVoteRepository } from '../voting/infrastructure/persistence/postgres-vote.repository.js';
 import { VerificationService } from './application/verification.service.js';
 
 const runtimePool = createDatabasePool('runtime');
 const migrationPool = createDatabasePool('migration');
 const repository = new DrizzleElectionRepository(createDatabase(runtimePool));
+const voteRepository = new PostgresVoteRepository(runtimePool);
 const adminId = randomUUID();
 let now = new Date('2030-01-01T10:00:00.000Z');
 const clock: Clock = { now: () => new Date(now) };
@@ -72,12 +83,18 @@ afterAll(async () => {
 });
 
 describe('verifiable result lifecycle', () => {
-  it('freezes, tallies, packages, verifies, and publishes without voter PII', async () => {
+  it('accepts, freezes, tallies, packages, verifies, and publishes a real vote without voter PII', async () => {
+    const voterSecret = '987654321012345678909876543210123456789';
+    const identityCommitment = await deriveIdentityCommitmentV1(voterSecret);
+    const tree = await buildMerkleTreeV1([
+      identityCommitment,
+      await deriveIdentityCommitmentV1('2'),
+    ]);
     const election = Election.create(
       {
-        closesAt: new Date('2030-01-01T13:00:00.000Z'),
+        closesAt: new Date('2035-01-01T13:00:00.000Z'),
         id: electionId(randomUUID()),
-        opensAt: new Date('2030-01-01T11:00:00.000Z'),
+        opensAt: new Date('2025-01-01T11:00:00.000Z'),
         options: [
           { displayOrder: 0, id: electionOptionId(randomUUID()), label: 'A' },
           { displayOrder: 1, id: electionOptionId(randomUUID()), label: 'B' },
@@ -96,8 +113,8 @@ describe('verifiable result lifecycle', () => {
       `INSERT INTO eligibility.eligibility_snapshots
         (commitment_scheme_version, configuration_version, created_at, election_id, frozen_at,
          id, leaf_count, merkle_root, status, tree_depth, version)
-       VALUES ('poseidon-bn254-v1',1,$1,$2,$1,$3,1,'123','FROZEN',20,1)`,
-      [now, election.snapshot().id, randomUUID()],
+       VALUES ('poseidon-bn254-v1',1,$1,$2,$1,$3,2,$4,'FROZEN',20,1)`,
+      [now, election.snapshot().id, randomUUID(), tree.root],
     );
     let event = election.prepare(adminId, clock);
     await repository.transitionState(election, event, 0);
@@ -107,6 +124,42 @@ describe('verifiable result lifecycle', () => {
     now = new Date('2030-01-01T12:00:00.000Z');
     event = election.open(adminId, clock);
     await repository.transitionState(election, event, 1);
+
+    const context = await voteRepository.loadAcceptanceContext(election.snapshot().id);
+    expect(context).not.toBeNull();
+    const membership = tree.proof(tree.leaves.indexOf(identityCommitment));
+    const nullifier = await deriveNullifierV1(voterSecret, envelope.manifest.electionContext);
+    const artifacts = protocolArtifactLocationsV1();
+    const generated = await groth16.fullProve(
+      {
+        electionContext: envelope.manifest.electionContext,
+        merklePathElements: [...membership.pathElements],
+        merklePathIndices: [...membership.pathIndices],
+        merkleRoot: tree.root,
+        nullifier,
+        optionCount: 2,
+        voteChoice: 1,
+        voterSecret,
+      },
+      artifacts.wasm.pathname,
+      artifacts.zkey.pathname,
+    );
+    const publicSignals = generated.publicSignals.map(String);
+    const accepted = await voteRepository.accept({
+      context: context!,
+      nullifier,
+      proof: generated.proof,
+      publicSignals,
+      submissionFingerprint: submissionFingerprintV1({
+        electionContext: envelope.manifest.electionContext,
+        merkleRoot: tree.root,
+        nullifier,
+        protocolVersion: PROTOCOL_VERSION_V1,
+        voteEncoding: 1,
+      }),
+      voteEncoding: 1,
+    });
+
     event = election.close(adminId, clock);
     await repository.transitionState(election, event, 2);
 
@@ -131,21 +184,21 @@ describe('verifiable result lifecycle', () => {
       service.computeTally(election.snapshot().id, principal()),
     ]);
     expect(retryTally).toEqual(tally);
-    expect(tally).toMatchObject({ acceptedVoteCount: 0, invalidAcceptedVoteCount: 0 });
+    expect(tally).toMatchObject({ acceptedVoteCount: 1, invalidAcceptedVoteCount: 0 });
     expect(tally.totalsByOption).toEqual([
       expect.objectContaining({ count: 0, encoding: 0 }),
-      expect.objectContaining({ count: 0, encoding: 1 }),
+      expect.objectContaining({ count: 1, encoding: 1 }),
     ]);
     const tallyRows = await migrationPool.query<{ count: number }>(
       `SELECT count(*)::int AS count FROM result.tally_manifests WHERE election_id = $1`,
       [election.snapshot().id],
     );
     expect(tallyRows.rows[0]?.count).toBe(1);
-    const generated = await service.generatePackage(election.snapshot().id, {
+    const packageResult = await service.generatePackage(election.snapshot().id, {
       adminId,
       authSessionId: randomUUID(),
     });
-    expect(generated).toMatchObject({ report: { valid: true } });
+    expect(packageResult).toMatchObject({ report: { valid: true } });
     await expect(service.getVerification(election.snapshot().id)).rejects.toMatchObject({
       code: 'VERIFICATION_PACKAGE_NOT_FOUND',
     });
@@ -154,7 +207,7 @@ describe('verifiable result lifecycle', () => {
         adminId,
         authSessionId: randomUUID(),
       }),
-    ).resolves.toMatchObject({ contentDigest: generated.contentDigest });
+    ).resolves.toMatchObject({ contentDigest: packageResult.contentDigest });
     const stored = await migrationPool.query<{ package_path: string }>(
       'SELECT package_path FROM result.verification_packages WHERE election_id = $1',
       [election.snapshot().id],
@@ -169,6 +222,22 @@ describe('verifiable result lifecycle', () => {
     expect(publicPackageText).not.toContain('not-used');
     expect(publicPackageText).not.toContain(adminId);
     expect(publicPackageText).not.toContain('acceptedAt');
+    for (const file of [
+      'accepted-votes.jsonl',
+      'checkpoints.json',
+      'election-manifest.json',
+      'result.json',
+      'tally.json',
+      'verification_key.json',
+    ]) {
+      const path = join(stored.rows[0]!.package_path, file);
+      const original = await readFile(path);
+      await writeFile(path, Buffer.concat([original, Buffer.from('\n')]));
+      await expect(verifyElectionPackage(stored.rows[0]!.package_path)).resolves.toMatchObject({
+        valid: false,
+      });
+      await writeFile(path, original);
+    }
     const tallyPath = join(stored.rows[0]!.package_path, 'tally.json');
     const originalTally = await readFile(tallyPath);
     await writeFile(tallyPath, '{}\n');
@@ -197,19 +266,25 @@ describe('verifiable result lifecycle', () => {
       adminId,
       authSessionId: randomUUID(),
     });
-    expect(published).toMatchObject({ resultVersion: 1, totalAcceptedVotes: 0 });
+    expect(published).toMatchObject({ resultVersion: 1, totalAcceptedVotes: 1 });
     await expect(
       service.publishResults(election.snapshot().id, {
         adminId,
         authSessionId: randomUUID(),
       }),
-    ).resolves.toMatchObject({ resultVersion: 1, totalAcceptedVotes: 0 });
+    ).resolves.toMatchObject({ resultVersion: 1, totalAcceptedVotes: 1 });
     await expect(service.getResults(election.snapshot().id)).resolves.toMatchObject({
       resultVersion: 1,
-      totalAcceptedVotes: 0,
+      totalAcceptedVotes: 1,
     });
     await expect(service.getResults(election.snapshot().id, 1)).resolves.toMatchObject({
       resultVersion: 1,
+    });
+    await expect(
+      service.getReceipt(election.snapshot().id, accepted.receipt.receiptCommitment),
+    ).resolves.toMatchObject({
+      nullifier,
+      receiptCommitment: accepted.receipt.receiptCommitment,
     });
     const persisted = await migrationPool.query<{
       package_count: number;

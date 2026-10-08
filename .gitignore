@@ -67,3 +67,5 @@ bun.lock
 bun.lockb
 .artifacts/
 apps/voter-web/public/artifacts/
+playwright-report/
+test-results/

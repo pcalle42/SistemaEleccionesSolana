@@ -90,6 +90,25 @@ afterAll(async () => {
 });
 
 describe('PostgreSQL vote acceptance', () => {
+  it('keeps the accepted vote table structurally anonymous', async () => {
+    const columns = await migrationPool.query<{ column_name: string }>(
+      `SELECT column_name
+         FROM information_schema.columns
+        WHERE table_schema = 'voting' AND table_name = 'accepted_votes'
+        ORDER BY ordinal_position`,
+    );
+    const names = columns.rows.map(({ column_name }) => column_name);
+    for (const forbidden of [
+      'credential_id',
+      'eligible_voter_id',
+      'identity_commitment',
+      'ip_address',
+      'user_agent',
+    ]) {
+      expect(names).not.toContain(forbidden);
+    }
+  });
+
   it('atomically inserts an immutable canonical vote and mandatory proof evidence', async () => {
     const electionId = await seedElection();
     const context = (await repository.loadAcceptanceContext(electionId))!;
@@ -247,7 +266,7 @@ describe('PostgreSQL vote acceptance', () => {
   );
 
   it('rejects the exclusive closing boundary even while status remains OPEN', async () => {
-    const electionId = await seedElection('OPEN', new Date(Date.now() - 1));
+    const electionId = await seedElection('OPEN', new Date(Date.now() - 60_000));
     const context = (await repository.loadAcceptanceContext(electionId))!;
     await expect(repository.accept(command(context))).rejects.toMatchObject({
       code: 'ELECTION_CLOSED',

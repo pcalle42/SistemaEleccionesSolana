@@ -40,6 +40,17 @@ pnpm test
 pnpm build
 ```
 
+La validación intensiva dispone de suites contract, property, PostgreSQL,
+Valkey, ZK, concurrencia, navegador, privacidad y tampering:
+
+```bash
+pnpm test:all
+```
+
+Consulte [`tests/README.md`](tests/README.md) y la
+[`matriz de invariantes`](tests/INVARIANT_MATRIX.md). Las suites con estado usan
+infraestructura Docker aislada y protegida contra resets fuera de test.
+
 `pnpm clean` elimina únicamente `dist`, `build`, `coverage` y `.cache` dentro de
 los workspaces conocidos. No elimina fuentes, configuración, datos ni artefactos
 ZK preservados.

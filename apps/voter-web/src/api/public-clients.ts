@@ -22,7 +22,7 @@ export interface VoteReceipt {
 
 export interface CastVoteResponse {
   readonly receipt: VoteReceipt;
-  readonly status: 'ACCEPTED' | 'ALREADY_ACCEPTED';
+  readonly status: 'accepted';
 }
 export interface ElectionResult {
   readonly electionId: string;
@@ -46,7 +46,7 @@ function parseCastVote(value: unknown): CastVoteResponse {
   if (
     !isRecord(value) ||
     !isRecord(value['receipt']) ||
-    !['ACCEPTED', 'ALREADY_ACCEPTED'].includes(String(value['status'])) ||
+    value['status'] !== 'accepted' ||
     typeof value['receipt']['electionId'] !== 'string' ||
     typeof value['receipt']['nullifier'] !== 'string' ||
     typeof value['receipt']['receiptCommitment'] !== 'string' ||
