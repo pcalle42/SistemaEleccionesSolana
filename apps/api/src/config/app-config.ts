@@ -44,6 +44,10 @@ export interface AppConfig {
     readonly enabled: boolean;
     readonly path: string;
   };
+  readonly observability: {
+    readonly metricsEnabled: boolean;
+    readonly metricsToken: string;
+  };
   readonly release: {
     readonly appVersion: string;
     readonly gitCommit: string;
@@ -191,6 +195,8 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
   const appVersion = environment['APP_VERSION'] ?? '0.1.0-dev';
   const gitCommit = environment['GIT_COMMIT'] ?? 'unknown';
   const manifestDigest = environment['RELEASE_MANIFEST_DIGEST'] ?? 'unreleased';
+  const metricsEnabled = boolean(environment, 'METRICS_ENABLED', false);
+  const metricsToken = environment['METRICS_AUTH_TOKEN'] ?? '';
   if (!semverPattern.test(appVersion)) {
     throw new Error('APP_VERSION must be SemVer');
   }
@@ -202,6 +208,11 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
   }
   if (runtime === 'production' && (gitCommit === 'unknown' || manifestDigest === 'unreleased')) {
     throw new Error('Production requires immutable release identity');
+  }
+  if (metricsEnabled && metricsToken.length < 32) {
+    throw new Error(
+      'METRICS_AUTH_TOKEN must contain at least 32 characters when metrics are enabled',
+    );
   }
   const sessionIdleSeconds = integer(
     environment,
@@ -265,6 +276,7 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
       enabled: boolean(environment, 'OPENAPI_ENABLED', runtime === 'local' || runtime === 'devnet'),
       path: 'docs',
     }),
+    observability: Object.freeze({ metricsEnabled, metricsToken }),
     release: Object.freeze({ appVersion, gitCommit, manifestDigest }),
     valkey: getValkeyConfig(environment),
     verification: Object.freeze({

@@ -13,3 +13,7 @@ sin dispersar ni mover parcialmente la secuencia numerada.
 La cadena de CI/CD y release está descrita en
 [`18-ci-cd-calidad-release.md`](18-ci-cd-calidad-release.md) y su operación en el
 [runbook de release](operations/release-runbook.md).
+
+La operación, observabilidad y recuperación se especifican en
+[`19-observabilidad-operacion-backup-recuperacion.md`](19-observabilidad-operacion-backup-recuperacion.md)
+y se materializan en [`operations/`](operations/README.md).

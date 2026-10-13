@@ -5,6 +5,7 @@ import {
   ZkProtocolError,
 } from '@votaciones/zk-protocol';
 import { groth16, type Groth16Proof } from 'snarkjs';
+import { performance } from 'node:perf_hooks';
 
 import type {
   VerifiedVoteProof,
@@ -14,6 +15,7 @@ import type {
 } from '../../application/ports/vote-proof-verifier.port.js';
 import { ZkVerificationError } from '../../domain/zk-errors.js';
 import type { TrustedArtifactRegistry } from './trusted-artifact-registry.js';
+import { OperationalMetricsService } from '../../../../observability/metrics.service.js';
 
 const MAX_PAYLOAD_BYTES = 64 * 1024;
 const COORDINATE = /^(0|[1-9][0-9]{0,79})$/u;
@@ -59,9 +61,31 @@ function enforcePayloadLimit(payload: VoteProofPayload): void {
 }
 
 export class SnarkJsVoteProofVerifier implements VoteProofVerifier {
-  constructor(private readonly artifacts: TrustedArtifactRegistry) {}
+  constructor(
+    private readonly artifacts: TrustedArtifactRegistry,
+    private readonly metrics: OperationalMetricsService = new OperationalMetricsService(),
+  ) {}
 
   async verify(
+    payload: VoteProofPayload,
+    expectation: VoteProofExpectation,
+  ): Promise<VerifiedVoteProof> {
+    const startedAt = performance.now();
+    let timedOut = false;
+    this.metrics.proofStarted();
+    try {
+      return await this.verifyProof(payload, expectation);
+    } catch (error: unknown) {
+      timedOut =
+        error instanceof Error &&
+        (error.name === 'TimeoutError' || /(?:timed?\s*out|timeout)/iu.test(error.message));
+      throw error;
+    } finally {
+      this.metrics.proofFinished(performance.now() - startedAt, timedOut);
+    }
+  }
+
+  private async verifyProof(
     payload: VoteProofPayload,
     expectation: VoteProofExpectation,
   ): Promise<VerifiedVoteProof> {

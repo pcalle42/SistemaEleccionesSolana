@@ -12,5 +12,6 @@ pnpm test:concurrency
 pnpm test:valkey
 pnpm test:security
 pnpm test:verification
+pnpm test:operations
 pnpm release:migrations:verify
 pnpm release:zk:verify -- --classification devnet

@@ -49,6 +49,7 @@ test-ledger/
 data/
 *.dump
 *.sql.gz
+*.artifact-backup.tar.gz
 infra/postgres/backups/*
 !infra/postgres/backups/README.md
 

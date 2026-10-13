@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ZkProtocolError } from '@votaciones/zk-protocol';
+import { performance } from 'node:perf_hooks';
 
 import { ApplicationError } from '../../../common/errors/application-error.js';
 import { electionId } from '../../elections/domain/election-id.js';
@@ -11,6 +12,10 @@ import { submissionFingerprintV1 } from '../domain/vote-receipt.js';
 import { mapVotingPublicSignalsV1 } from '../domain/vote-public-signals.js';
 import { VotingError, type VotingErrorCode } from '../domain/voting-errors.js';
 import { VOTE_REPOSITORY } from '../voting.tokens.js';
+import {
+  OperationalMetricsService,
+  type VoteRejectionReason,
+} from '../../../observability/metrics.service.js';
 import type { VoteRepository } from './ports/vote-repository.port.js';
 
 export interface CastVoteCommand {
@@ -78,11 +83,28 @@ function assertOpen(status: string, observedAt: Date, opensAt: Date, closesAt: D
   }
 }
 
+function rejectionReason(code: VotingErrorCode): VoteRejectionReason {
+  if (code === 'NULLIFIER_ALREADY_USED' || code === 'VOTE_SUBMISSION_CONFLICT') return 'duplicate';
+  if (code === 'ELECTION_NOT_OPEN') return 'not_open';
+  if (code === 'ELECTION_NOT_STARTED' || code === 'ELECTION_CLOSED') return 'out_of_window';
+  if (code === 'PROOF_ELECTION_CONTEXT_MISMATCH' || code === 'PROOF_ROOT_MISMATCH') {
+    return 'wrong_context';
+  }
+  if (code === 'PROOF_VERIFICATION_FAILED' || code === 'INVALID_VOTE_ENCODING') {
+    return 'invalid_proof';
+  }
+  if (code === 'VOTE_ACCEPTANCE_UNAVAILABLE' || code === 'ZK_VERIFIER_UNAVAILABLE') {
+    return 'dependency_failure';
+  }
+  return 'invalid_request';
+}
+
 @Injectable()
 export class CastVoteService {
   constructor(
     @Inject(VOTE_REPOSITORY) private readonly votes: VoteRepository,
     @Inject(VOTE_PROOF_VERIFIER) private readonly verifier: VoteProofVerifier,
+    private readonly metrics: OperationalMetricsService = new OperationalMetricsService(),
   ) {}
 
   async cast(command: CastVoteCommand): Promise<CastVoteResult> {
@@ -168,23 +190,31 @@ export class CastVoteService {
         throw new VotingError('PROOF_VERIFICATION_FAILED', 'Proof verification failed.');
       }
 
-      const accepted = await this.votes.accept({
-        context,
-        nullifier: signals.nullifier,
-        proof: command.proof,
-        publicSignals: command.publicSignals,
-        submissionFingerprint: submissionFingerprintV1({
-          electionContext: signals.electionContext,
-          merkleRoot: signals.merkleRoot,
+      const acceptanceStartedAt = performance.now();
+      const accepted = await this.votes
+        .accept({
+          context,
           nullifier: signals.nullifier,
-          protocolVersion: command.protocolVersion,
+          proof: command.proof,
+          publicSignals: command.publicSignals,
+          submissionFingerprint: submissionFingerprintV1({
+            electionContext: signals.electionContext,
+            merkleRoot: signals.merkleRoot,
+            nullifier: signals.nullifier,
+            protocolVersion: command.protocolVersion,
+            voteEncoding: signals.voteEncoding,
+          }),
           voteEncoding: signals.voteEncoding,
-        }),
-        voteEncoding: signals.voteEncoding,
-      });
+        })
+        .finally(() => this.metrics.observeVoteAcceptance(performance.now() - acceptanceStartedAt));
+      this.metrics.recordVoteAccepted(accepted.idempotentRetry);
       return { ...accepted, status: 'accepted' };
     } catch (error: unknown) {
-      if (error instanceof VotingError) throw applicationError(error);
+      if (error instanceof VotingError) {
+        this.metrics.recordVoteRejected(rejectionReason(error.code));
+        throw applicationError(error);
+      }
+      this.metrics.recordVoteRejected('internal_error');
       throw error;
     }
   }

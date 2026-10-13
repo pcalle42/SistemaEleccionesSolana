@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "OperationalDashboardsV1",
+  "dashboards": [
+    {
+      "name": "system",
+      "access": ["operator", "security", "database-operator"],
+      "panels": [
+        "release identity",
+        "liveness and readiness",
+        "HTTP rate latency and status class",
+        "PostgreSQL health pool locks disk and WAL",
+        "Valkey health latency memory and evictions",
+        "host CPU memory disk and clock drift",
+        "backup and restore drill status"
+      ]
+    },
+    {
+      "name": "election-operations",
+      "access": ["operator", "auditor"],
+      "panels": [
+        "state and UTC window",
+        "aggregate accepted vote count",
+        "aggregate request and rejection rate",
+        "proof verification latency and inflight",
+        "vote acceptance transaction latency",
+        "database and resource saturation"
+      ],
+      "forbiddenWhileOpen": [
+        "live tally",
+        "option distribution",
+        "nullifier",
+        "receipt",
+        "IP address",
+        "individual timestamp"
+      ]
+    }
+  ]
+}

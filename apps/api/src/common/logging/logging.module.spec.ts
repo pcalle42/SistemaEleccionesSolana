@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { safeRequestLogFields, successfulRequestLog } from './logging.module.js';
+import { routeTemplate, safeRequestLogFields, successfulRequestLog } from './logging.module.js';
 import type { RequestWithId } from './request-id.js';
 
 describe('safe HTTP logging', () => {
@@ -27,6 +27,7 @@ describe('safe HTTP logging', () => {
       method: 'GET',
       requestId: 'request-12345678',
       route: '/api/v1/example',
+      statusClass: '2xx',
       statusCode: 200,
     });
   });
@@ -63,5 +64,14 @@ describe('safe HTTP logging', () => {
       route: '/api/v1/elections/:electionId/votes',
     });
     for (const canary of Object.values(canaries)) expect(serialized).not.toContain(canary);
+  });
+
+  it('never falls back to a request URL containing identifiers', () => {
+    const request = {
+      baseUrl: '',
+      method: 'GET',
+      path: '/api/v1/elections/individual-id?receipt=secret',
+    } as RequestWithId;
+    expect(routeTemplate(request)).toBe('/unmatched');
   });
 });

@@ -14,6 +14,7 @@ fi
   fail 'restore replaces the database; usage: db-restore.sh <local|devnet> --force <archive.dump>'
 archive_path="$2"
 [[ -f "${archive_path}" && -s "${archive_path}" ]] || fail "invalid backup archive: ${archive_path}"
+node "${REPOSITORY_ROOT}/scripts/operations/verify-backup.mjs" --archive "${archive_path}"
 
 require_docker
 compose_cmd config --quiet
@@ -60,4 +61,18 @@ compose_cmd exec --no-TTY postgres sh -ceu '
     --command "SELECT 1"
 ' | grep -qx '1' || fail 'runtime smoke check failed after restore'
 
-printf 'Database restored and runtime smoke check passed for %s.\n' "${VOTACIONES_ENVIRONMENT}"
+compose_cmd exec --no-TTY postgres psql \
+  --username "$(env_value POSTGRES_USER)" \
+  --dbname "$(env_value POSTGRES_DB)" \
+  --set ON_ERROR_STOP=1 \
+  --file /dev/stdin <"${INFRA_ROOT}/postgres/post-restore-invariants.sql"
+restored_evidence="$(compose_cmd exec --no-TTY postgres psql \
+  --username "$(env_value POSTGRES_USER)" \
+  --dbname "$(env_value POSTGRES_DB)" \
+  --no-align --tuples-only --set ON_ERROR_STOP=1 \
+  --file /dev/stdin <"${INFRA_ROOT}/postgres/operational-evidence.sql")"
+node "${REPOSITORY_ROOT}/scripts/operations/verify-backup.mjs" \
+  --archive "${archive_path}" \
+  --restored-evidence "${restored_evidence}"
+
+printf 'Database restored; digest, runtime and electoral invariants passed for %s.\n' "${VOTACIONES_ENVIRONMENT}"

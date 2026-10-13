@@ -247,4 +247,10 @@ describe('NestJS HTTP foundation', () => {
   it('does not expose Swagger UI when disabled', async () => {
     await request(httpServer).get(`/${config.openApi.path}`).expect(404);
   });
+
+  it('keeps the internal metrics endpoint disabled and out of OpenAPI by default', async () => {
+    await request(httpServer).get('/api/v1/internal/metrics').expect(404);
+    const document = createOpenApiDocument(app);
+    expect(document.paths['/api/v1/internal/metrics']).toBeUndefined();
+  });
 });

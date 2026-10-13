@@ -12,6 +12,8 @@ import type { AppConfig } from './config/app-config.js';
 import { APP_CONFIG } from './config/config.tokens.js';
 import { loadEnvironment } from './config/environment.js';
 import { configureOpenApi } from './openapi/openapi.js';
+import { createHttpMetricsMiddleware } from './observability/http-metrics.js';
+import { OperationalMetricsService } from './observability/metrics.service.js';
 
 export function configureApplication(app: NestExpressApplication, config: AppConfig): void {
   if (config.http.trustedProxyAddresses.length > 0) {
@@ -32,6 +34,7 @@ export function configureApplication(app: NestExpressApplication, config: AppCon
         : false,
   });
   app.use(requestIdMiddleware);
+  app.use(createHttpMetricsMiddleware(app.get(OperationalMetricsService)));
   app.enableCors({
     allowedHeaders: ['content-type', 'authorization', 'x-csrf-token', 'x-request-id'],
     credentials: true,

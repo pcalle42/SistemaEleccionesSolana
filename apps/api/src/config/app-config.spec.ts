@@ -21,6 +21,7 @@ describe('application configuration', () => {
       },
       logging: { level: 'silent', service: 'votaciones-api' },
       openApi: { enabled: false, path: 'docs' },
+      observability: { metricsEnabled: false, metricsToken: '' },
       release: {
         appVersion: '0.1.0-dev',
         gitCommit: 'unknown',
@@ -117,6 +118,19 @@ describe('application configuration', () => {
     expect(() => getAppConfig({ ...validEnvironment, VOTE_RATE_LIMIT_MAXIMUM: '0' })).toThrow(
       'VOTE_RATE_LIMIT_MAXIMUM',
     );
+  });
+
+  it('requires a strong metrics credential when the private endpoint is enabled', () => {
+    expect(() =>
+      getAppConfig({ ...validEnvironment, METRICS_AUTH_TOKEN: 'short', METRICS_ENABLED: 'true' }),
+    ).toThrow('METRICS_AUTH_TOKEN');
+    expect(
+      getAppConfig({
+        ...validEnvironment,
+        METRICS_AUTH_TOKEN: 'a'.repeat(32),
+        METRICS_ENABLED: 'true',
+      }).observability,
+    ).toEqual({ metricsEnabled: true, metricsToken: 'a'.repeat(32) });
   });
 
   it('accepts only explicit IP/CIDR proxy boundaries', () => {

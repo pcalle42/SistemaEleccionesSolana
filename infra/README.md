@@ -124,10 +124,13 @@ El reset de la base, que conserva el volumen y Valkey, se ejecuta con
 ```bash
 pnpm db:backup
 pnpm db:restore -- --force infra/postgres/backups/<archivo>.dump
+pnpm db:restore:drill -- infra/postgres/backups/<archivo>.dump [verification-package]
 ```
 
 Restore reemplaza la base devnet completa y valida el archivo antes de hacerlo.
-Los dumps se crean con permisos restrictivos y están ignorados por Git.
+Los dumps y sus sidecars se crean con permisos restrictivos y están ignorados por
+Git. El drill usa un proyecto Docker aislado, sin puertos ni volumen persistente,
+y comprueba schema, nullifiers, audit, resultados y evidencia lógica.
 
 ## Logs
 

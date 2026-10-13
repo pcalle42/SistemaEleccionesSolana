@@ -5,7 +5,9 @@ import {
   type OnApplicationShutdown,
   type OnModuleInit,
 } from '@nestjs/common';
+import { performance } from 'node:perf_hooks';
 
+import { OperationalMetricsService } from '../observability/metrics.service.js';
 import type { ValkeyModule } from './valkey.module.js';
 import { VALKEY_RUNTIME } from './valkey.tokens.js';
 
@@ -15,7 +17,10 @@ export type ValkeyDependencyState = 'healthy' | 'degraded' | 'unavailable';
 export class ValkeyLifecycleService implements OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger(ValkeyLifecycleService.name);
 
-  constructor(@Inject(VALKEY_RUNTIME) private readonly runtime: ValkeyModule) {}
+  constructor(
+    @Inject(VALKEY_RUNTIME) private readonly runtime: ValkeyModule,
+    private readonly metrics: OperationalMetricsService = new OperationalMetricsService(),
+  ) {}
 
   async onModuleInit(): Promise<void> {
     try {
@@ -26,11 +31,14 @@ export class ValkeyLifecycleService implements OnModuleInit, OnApplicationShutdo
   }
 
   async health(): Promise<ValkeyDependencyState> {
+    const startedAt = performance.now();
     try {
       await this.runtime.service.connect();
       await this.runtime.service.ping();
+      this.metrics.recordValkeyHealth(performance.now() - startedAt, 'healthy');
       return 'healthy';
     } catch {
+      this.metrics.recordValkeyHealth(performance.now() - startedAt, 'unavailable');
       return 'unavailable';
     }
   }

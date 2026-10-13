@@ -11,6 +11,8 @@
 | Proof ligado a elección, root, encoding y versión             | ZK negative tests y API replay E2E                                             |
 | Voto y evidencia son atómicos                                 | PostgreSQL rollback por fallo de evidencia                                     |
 | `accepted_votes` no relaciona identidad                       | guard estructural de columnas PostgreSQL y privacy browser E2E                 |
+| Telemetría no crea correlación identidad→voto                 | métricas con labels cerrados, logs allowlist y canarios                        |
+| Backup restaurable conserva evidencia                         | manifest SHA-256, restore aislado e invariantes post-restore                   |
 | Valkey no es autoridad                                        | Valkey integration: unavailable, TTL, flush y restart con recarga autoritativa |
 | Snapshot, tally y publicación son únicos/idempotentes         | verification integration concurrente                                           |
 | Tally es determinista, total y no negativo                    | verification unit + fast-check property suite                                  |

@@ -19,6 +19,7 @@ pnpm test:e2e
 pnpm test:security
 pnpm test:verification
 pnpm test:performance
+pnpm test:operations
 pnpm test:all
 ```
 
@@ -26,6 +27,10 @@ pnpm test:all
 levantan y detienen su infraestructura automáticamente. La base usa el puerto
 `55432`, Valkey `56379` y un proyecto Compose cuyo nombre comienza por
 `votaciones-test-`.
+
+`test:operations` valida cardinalidad/privacidad de métricas, estructura de
+runbooks, metadata inmutable de backups, detección de tampering y cálculo de
+clock drift. El restore real se ejecuta con `pnpm db:restore:drill`.
 
 ## Seguridad destructiva
 

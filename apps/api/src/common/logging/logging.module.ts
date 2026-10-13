@@ -6,14 +6,14 @@ import { RuntimeConfigModule } from '../../config/config.module.js';
 import { APP_CONFIG } from '../../config/config.tokens.js';
 import { resolveRequestId, type RequestWithId } from './request-id.js';
 
-function routeTemplate(request: RequestWithId): string {
+export function routeTemplate(request: RequestWithId): string {
   const route = request.route as unknown;
   const path =
     typeof route === 'object' && route !== null ? (route as { path?: unknown }).path : undefined;
   if (typeof path === 'string' && path) {
     return `${request.baseUrl}${path}`;
   }
-  return request.path || '/';
+  return '/unmatched';
 }
 
 function asRequestWithId(request: unknown): RequestWithId {
@@ -22,6 +22,10 @@ function asRequestWithId(request: unknown): RequestWithId {
 
 function errorName(error: unknown): string {
   return error instanceof Error ? error.name : 'UnknownError';
+}
+
+function statusClass(statusCode: number): string {
+  return `${Math.floor(statusCode / 100)}xx`;
 }
 
 function failedRequestLog(
@@ -35,6 +39,7 @@ function failedRequestLog(
     method: request.method,
     requestId: request.id,
     route: routeTemplate(request),
+    statusClass: statusClass(response.statusCode),
     statusCode: response.statusCode,
   };
 }
@@ -58,6 +63,7 @@ export function successfulRequestLog(
     method: request.method,
     requestId: request.id,
     route: routeTemplate(request),
+    statusClass: statusClass(response.statusCode),
     statusCode: response.statusCode,
   };
 }
@@ -71,7 +77,9 @@ export function successfulRequestLog(
       useFactory: (config: AppConfig) => ({
         pinoHttp: {
           base: {
+            appVersion: config.release.appVersion,
             environment: config.environment,
+            releaseManifestDigest: config.release.manifestDigest,
             service: config.logging.service,
           },
           customErrorMessage: () => 'HTTP request failed',
@@ -102,6 +110,7 @@ export function successfulRequestLog(
               'req.headers.cookie',
               'req.headers.x-csrf-token',
               'req.headers.proxy-authorization',
+              'req.headers.x-observability-token',
               'res.headers.set-cookie',
               'DATABASE_URL',
               'VALKEY_URL',

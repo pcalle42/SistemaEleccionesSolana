@@ -13,11 +13,13 @@ import { VotingModule } from './modules/voting/voting.module.js';
 import { VerificationModule } from './modules/verification/verification.module.js';
 import { ValkeyNestModule } from './valkey/valkey-nest.module.js';
 import { VersionModule } from './version/version.module.js';
+import { ObservabilityModule } from './observability/observability.module.js';
 
 @Module({
   imports: [
     RuntimeConfigModule,
     ApplicationLoggingModule,
+    ObservabilityModule,
     DatabaseModule,
     ValkeyNestModule,
     HealthModule,

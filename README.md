@@ -56,6 +56,8 @@ pnpm ci:release
 pnpm release:migrations:verify
 pnpm release:zk:verify -- --classification devnet
 pnpm release:verify -- --manifest <ReleaseManifestV1.json>
+pnpm test:operations
+pnpm db:restore:drill -- <backup.dump> [verification-package]
 ```
 
 Consulte el [contrato de release](release/README.md) y el
@@ -176,6 +178,7 @@ namespaces, TTLs y políticas ante indisponibilidad.
 17. [`docs/16-seguridad-hardening-threat-model.md`](docs/16-seguridad-hardening-threat-model.md)
 18. [`docs/17-devnet-e2e-reproducible.md`](docs/17-devnet-e2e-reproducible.md)
 19. [`docs/18-ci-cd-calidad-release.md`](docs/18-ci-cd-calidad-release.md)
+20. [`docs/19-observabilidad-operacion-backup-recuperacion.md`](docs/19-observabilidad-operacion-backup-recuperacion.md)
 
 ## Zero-knowledge
 

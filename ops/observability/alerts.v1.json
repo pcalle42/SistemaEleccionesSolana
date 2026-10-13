@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "OperationalAlertsV1",
+  "alerts": [
+    {
+      "name": "VotingApiUnavailableWhileOpen",
+      "severity": "SEV1",
+      "signal": "http availability and election state",
+      "runbook": "docs/operations/runbooks/api-unavailable.md"
+    },
+    {
+      "name": "PostgresUnavailable",
+      "severity": "SEV1",
+      "signal": "postgres_health_total unavailable",
+      "runbook": "docs/operations/runbooks/postgres-unavailable.md"
+    },
+    {
+      "name": "PostgresDiskPressure",
+      "severity": "SEV1",
+      "signal": "infrastructure disk and WAL capacity",
+      "runbook": "docs/operations/runbooks/postgres-disk-pressure.md"
+    },
+    {
+      "name": "AcceptedVotePersistenceAnomaly",
+      "severity": "SEV1",
+      "signal": "vote rejection and transaction health",
+      "runbook": "docs/operations/runbooks/election-open-incident.md"
+    },
+    {
+      "name": "RequiredZkArtifactInvalid",
+      "severity": "SEV1",
+      "signal": "readiness protocolArtifacts",
+      "runbook": "docs/operations/runbooks/artifact-digest-mismatch.md"
+    },
+    {
+      "name": "SystematicVerifierFailure",
+      "severity": "SEV1",
+      "signal": "vote_rejected_total invalid_proof and proof latency",
+      "runbook": "docs/operations/runbooks/zk-verifier-failure.md"
+    },
+    {
+      "name": "ClockDriftOutsidePolicy",
+      "severity": "SEV1",
+      "signal": "clock drift check",
+      "runbook": "docs/operations/runbooks/clock-drift.md"
+    },
+    {
+      "name": "ResultPackageVerificationFailure",
+      "severity": "SEV1",
+      "signal": "publication and offline verifier result",
+      "runbook": "docs/operations/runbooks/post-election-verification-failure.md"
+    },
+    {
+      "name": "BackupOutsidePolicy",
+      "severity": "SEV2",
+      "signal": "backup and restore drill result",
+      "runbook": "docs/operations/runbooks/backup-failure.md"
+    },
+    {
+      "name": "ValkeyUnavailable",
+      "severity": "SEV3",
+      "signal": "valkey_health_total unavailable",
+      "runbook": "docs/operations/runbooks/valkey-unavailable.md"
+    },
+    {
+      "name": "ApiHighLatency",
+      "severity": "SEV2",
+      "signal": "http_request_duration_seconds against approved SLO",
+      "runbook": "docs/operations/runbooks/high-latency.md"
+    },
+    {
+      "name": "ApiHighErrorRate",
+      "severity": "SEV2",
+      "signal": "http_requests_total 5xx against approved SLO",
+      "runbook": "docs/operations/runbooks/high-error-rate.md"
+    }
+  ]
+}
