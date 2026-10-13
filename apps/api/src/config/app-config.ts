@@ -44,6 +44,11 @@ export interface AppConfig {
     readonly enabled: boolean;
     readonly path: string;
   };
+  readonly release: {
+    readonly appVersion: string;
+    readonly gitCommit: string;
+    readonly manifestDigest: string;
+  };
   readonly valkey: ValkeyConfig;
   readonly voting: {
     readonly maximumConcurrentProofs: number;
@@ -57,6 +62,10 @@ export interface AppConfig {
 
 const environments = new Set<RuntimeEnvironment>(['local', 'test', 'devnet', 'production']);
 const logLevels = new Set<LogLevel>(['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent']);
+const semverPattern =
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/u;
+const gitCommitPattern = /^[a-f0-9]{40}$/u;
+const releaseDigestPattern = /^sha256:[a-f0-9]{64}$/u;
 
 function integer(
   environment: NodeJS.ProcessEnv,
@@ -178,6 +187,22 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
   if (runtime === 'production' && !cookieSecure) {
     throw new Error('ADMIN_COOKIE_SECURE must be true in production');
   }
+  const configuredCorsOrigins = corsOrigins(environment, runtime);
+  const appVersion = environment['APP_VERSION'] ?? '0.1.0-dev';
+  const gitCommit = environment['GIT_COMMIT'] ?? 'unknown';
+  const manifestDigest = environment['RELEASE_MANIFEST_DIGEST'] ?? 'unreleased';
+  if (!semverPattern.test(appVersion)) {
+    throw new Error('APP_VERSION must be SemVer');
+  }
+  if (gitCommit !== 'unknown' && !gitCommitPattern.test(gitCommit)) {
+    throw new Error('GIT_COMMIT must be a full commit SHA');
+  }
+  if (manifestDigest !== 'unreleased' && !releaseDigestPattern.test(manifestDigest)) {
+    throw new Error('RELEASE_MANIFEST_DIGEST must be a sha256 digest');
+  }
+  if (runtime === 'production' && (gitCommit === 'unknown' || manifestDigest === 'unreleased')) {
+    throw new Error('Production requires immutable release identity');
+  }
   const sessionIdleSeconds = integer(
     environment,
     'ADMIN_SESSION_IDLE_SECONDS',
@@ -226,7 +251,7 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
         1_024,
         2 * 1024 * 1024,
       ),
-      corsOrigins: Object.freeze(corsOrigins(environment, runtime)),
+      corsOrigins: Object.freeze(configuredCorsOrigins),
       host,
       port: integer(environment, 'APP_PORT', 3_000, 1, 65_535),
       requestTimeoutMs: integer(environment, 'HTTP_REQUEST_TIMEOUT_MS', 15_000, 1_000, 120_000),
@@ -240,6 +265,7 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
       enabled: boolean(environment, 'OPENAPI_ENABLED', runtime === 'local' || runtime === 'devnet'),
       path: 'docs',
     }),
+    release: Object.freeze({ appVersion, gitCommit, manifestDigest }),
     valkey: getValkeyConfig(environment),
     verification: Object.freeze({
       artifactDirectory: resolve(

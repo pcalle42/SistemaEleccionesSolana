@@ -2,7 +2,7 @@ name: ${COMPOSE_PROJECT_NAME:-votaciones}
 
 services:
   api:
-    image: ${COMPOSE_PROJECT_NAME:-votaciones}-api
+    image: ${API_IMAGE:-${COMPOSE_PROJECT_NAME:-votaciones}-api}
     build:
       context: ../..
       dockerfile: apps/api/Dockerfile
@@ -18,6 +18,7 @@ services:
       ADMIN_SESSION_IDLE_SECONDS: ${ADMIN_SESSION_IDLE_SECONDS:-900}
       APP_HOST: 0.0.0.0
       APP_PORT: '3000'
+      APP_VERSION: ${APP_VERSION:-0.1.0-dev}
       DATABASE_MIGRATION_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER is required}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}
       DATABASE_URL: postgresql://${POSTGRES_RUNTIME_USER:?POSTGRES_RUNTIME_USER is required}:${POSTGRES_RUNTIME_PASSWORD:?POSTGRES_RUNTIME_PASSWORD is required}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}
       DB_CONNECTION_TIMEOUT_MS: ${DB_CONNECTION_TIMEOUT_MS:-5000}
@@ -27,12 +28,14 @@ services:
       DEVNET_ADMIN_PASSWORD: ${DEVNET_ADMIN_PASSWORD:-}
       DEVNET_ADMIN_USERNAME: ${DEVNET_ADMIN_USERNAME:-}
       DEVNET_GIT_COMMIT: ${DEVNET_GIT_COMMIT:-unknown}
+      GIT_COMMIT: ${GIT_COMMIT:-unknown}
       HTTP_BODY_LIMIT_BYTES: ${HTTP_BODY_LIMIT_BYTES:-262144}
       HTTP_CORS_ORIGINS: ${HTTP_CORS_ORIGINS:?HTTP_CORS_ORIGINS is required}
       HTTP_REQUEST_TIMEOUT_MS: ${HTTP_REQUEST_TIMEOUT_MS:-15000}
       HTTP_TRUST_PROXY_ADDRESSES: ${HTTP_TRUST_PROXY_ADDRESSES:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       OPENAPI_ENABLED: ${OPENAPI_ENABLED:-false}
+      RELEASE_MANIFEST_DIGEST: ${RELEASE_MANIFEST_DIGEST:-unreleased}
       TZ: UTC
       VALKEY_COMMAND_TIMEOUT_MS: ${VALKEY_COMMAND_TIMEOUT_MS:-1000}
       VALKEY_CONNECT_TIMEOUT_MS: ${VALKEY_CONNECT_TIMEOUT_MS:-1000}
@@ -75,6 +78,8 @@ services:
     networks:
       - internal
     read_only: true
+    cap_drop:
+      - ALL
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -85,7 +90,7 @@ services:
       - verification-artifacts:/app/.artifacts
 
   artifact-init:
-    image: ${COMPOSE_PROJECT_NAME:-votaciones}-api
+    image: ${API_IMAGE:-${COMPOSE_PROJECT_NAME:-votaciones}-api}
     command:
       - sh
       - -ceu
@@ -107,6 +112,7 @@ services:
       - verification-artifacts:/app/.artifacts
 
   admin-web:
+    image: ${ADMIN_WEB_IMAGE:-${COMPOSE_PROJECT_NAME:-votaciones}-admin-web}
     build:
       context: ../..
       dockerfile: apps/admin-web/Dockerfile
@@ -137,6 +143,7 @@ services:
       - no-new-privileges:true
 
   voter-web:
+    image: ${VOTER_WEB_IMAGE:-${COMPOSE_PROJECT_NAME:-votaciones}-voter-web}
     build:
       context: ../..
       dockerfile: apps/voter-web/Dockerfile

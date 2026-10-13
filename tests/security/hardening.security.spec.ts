@@ -15,9 +15,9 @@ describe('repository security policy', () => {
 
     expect(compose).not.toMatch(/^\s*privileged\s*:/mu);
     expect(compose).not.toContain('/var/run/docker.sock');
-    expect(compose.match(/read_only: true/gu)).toHaveLength(2);
-    expect(compose.match(/cap_drop:\n\s+- ALL/gu)).toHaveLength(2);
-    expect(compose.match(/no-new-privileges:true/gu)).toHaveLength(4);
+    expect(compose.match(/read_only: true/gu)?.length).toBeGreaterThanOrEqual(4);
+    expect(compose.match(/cap_drop:\n\s+- ALL/gu)?.length).toBeGreaterThanOrEqual(4);
+    expect(compose.match(/no-new-privileges:true/gu)?.length).toBeGreaterThanOrEqual(6);
     for (const dockerfile of [adminDockerfile, voterDockerfile]) {
       expect(dockerfile).toMatch(/^USER node$/mu);
       expect(dockerfile.match(/@sha256:[a-f0-9]{64}/gu)).toHaveLength(2);

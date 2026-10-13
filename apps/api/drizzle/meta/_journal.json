@@ -78,6 +78,13 @@
       "when": 1791031000000,
       "tag": "0010_youthful_triton",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791032000000,
+      "tag": "0011_release_schema_compatibility",
+      "breakpoints": true
     }
   ]
 }

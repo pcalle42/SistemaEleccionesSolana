@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.invalid/schemas/promotion-record-v1.schema.json",
+  "title": "PromotionRecordV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "releaseVersion",
+    "releaseManifestDigest",
+    "environment",
+    "images",
+    "protocols",
+    "deployedAt",
+    "actor",
+    "migrationStatus"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "PromotionRecordV1" },
+    "releaseVersion": { "type": "string", "minLength": 1 },
+    "releaseManifestDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "environment": { "enum": ["staging", "production"] },
+    "images": { "type": "object", "minProperties": 3 },
+    "protocols": { "type": "array", "minItems": 1 },
+    "deployedAt": { "type": "string", "format": "date-time" },
+    "actor": { "type": "string", "minLength": 1 },
+    "migrationStatus": { "enum": ["not-required", "planned", "applied", "verified"] }
+  }
+}

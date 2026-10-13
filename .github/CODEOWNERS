@@ -1,0 +1,16 @@
+# Default ownership. GitHub branch protection must require CODEOWNER review.
+* @pcalle42
+
+# Critical electoral and release boundaries.
+/apps/api/drizzle/ @pcalle42
+/apps/api/src/modules/auth/ @pcalle42
+/apps/api/src/modules/eligibility/ @pcalle42
+/apps/api/src/modules/voting/ @pcalle42
+/apps/api/src/modules/verification/ @pcalle42
+/apps/api/src/modules/zk/ @pcalle42
+/packages/zk-protocol/ @pcalle42
+/packages/verification-protocol/ @pcalle42
+/infra/ @pcalle42
+/release/ @pcalle42
+/.github/workflows/ @pcalle42
+/docs/security/ @pcalle42

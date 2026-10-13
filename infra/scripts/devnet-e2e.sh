@@ -8,6 +8,7 @@ init_infra_context devnet
 require_docker
 require_command git
 export DEVNET_GIT_COMMIT="$(git -C "${REPOSITORY_ROOT}" rev-parse HEAD)"
+export GIT_COMMIT="${DEVNET_GIT_COMMIT}"
 
 compose_cmd up --detach --wait --wait-timeout "${VOTACIONES_HEALTH_TIMEOUT}"
 set -a

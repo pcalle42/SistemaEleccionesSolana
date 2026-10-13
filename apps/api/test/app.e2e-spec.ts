@@ -134,6 +134,18 @@ describe('NestJS HTTP foundation', () => {
       });
   });
 
+  it('exposes only public immutable release metadata', async () => {
+    const response = await request(httpServer).get('/api/v1/version').expect(200);
+    expect(response.body).toEqual({
+      appVersion: '0.1.0-dev',
+      gitCommit: 'unknown',
+      releaseManifestDigest: 'unreleased',
+      supportedProtocolVersions: ['anonymous-single-choice-v1'],
+    });
+    expect(response.text).not.toContain('DATABASE_URL');
+    expect(response.text).not.toContain('127.0.0.1');
+  });
+
   it('returns a safe 503 when PostgreSQL is unavailable', async () => {
     database.readiness.mockRejectedValueOnce(new Error('connection to private-host failed'));
     const response = await request(httpServer).get('/health/ready').expect(503);

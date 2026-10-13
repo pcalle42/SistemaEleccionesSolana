@@ -66,6 +66,7 @@ yarn.lock
 bun.lock
 bun.lockb
 .artifacts/
+artifacts/release/
 apps/voter-web/public/artifacts/
 playwright-report/
 test-results/

@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { Logger } from 'nestjs-pino';
 
 import type { AppConfig } from './config/app-config.js';
 import { APP_CONFIG } from './config/config.tokens.js';
@@ -6,7 +7,14 @@ import { createApplication, listen } from './bootstrap.js';
 
 async function bootstrap(): Promise<void> {
   const app = await createApplication();
-  await listen(app, app.get<AppConfig>(APP_CONFIG));
+  const config = app.get<AppConfig>(APP_CONFIG);
+  await listen(app, config);
+  app.get(Logger).log({
+    appVersion: config.release.appVersion,
+    environment: config.environment,
+    event: 'application_started',
+    releaseManifestDigest: config.release.manifestDigest,
+  });
 }
 
 bootstrap().catch(() => {

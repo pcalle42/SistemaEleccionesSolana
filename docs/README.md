@@ -9,3 +9,7 @@ sin dispersar ni mover parcialmente la secuencia numerada.
 - `security/`: modelos de amenazas y controles.
 - `operations/`: runbooks y recuperación.
 - `adr/`: decisiones arquitectónicas nuevas.
+
+La cadena de CI/CD y release está descrita en
+[`18-ci-cd-calidad-release.md`](18-ci-cd-calidad-release.md) y su operación en el
+[runbook de release](operations/release-runbook.md).

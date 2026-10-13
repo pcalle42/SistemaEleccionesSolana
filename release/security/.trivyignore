@@ -1,0 +1,2 @@
+# Each future CVE exception must also be recorded with owner, risk and expiry in
+# vulnerability-exceptions.json. There are no active exceptions.

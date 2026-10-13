@@ -11,7 +11,12 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @votaciones/admin-web build
 
 FROM node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a AS runtime
+ARG APP_VERSION=0.1.0-dev
+ARG GIT_COMMIT=unknown
 ENV NODE_ENV=production PORT=3001 API_ORIGIN=http://localhost:3000
+LABEL org.opencontainers.image.revision=$GIT_COMMIT \
+  org.opencontainers.image.source="https://github.com/pcalle42/SistemaEleccionesSolana" \
+  org.opencontainers.image.version=$APP_VERSION
 WORKDIR /app
 COPY --from=build --chown=node:node /workspace/apps/admin-web/dist ./dist
 COPY --from=build --chown=node:node /workspace/apps/admin-web/server.mjs ./server.mjs

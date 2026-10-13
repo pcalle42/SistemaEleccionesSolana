@@ -47,6 +47,22 @@ Valkey, ZK, concurrencia, navegador, privacidad y tampering:
 pnpm test:all
 ```
 
+La interfaz canónica de CI y release es:
+
+```bash
+pnpm ci:validate
+pnpm ci:main
+pnpm ci:release
+pnpm release:migrations:verify
+pnpm release:zk:verify -- --classification devnet
+pnpm release:verify -- --manifest <ReleaseManifestV1.json>
+```
+
+Consulte el [contrato de release](release/README.md) y el
+[runbook de promoción](docs/operations/release-runbook.md). La producción está
+bloqueada hasta registrar artefactos ZK productivos aprobados; CI nunca promueve
+el trusted setup devnet.
+
 Consulte [`tests/README.md`](tests/README.md) y la
 [`matriz de invariantes`](tests/INVARIANT_MATRIX.md). Las suites con estado usan
 infraestructura Docker aislada y protegida contra resets fuera de test.
@@ -153,6 +169,13 @@ namespaces, TTLs y políticas ante indisponibilidad.
 10. [`docs/09-elegibilidad-identidad-electoral.md`](docs/09-elegibilidad-identidad-electoral.md)
 11. [`docs/10-zk-circom-snarkjs.md`](docs/10-zk-circom-snarkjs.md)
 12. [`docs/11-protocolo-voto-nullifier-atomicidad.md`](docs/11-protocolo-voto-nullifier-atomicidad.md)
+13. [`docs/12-auditoria-transparencia-verificabilidad.md`](docs/12-auditoria-transparencia-verificabilidad.md)
+14. [`docs/13-conteo-resultados-publicacion.md`](docs/13-conteo-resultados-publicacion.md)
+15. [`docs/14-frontend-flujos-ux-seguridad.md`](docs/14-frontend-flujos-ux-seguridad.md)
+16. [`docs/15-testing-integracion-e2e-seguridad.md`](docs/15-testing-integracion-e2e-seguridad.md)
+17. [`docs/16-seguridad-hardening-threat-model.md`](docs/16-seguridad-hardening-threat-model.md)
+18. [`docs/17-devnet-e2e-reproducible.md`](docs/17-devnet-e2e-reproducible.md)
+19. [`docs/18-ci-cd-calidad-release.md`](docs/18-ci-cd-calidad-release.md)
 
 ## Zero-knowledge
 

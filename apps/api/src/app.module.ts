@@ -12,6 +12,7 @@ import { ZkModule } from './modules/zk/zk.module.js';
 import { VotingModule } from './modules/voting/voting.module.js';
 import { VerificationModule } from './modules/verification/verification.module.js';
 import { ValkeyNestModule } from './valkey/valkey-nest.module.js';
+import { VersionModule } from './version/version.module.js';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ValkeyNestModule } from './valkey/valkey-nest.module.js';
     ZkModule,
     VotingModule,
     VerificationModule,
+    VersionModule,
   ],
 })
 export class AppModule {}

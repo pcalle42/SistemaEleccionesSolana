@@ -1,0 +1,102 @@
+name: promote-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: Immutable RC version (MAJOR.MINOR.PATCH-rc.N)
+        required: true
+        type: string
+      release_run_id:
+        description: Successful release-candidate workflow run ID
+        required: true
+        type: string
+      target:
+        description: Explicit promotion target
+        options: [staging, production]
+        required: true
+        type: choice
+      current_release:
+        description: Currently deployed release identity
+        required: true
+        type: string
+      backup_restore_ready:
+        description: Production-only approved backup/restore evidence
+        options: ['false', 'true']
+        required: true
+        type: choice
+      migration_plan_approved:
+        description: Production-only approved migration/forward-fix plan
+        options: ['false', 'true']
+        required: true
+        type: choice
+      post_deploy_base_url:
+        description: Optional HTTPS base URL for safe post-deploy checks
+        required: false
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+  packages: read
+
+jobs:
+  promote-approved-digests:
+    environment: ${{ inputs.target }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.23.3
+      - name: Activate pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.9.0 --activate
+      - run: pnpm install --frozen-lockfile
+      - name: Download the exact RC evidence; never rebuild
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: release-${{ inputs.release_version }}
+          path: artifacts/release
+          run-id: ${{ inputs.release_run_id }}
+      - name: Verify release bundle and explicit target prerequisites
+        env:
+          BACKUP_READY: ${{ inputs.backup_restore_ready }}
+          MIGRATION_APPROVED: ${{ inputs.migration_plan_approved }}
+        run: |
+          pnpm release:verify -- --manifest artifacts/release/release-manifest.json
+          api_image="$(node -p "require('./artifacts/release/release-manifest.json').images.api.reference")"
+          admin_image="$(node -p "require('./artifacts/release/release-manifest.json').images.adminWeb.reference")"
+          voter_image="$(node -p "require('./artifacts/release/release-manifest.json').images.voterWeb.reference")"
+          bash scripts/release/verify-images.sh "${api_image}" "${admin_image}" "${voter_image}"
+          if [[ "${{ inputs.target }}" == 'production' ]]; then
+            [[ "${BACKUP_READY}" == 'true' && "${MIGRATION_APPROVED}" == 'true' ]] || {
+              printf 'error: production evidence was not explicitly approved\n' >&2
+              exit 1
+            }
+          fi
+          mkdir -p artifacts/promotion
+          printf '{"status":"%s"}\n' "$([[ "${BACKUP_READY}" == 'true' ]] && printf ready || printf unavailable)" >artifacts/promotion/backup-status.json
+          printf '{"status":"%s","databaseStrategy":"forward-fix"}\n' "$([[ "${MIGRATION_APPROVED}" == 'true' ]] && printf approved || printf pending)" >artifacts/promotion/migration-plan.json
+          args=(--target "${{ inputs.target }}" --manifest artifacts/release/release-manifest.json --current-release "${{ inputs.current_release }}")
+          if [[ "${{ inputs.target }}" == 'production' ]]; then
+            args+=(--backup-status artifacts/promotion/backup-status.json --migration-plan artifacts/promotion/migration-plan.json)
+          fi
+          pnpm release:preflight -- "${args[@]}"
+      - name: Record digest-only promotion handoff
+        run: pnpm release:promotion-record -- --environment "${{ inputs.target }}" --manifest artifacts/release/release-manifest.json --actor "${GITHUB_ACTOR}" --migration-status planned --output "artifacts/promotion/${{ inputs.target }}.json"
+      - name: Safe post-deploy verification when an endpoint is supplied
+        if: inputs.post_deploy_base_url != ''
+        run: pnpm release:post-deploy -- --base-url "${{ inputs.post_deploy_base_url }}" --expected-version "${{ inputs.release_version }}" --expected-manifest-digest "$(node -p "require('./artifacts/release/release-manifest.json').manifestDigest")"
+      - name: Preserve promotion record
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          if-no-files-found: error
+          name: promotion-${{ inputs.target }}-${{ inputs.release_version }}
+          path: artifacts/promotion
+          retention-days: 365

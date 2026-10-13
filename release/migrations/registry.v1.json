@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "MigrationRegistryV1",
+  "upgradeBaseline": null,
+  "upgradeBaselineReason": "No prior production release exists; the first release validates empty database to latest.",
+  "migrations": [
+    {
+      "file": "0000_bootstrap-persistence.sql",
+      "risk": "safe-additive",
+      "sha256": "ac098a363f43e63a7c55a1e3ec8caa2934c28fc563b45752289b7c04bf39dea9"
+    },
+    {
+      "file": "0001_careful_talon.sql",
+      "risk": "safe-additive",
+      "sha256": "146b8c50297822af62953d75f7716b8c1a730c2ef4bc3af0c784d8326274bcea"
+    },
+    {
+      "file": "0002_same_jack_power.sql",
+      "risk": "safe-additive",
+      "sha256": "aa45b95fbd3616ad50b375e638e4859423b48b1b5c190b789a2fef08d82b2924"
+    },
+    {
+      "file": "0003_glorious_synch.sql",
+      "risk": "safe-additive",
+      "sha256": "eee32f0ad29c967346d6fd8b038c2c4d2c688bb375756928a959b49bb9011891"
+    },
+    {
+      "file": "0004_fat_warbird.sql",
+      "risk": "safe-additive",
+      "sha256": "47bfe9f1be787711d2bce3e85d7cc1b0f8e6514831804192edd61299b7d3bea0"
+    },
+    {
+      "file": "0005_immutable_votes.sql",
+      "risk": "requires-coordination",
+      "sha256": "1d2bb8a69628b99ef7e848eca1dc49fe648ccc40b9fd8645e23fc3159b01ff0c"
+    },
+    {
+      "file": "0006_little_sleepwalker.sql",
+      "risk": "safe-additive",
+      "sha256": "252aa42eac784be1300b75fab88d5919954436b25c9a9e47bf14b65c1e566127"
+    },
+    {
+      "file": "0007_fix_audit_checkpoint.sql",
+      "risk": "requires-coordination",
+      "sha256": "055dfb0bb6d315b979c6e15022089e24af739ada8957bd158a539571f25d174a"
+    },
+    {
+      "file": "0008_grant_audit_head_read.sql",
+      "risk": "safe-additive",
+      "sha256": "3a6464d085863f7f5bc0a2586553b295ce24251f9aeb95bce9d6b09061171f7a"
+    },
+    {
+      "file": "0009_curvy_cerise.sql",
+      "risk": "safe-additive",
+      "sha256": "d0e2967957b33a593d21a803932d6a1e2a0ad0b097e69577ac8aa1990dce3814"
+    },
+    {
+      "file": "0010_youthful_triton.sql",
+      "risk": "requires-coordination",
+      "sha256": "86c455dd5bce77dea3316ee7b42cf142c4a18dce4beaef862d9ffcfa1defb4b2"
+    },
+    {
+      "file": "0011_release_schema_compatibility.sql",
+      "risk": "safe-additive",
+      "sha256": "e8740d0c83162867d7f9a28fcf8c1008ffbe743563c52bb4ac03808234fbf6c8"
+    }
+  ]
+}

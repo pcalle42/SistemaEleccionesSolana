@@ -1,0 +1,27 @@
+{
+  "images": {
+    "api": {
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "reference": "ghcr.io/pcalle42/votaciones-api@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "adminWeb": {
+      "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "reference": "ghcr.io/pcalle42/votaciones-admin-web@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "voterWeb": {
+      "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "reference": "ghcr.io/pcalle42/votaciones-voter-web@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  },
+  "provenance": {
+    "builder": "local-release-contract-test",
+    "workflowRef": "tests/release/release.spec.ts"
+  },
+  "sbomRefs": {
+    "api": "sbom-api.spdx.json",
+    "adminWeb": "sbom-admin-web.spdx.json",
+    "voterWeb": "sbom-voter-web.spdx.json"
+  },
+  "securityScanRefs": ["security-summary.json", "trivy-results.sarif"],
+  "testEvidenceRefs": ["main-validation", "devnet-clean-room"]
+}

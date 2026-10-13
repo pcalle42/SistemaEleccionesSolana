@@ -21,6 +21,11 @@ describe('application configuration', () => {
       },
       logging: { level: 'silent', service: 'votaciones-api' },
       openApi: { enabled: false, path: 'docs' },
+      release: {
+        appVersion: '0.1.0-dev',
+        gitCommit: 'unknown',
+        manifestDigest: 'unreleased',
+      },
       voting: {
         maximumConcurrentProofs: 2,
         rateLimitMaximum: 30,
@@ -64,6 +69,32 @@ describe('application configuration', () => {
         VOTACIONES_ENV: 'production',
       }),
     ).toThrow('DEVNET_ADMIN');
+  });
+
+  it('requires immutable release identity in production', () => {
+    expect(() =>
+      getAppConfig({
+        ...validEnvironment,
+        ADMIN_COOKIE_SECURE: 'true',
+        HTTP_CORS_ORIGINS: 'https://admin.example.test',
+        VOTACIONES_ENV: 'production',
+      }),
+    ).toThrow('immutable release identity');
+    expect(
+      getAppConfig({
+        ...validEnvironment,
+        ADMIN_COOKIE_SECURE: 'true',
+        APP_VERSION: '1.0.0-rc.1',
+        GIT_COMMIT: 'a'.repeat(40),
+        HTTP_CORS_ORIGINS: 'https://admin.example.test',
+        RELEASE_MANIFEST_DIGEST: `sha256:${'b'.repeat(64)}`,
+        VOTACIONES_ENV: 'production',
+      }).release,
+    ).toEqual({
+      appVersion: '1.0.0-rc.1',
+      gitCommit: 'a'.repeat(40),
+      manifestDigest: `sha256:${'b'.repeat(64)}`,
+    });
   });
 
   it('validates administrative session and Argon2 bounds', () => {

@@ -18,7 +18,11 @@ describe('real NestJS infrastructure integration', () => {
     await request(app.getHttpServer())
       .get('/health/ready')
       .expect(200, {
-        dependencies: { postgresql: 'healthy', valkey: 'healthy' },
+        dependencies: {
+          postgresql: 'healthy',
+          protocolArtifacts: 'healthy',
+          valkey: 'healthy',
+        },
         status: 'ready',
       });
 

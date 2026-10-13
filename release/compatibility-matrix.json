@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "CompatibilityMatrixV1",
+  "entries": [
+    {
+      "appVersionRange": ">=0.1.0 <0.2.0",
+      "artifactRegistryVersion": "zk-artifact-registry-v1",
+      "circuitVersions": ["1.0.0"],
+      "frontendCompatibility": "admin-web and voter-web must use the same app release digest as the API",
+      "protocolVersions": ["anonymous-single-choice-v1"],
+      "schemaRange": {
+        "maximumMigration": "0011_release_schema_compatibility.sql",
+        "minimumMigration": "0000_bootstrap-persistence.sql"
+      }
+    }
+  ]
+}
