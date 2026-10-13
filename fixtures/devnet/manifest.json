@@ -1,0 +1,36 @@
+{
+  "fixtureVersion": "devnet-fixtures-v1",
+  "warning": "DEVNET/TEST ONLY — NEVER USE THESE CREDENTIALS FOR A REAL ELECTION",
+  "demoElection": {
+    "title": "Devnet Election",
+    "options": ["Option Alpha", "Option Beta", "Blank"]
+  },
+  "voters": [
+    {
+      "externalReference": "DEV-VOTER-001",
+      "voterSecret": "101",
+      "identityCommitment": "13822951296392872989655038662426582014639826786130340787206814926194655934954"
+    },
+    {
+      "externalReference": "DEV-VOTER-002",
+      "voterSecret": "102",
+      "identityCommitment": "3382918112785616993527147882471456596068798007243490787403595613481921156588"
+    },
+    {
+      "externalReference": "DEV-VOTER-003",
+      "voterSecret": "103",
+      "identityCommitment": "13689362856127131645330403859460458971948050922880216306974919270516986406831"
+    },
+    {
+      "externalReference": "DEV-VOTER-004",
+      "voterSecret": "104",
+      "identityCommitment": "8992930749222005887370453096256638686692261489810446048635272732933352386399"
+    },
+    {
+      "externalReference": "DEV-VOTER-005",
+      "voterSecret": "105",
+      "identityCommitment": "20434077944858081791350257475954127441845730158026717052586207118823270511846"
+    }
+  ],
+  "expectedMerkleRoot": "16642389253599822648549378459335168505515507936151817863544793041381408883959"
+}

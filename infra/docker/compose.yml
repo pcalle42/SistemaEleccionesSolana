@@ -1,6 +1,111 @@
 name: ${COMPOSE_PROJECT_NAME:-votaciones}
 
 services:
+  api:
+    image: ${COMPOSE_PROJECT_NAME:-votaciones}-api
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    environment:
+      ADMIN_ARGON2_MEMORY_KIB: ${ADMIN_ARGON2_MEMORY_KIB:-19456}
+      ADMIN_ARGON2_PARALLELISM: ${ADMIN_ARGON2_PARALLELISM:-1}
+      ADMIN_ARGON2_TIME_COST: ${ADMIN_ARGON2_TIME_COST:-2}
+      ADMIN_COOKIE_SECURE: ${ADMIN_COOKIE_SECURE:-false}
+      ADMIN_LOGIN_NETWORK_MAXIMUM: ${ADMIN_LOGIN_NETWORK_MAXIMUM:-20}
+      ADMIN_LOGIN_USER_MAXIMUM: ${ADMIN_LOGIN_USER_MAXIMUM:-5}
+      ADMIN_LOGIN_WINDOW_SECONDS: ${ADMIN_LOGIN_WINDOW_SECONDS:-300}
+      ADMIN_SESSION_ABSOLUTE_SECONDS: ${ADMIN_SESSION_ABSOLUTE_SECONDS:-28800}
+      ADMIN_SESSION_IDLE_SECONDS: ${ADMIN_SESSION_IDLE_SECONDS:-900}
+      APP_HOST: 0.0.0.0
+      APP_PORT: '3000'
+      DATABASE_MIGRATION_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER is required}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}
+      DATABASE_URL: postgresql://${POSTGRES_RUNTIME_USER:?POSTGRES_RUNTIME_USER is required}:${POSTGRES_RUNTIME_PASSWORD:?POSTGRES_RUNTIME_PASSWORD is required}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}
+      DB_CONNECTION_TIMEOUT_MS: ${DB_CONNECTION_TIMEOUT_MS:-5000}
+      DB_IDLE_TIMEOUT_MS: ${DB_IDLE_TIMEOUT_MS:-10000}
+      DB_POOL_MAX: ${DB_POOL_MAX:-10}
+      DB_STATEMENT_TIMEOUT_MS: ${DB_STATEMENT_TIMEOUT_MS:-5000}
+      DEVNET_ADMIN_PASSWORD: ${DEVNET_ADMIN_PASSWORD:-}
+      DEVNET_ADMIN_USERNAME: ${DEVNET_ADMIN_USERNAME:-}
+      DEVNET_GIT_COMMIT: ${DEVNET_GIT_COMMIT:-unknown}
+      HTTP_BODY_LIMIT_BYTES: ${HTTP_BODY_LIMIT_BYTES:-262144}
+      HTTP_CORS_ORIGINS: ${HTTP_CORS_ORIGINS:?HTTP_CORS_ORIGINS is required}
+      HTTP_REQUEST_TIMEOUT_MS: ${HTTP_REQUEST_TIMEOUT_MS:-15000}
+      HTTP_TRUST_PROXY_ADDRESSES: ${HTTP_TRUST_PROXY_ADDRESSES:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      OPENAPI_ENABLED: ${OPENAPI_ENABLED:-false}
+      TZ: UTC
+      VALKEY_COMMAND_TIMEOUT_MS: ${VALKEY_COMMAND_TIMEOUT_MS:-1000}
+      VALKEY_CONNECT_TIMEOUT_MS: ${VALKEY_CONNECT_TIMEOUT_MS:-1000}
+      VALKEY_DB: ${VALKEY_DB:-0}
+      VALKEY_HOST: valkey
+      VALKEY_MAX_RECONNECT_ATTEMPTS: ${VALKEY_MAX_RECONNECT_ATTEMPTS:-3}
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD:-}
+      VALKEY_PORT: '6379'
+      VALKEY_USERNAME: ${VALKEY_USERNAME:-}
+      VERIFICATION_ARTIFACT_DIRECTORY: /app/.artifacts/verification-packages
+      VOTE_MAXIMUM_CONCURRENT_PROOFS: ${VOTE_MAXIMUM_CONCURRENT_PROOFS:-2}
+      VOTE_RATE_LIMIT_MAXIMUM: ${VOTE_RATE_LIMIT_MAXIMUM:-30}
+      VOTE_RATE_LIMIT_WINDOW_SECONDS: ${VOTE_RATE_LIMIT_WINDOW_SECONDS:-60}
+      VOTACIONES_ENV: ${VOTACIONES_ENV:?VOTACIONES_ENV is required}
+      VOTACIONES_ENV_FILE: /app/config/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    expose:
+      - '3000'
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "fetch('http://127.0.0.1:3000/health/live').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 18
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-file: '3'
+        max-size: 10m
+    networks:
+      - internal
+    read_only: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    volumes:
+      - ${VOTACIONES_ENV_FILE:-../devnet/.env.example}:/app/config/.env:ro
+      - verification-artifacts:/app/.artifacts
+
+  artifact-init:
+    image: ${COMPOSE_PROJECT_NAME:-votaciones}-api
+    command:
+      - sh
+      - -ceu
+      - chown -R 1000:1000 /app/.artifacts && chmod 0750 /app/.artifacts
+    user: '0:0'
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+    profiles:
+      - jobs
+    read_only: true
+    restart: 'no'
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - verification-artifacts:/app/.artifacts
+
   admin-web:
     build:
       context: ../..
@@ -134,3 +239,5 @@ networks:
 volumes:
   postgres-data:
     name: ${COMPOSE_PROJECT_NAME:-votaciones}_postgres_data
+  verification-artifacts:
+    name: ${COMPOSE_PROJECT_NAME:-votaciones}_verification_artifacts

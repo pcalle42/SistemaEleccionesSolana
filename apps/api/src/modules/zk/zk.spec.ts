@@ -67,6 +67,13 @@ beforeAll(async () => {
 }, 60_000);
 
 describe('SnarkJsVoteProofVerifier', () => {
+  it('fails closed when production attempts to load devnet setup artifacts', async () => {
+    const productionRegistry = new FileTrustedArtifactRegistry('production');
+    await expect(
+      productionRegistry.get(PROTOCOL_VERSION_V1, CIRCUIT_VERSION_V1),
+    ).rejects.toMatchObject({ code: 'ZK_VERIFIER_UNAVAILABLE' });
+  });
+
   it('verifies a proof only with trusted artifacts and typed public signals', async () => {
     await expect(
       verifier.verify(

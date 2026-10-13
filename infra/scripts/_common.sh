@@ -99,3 +99,33 @@ assert_service_network() {
     "${container_id}")"
   [[ -n "${ip_address}" ]] || fail "${service} is not attached to ${network_name}"
 }
+
+assert_devnet_destructive_target() {
+  [[ "${VOTACIONES_ENVIRONMENT}" == 'devnet' ]] ||
+    fail 'destructive devnet command refused outside devnet'
+  [[ "$(env_value POSTGRES_DB)" == 'votaciones_devnet' ]] ||
+    fail 'devnet reset requires POSTGRES_DB=votaciones_devnet'
+  [[ "${VOTACIONES_PROJECT_NAME}" == 'votaciones-devnet' ||
+    "${VOTACIONES_PROJECT_NAME}" == votaciones-devnet-* ]] ||
+    fail 'devnet reset requires the votaciones-devnet project namespace'
+
+  local volume label_project label_environment compose_project compose_volume expected_compose_volume
+  for volume in \
+    "${VOTACIONES_PROJECT_NAME}_postgres_data" \
+    "${VOTACIONES_PROJECT_NAME}_verification_artifacts"; do
+    if docker volume inspect "${volume}" >/dev/null 2>&1; then
+      label_project="$(docker volume inspect --format '{{index .Labels "votaciones.project"}}' "${volume}")"
+      label_environment="$(docker volume inspect --format '{{index .Labels "votaciones.environment"}}' "${volume}")"
+      compose_project="$(docker volume inspect --format '{{index .Labels "com.docker.compose.project"}}' "${volume}")"
+      compose_volume="$(docker volume inspect --format '{{index .Labels "com.docker.compose.volume"}}' "${volume}")"
+      expected_compose_volume='verification-artifacts'
+      [[ "${volume}" == "${VOTACIONES_PROJECT_NAME}_postgres_data" ]] &&
+        expected_compose_volume='postgres-data'
+      if [[ "${label_project}" != "${VOTACIONES_PROJECT_NAME}" || "${label_environment}" != 'devnet' ]]; then
+        [[ "${compose_project}" == "${VOTACIONES_PROJECT_NAME}" &&
+          "${compose_volume}" == "${expected_compose_volume}" ]] ||
+          fail "volume labels do not authorize reset: ${volume}"
+      fi
+    fi
+  done
+}

@@ -4,5 +4,11 @@
     "lib": ["ES2023", "DOM"],
     "noEmit": true
   },
-  "include": ["eslint.config.mjs", "playwright.config.ts", "scripts/**/*.mjs", "tests/**/*.ts"]
+  "include": [
+    "eslint.config.mjs",
+    "playwright.config.ts",
+    "playwright.devnet.config.ts",
+    "scripts/**/*.mjs",
+    "tests/**/*.ts"
+  ]
 }

@@ -50,6 +50,7 @@
     "test": "pnpm build && pnpm --recursive --if-present test",
     "test:all": "pnpm test:release",
     "test:browser": "pnpm build && playwright test",
+    "test:browser:devnet": "playwright test --config playwright.devnet.config.ts",
     "test:concurrency": "bash tests/scripts/run-with-infra.sh concurrency",
     "test:contract": "vitest run tests/contract",
     "test:e2e": "pnpm test:e2e:api && pnpm test:browser",
@@ -82,12 +83,15 @@
     "zk:test": "pnpm --filter @votaciones/zk-protocol zk:test",
     "zk:verify-artifacts": "pnpm --filter @votaciones/zk-protocol zk:verify-artifacts",
     "devnet:config": "bash infra/scripts/config.sh devnet",
+    "devnet:bootstrap": "bash infra/scripts/devnet-bootstrap.sh",
     "devnet:down": "bash infra/scripts/down.sh devnet",
     "devnet:logs": "bash infra/scripts/logs.sh devnet",
+    "devnet:e2e": "bash infra/scripts/devnet-e2e.sh",
     "devnet:reset": "bash infra/scripts/reset.sh devnet",
     "devnet:smoke": "bash infra/scripts/smoke.sh devnet",
     "devnet:status": "bash infra/scripts/status.sh devnet",
     "devnet:up": "bash infra/scripts/up.sh devnet",
+    "devnet:verify": "bash infra/scripts/devnet-verify.sh devnet",
     "devnet:verify:persistence": "bash infra/scripts/verify-persistence.sh devnet"
   },
   "devDependencies": {

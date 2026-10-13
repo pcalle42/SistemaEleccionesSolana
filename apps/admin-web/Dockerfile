@@ -1,7 +1,8 @@
 FROM node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a AS build
 WORKDIR /workspace
 ARG VITE_API_BASE_URL=http://localhost:3000/api/v1
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ARG VITE_RUNTIME_ENV=local
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL VITE_RUNTIME_ENV=$VITE_RUNTIME_ENV
 RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages

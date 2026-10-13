@@ -17,6 +17,14 @@ require_docker
 compose_cmd config --quiet
 print_context
 printf 'Destroying containers and volumes for project %s.\n' "${VOTACIONES_PROJECT_NAME}"
+if [[ "${VOTACIONES_ENVIRONMENT}" == 'devnet' ]]; then
+  assert_devnet_destructive_target
+  printf 'Authorized devnet volumes: %s_postgres_data, %s_verification_artifacts.\n' \
+    "${VOTACIONES_PROJECT_NAME}" "${VOTACIONES_PROJECT_NAME}"
+  compose_cmd down --volumes --remove-orphans
+  printf 'Devnet reset completed; no services were restarted.\n'
+  exit 0
+fi
 compose_cmd down --volumes --remove-orphans
 compose_cmd up --detach --wait --wait-timeout "${VOTACIONES_HEALTH_TIMEOUT}"
 compose_cmd ps

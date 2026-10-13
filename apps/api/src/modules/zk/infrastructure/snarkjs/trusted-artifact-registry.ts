@@ -23,6 +23,8 @@ export interface TrustedArtifactRegistry {
 export class FileTrustedArtifactRegistry implements TrustedArtifactRegistry {
   private loaded: Promise<TrustedVerificationArtifacts> | undefined;
 
+  constructor(private readonly runtimeEnvironment = process.env['VOTACIONES_ENV'] ?? 'local') {}
+
   get(protocolVersion: string, circuitVersion: string): Promise<TrustedVerificationArtifacts> {
     if (protocolVersion !== PROTOCOL_VERSION_V1 || circuitVersion !== CIRCUIT_VERSION_V1) {
       return Promise.reject(
@@ -41,6 +43,12 @@ export class FileTrustedArtifactRegistry implements TrustedArtifactRegistry {
       const locations = protocolArtifactLocationsV1();
       const manifest: unknown = JSON.parse(await readFile(locations.manifest, 'utf8'));
       assertProtocolManifestV1(manifest);
+      if (
+        this.runtimeEnvironment === 'production' &&
+        manifest.environment === 'DEVNET / NOT FOR PRODUCTION'
+      ) {
+        throw new Error('Devnet proof artifacts cannot be loaded in production.');
+      }
       const verificationKeyBytes = await readFile(locations.verificationKey);
       const digest = createHash('sha256').update(verificationKeyBytes).digest('hex');
       if (digest !== manifest.artifactDigests.verificationKeySha256) {

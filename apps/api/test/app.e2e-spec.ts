@@ -57,6 +57,7 @@ const config = getAppConfig({
 
 const database = {
   health: vi.fn().mockResolvedValue(undefined),
+  readiness: vi.fn().mockResolvedValue(undefined),
   onApplicationShutdown: vi.fn().mockResolvedValue(undefined),
 };
 const valkey = {
@@ -116,7 +117,7 @@ describe('NestJS HTTP foundation', () => {
     await request(httpServer)
       .get('/health/ready')
       .expect(200, {
-        dependencies: { postgresql: 'healthy', valkey: 'healthy' },
+        dependencies: { postgresql: 'healthy', protocolArtifacts: 'healthy', valkey: 'healthy' },
         status: 'ready',
       });
 
@@ -124,13 +125,17 @@ describe('NestJS HTTP foundation', () => {
     await request(httpServer)
       .get('/health/ready')
       .expect(200, {
-        dependencies: { postgresql: 'healthy', valkey: 'unavailable' },
+        dependencies: {
+          postgresql: 'healthy',
+          protocolArtifacts: 'healthy',
+          valkey: 'unavailable',
+        },
         status: 'degraded',
       });
   });
 
   it('returns a safe 503 when PostgreSQL is unavailable', async () => {
-    database.health.mockRejectedValueOnce(new Error('connection to private-host failed'));
+    database.readiness.mockRejectedValueOnce(new Error('connection to private-host failed'));
     const response = await request(httpServer).get('/health/ready').expect(503);
 
     expect(response.body).toMatchObject({

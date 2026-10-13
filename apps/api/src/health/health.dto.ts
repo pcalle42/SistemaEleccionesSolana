@@ -9,6 +9,9 @@ export class DependencyHealthDto {
   @ApiProperty({ enum: ['healthy'], example: 'healthy' })
   postgresql!: 'healthy';
 
+  @ApiProperty({ enum: ['healthy'], example: 'healthy' })
+  protocolArtifacts!: 'healthy';
+
   @ApiProperty({ enum: ['healthy', 'degraded', 'unavailable'], example: 'healthy' })
   valkey!: 'healthy' | 'degraded' | 'unavailable';
 }

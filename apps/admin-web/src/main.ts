@@ -3,6 +3,12 @@ import { AdminApp } from './app/admin-app.js';
 
 const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Application root is missing.');
+if (import.meta.env['VITE_RUNTIME_ENV'] === 'devnet') {
+  root.insertAdjacentHTML(
+    'beforebegin',
+    '<aside class="devnet-banner" role="note">DEVNET · NO USAR EN ELECCIONES REALES</aside>',
+  );
+}
 const configuredBaseUrl: unknown = import.meta.env['VITE_API_BASE_URL'];
 const baseUrl =
   typeof configuredBaseUrl === 'string' ? configuredBaseUrl : 'http://localhost:3000/api/v1';

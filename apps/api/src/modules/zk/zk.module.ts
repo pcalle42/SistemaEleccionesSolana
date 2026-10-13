@@ -5,7 +5,7 @@ import { FileTrustedArtifactRegistry } from './infrastructure/snarkjs/trusted-ar
 import { TRUSTED_ARTIFACT_REGISTRY, VOTE_PROOF_VERIFIER } from './zk.tokens.js';
 
 @Module({
-  exports: [VOTE_PROOF_VERIFIER],
+  exports: [TRUSTED_ARTIFACT_REGISTRY, VOTE_PROOF_VERIFIER],
   providers: [
     { provide: TRUSTED_ARTIFACT_REGISTRY, useClass: FileTrustedArtifactRegistry },
     {

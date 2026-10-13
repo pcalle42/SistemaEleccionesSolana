@@ -1,4 +1,11 @@
 services:
+  api:
+    networks:
+      - internal
+      - local-access
+    ports:
+      - 127.0.0.1:${API_HOST_PORT:-3000}:3000
+
   admin-web:
     networks:
       - internal

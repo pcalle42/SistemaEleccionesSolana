@@ -192,7 +192,7 @@ describe('anonymous voting HTTP protocol', () => {
         },
       })
       .overrideProvider(DatabaseLifecycleService)
-      .useValue({ health: vi.fn(), onApplicationShutdown: vi.fn() })
+      .useValue({ health: vi.fn(), readiness: vi.fn(), onApplicationShutdown: vi.fn() })
       .overrideProvider(ValkeyLifecycleService)
       .useValue({ health: vi.fn(), onApplicationShutdown: vi.fn(), onModuleInit: vi.fn() })
       .compile();

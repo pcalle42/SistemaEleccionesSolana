@@ -86,6 +86,18 @@ Use `pnpm infra:down` para detenerlos sin borrar PostgreSQL. Consulte
 [`infra/README.md`](infra/README.md) para devnet, configuración, persistencia,
 logs y reset protegido.
 
+El ciclo devnet reproducible completo es:
+
+```bash
+pnpm devnet:bootstrap
+pnpm devnet:e2e
+pnpm devnet:verify
+```
+
+Consulte la [guía devnet](infra/devnet/README.md) antes de usar reset o cambiar
+puertos. Este perfil contiene credenciales y un trusted setup exclusivamente de
+prueba; no es apto para elecciones reales.
+
 ## Persistencia PostgreSQL
 
 La API integra Drizzle ORM sobre `pg`, con un rol administrativo exclusivo para

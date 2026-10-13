@@ -126,6 +126,7 @@ const merkleBuilder = new PoseidonMerkleTreeBuilder();
 const electionReadiness = new MemoryElectionReadinessVerifier(snapshotRepository);
 const databaseLifecycle = {
   health: vi.fn(),
+  readiness: vi.fn(),
   onApplicationShutdown: vi.fn(),
 };
 const valkeyLifecycle = {

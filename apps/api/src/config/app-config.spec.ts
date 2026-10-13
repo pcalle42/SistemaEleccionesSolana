@@ -54,6 +54,18 @@ describe('application configuration', () => {
     ).toThrow('ADMIN_COOKIE_SECURE');
   });
 
+  it('rejects devnet administrative credentials in production', () => {
+    expect(() =>
+      getAppConfig({
+        ...validEnvironment,
+        ADMIN_COOKIE_SECURE: 'true',
+        DEVNET_ADMIN_PASSWORD: 'devnet-only-password-change-before-production',
+        HTTP_CORS_ORIGINS: 'https://admin.example.test',
+        VOTACIONES_ENV: 'production',
+      }),
+    ).toThrow('DEVNET_ADMIN');
+  });
+
   it('validates administrative session and Argon2 bounds', () => {
     expect(() =>
       getAppConfig({

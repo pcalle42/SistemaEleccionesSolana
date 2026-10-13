@@ -11,6 +11,9 @@ print_context
 compose_cmd up --detach --wait --wait-timeout "${VOTACIONES_HEALTH_TIMEOUT}"
 assert_service_network postgres
 assert_service_network valkey
+if [[ "${VOTACIONES_ENVIRONMENT}" == 'devnet' ]]; then
+  assert_service_network api
+fi
 
 postgres_result="$(compose_cmd exec --no-TTY postgres sh -ceu '
   psql \
@@ -33,4 +36,13 @@ valkey_ttl="$(compose_cmd exec --no-TTY valkey valkey-cli TTL "${valkey_key}")"
 [[ "${valkey_ttl}" =~ ^[1-9][0-9]*$ ]] || fail 'Valkey TTL smoke test failed'
 compose_cmd exec --no-TTY valkey valkey-cli DEL "${valkey_key}" >/dev/null
 
-printf 'PostgreSQL, Valkey, TTL, and internal-network smoke tests passed.\n'
+if [[ "${VOTACIONES_ENVIRONMENT}" == 'devnet' ]]; then
+  compose_cmd exec --no-TTY api node -e \
+    "fetch('http://127.0.0.1:3000/health/ready').then(async r=>{if(!r.ok)throw new Error(await r.text())})"
+  compose_cmd exec --no-TTY admin-web node -e \
+    "fetch('http://127.0.0.1:3001').then(r=>{if(!r.ok)process.exit(1)})"
+  compose_cmd exec --no-TTY voter-web node -e \
+    "fetch('http://127.0.0.1:3002').then(r=>{if(!r.ok)process.exit(1)})"
+fi
+
+printf 'PostgreSQL, Valkey, API readiness, frontends, TTL, and network smoke tests passed.\n'

@@ -1,5 +1,18 @@
 services:
+  api:
+    labels:
+      votaciones.environment: devnet
+      votaciones.project: ${COMPOSE_PROJECT_NAME:-votaciones-devnet}
+    networks:
+      - internal
+      - migration-access
+    ports:
+      - 127.0.0.1:${API_HOST_PORT:-3000}:3000
+
   admin-web:
+    build:
+      args:
+        VITE_RUNTIME_ENV: devnet
     labels:
       votaciones.environment: devnet
     networks:
@@ -9,6 +22,9 @@ services:
       - 127.0.0.1:${ADMIN_WEB_HOST_PORT:-3101}:3001
 
   voter-web:
+    build:
+      args:
+        VITE_RUNTIME_ENV: devnet
     labels:
       votaciones.environment: devnet
     networks:
@@ -29,6 +45,17 @@ services:
   valkey:
     labels:
       votaciones.environment: devnet
+      votaciones.project: ${COMPOSE_PROJECT_NAME:-votaciones-devnet}
+
+volumes:
+  postgres-data:
+    labels:
+      votaciones.environment: devnet
+      votaciones.project: ${COMPOSE_PROJECT_NAME:-votaciones-devnet}
+  verification-artifacts:
+    labels:
+      votaciones.environment: devnet
+      votaciones.project: ${COMPOSE_PROJECT_NAME:-votaciones-devnet}
 
 networks:
   migration-access:

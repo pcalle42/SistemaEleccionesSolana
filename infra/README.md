@@ -1,8 +1,8 @@
 # Infraestructura local y devnet
 
-Esta infraestructura ejecuta PostgreSQL y Valkey mediante Docker Compose. Las
-migraciones PostgreSQL se gestionan desde la API; los circuitos y componentes
-Solana se incorporarán en etapas posteriores.
+Esta infraestructura ejecuta PostgreSQL, Valkey, API y ambos frontends mediante
+Docker Compose. Las migraciones PostgreSQL se gestionan desde la API y los
+artefactos ZK versionados se validan por digest.
 
 ## Versiones fijadas
 
@@ -38,7 +38,8 @@ Los puertos pueden cambiarse creando `infra/local/.env` a partir de
 - PostgreSQL está disponible en `127.0.0.1:55432` para migraciones y pruebas;
 - Valkey solo es accesible desde `votaciones-devnet_internal`;
 - credenciales conocidas y exclusivamente de integración;
-- volumen: `votaciones-devnet_postgres_data`.
+- volúmenes: `votaciones-devnet_postgres_data` y
+  `votaciones-devnet_verification_artifacts`.
 
 Devnet no está endurecido para exposición a internet y no puede tratarse como
 producción cambiando únicamente variables.
@@ -69,11 +70,18 @@ Los equivalentes usan el prefijo `devnet`, por ejemplo:
 ```bash
 pnpm devnet:config
 pnpm devnet:up
+pnpm devnet:bootstrap
+pnpm devnet:status
+pnpm devnet:e2e
+pnpm devnet:verify
 pnpm devnet:smoke
 pnpm devnet:verify:persistence
 pnpm devnet:down
 pnpm devnet:reset -- --force
 ```
+
+El procedimiento completo, los guards, URLs y diagnóstico están en
+[`infra/devnet/README.md`](devnet/README.md).
 
 ## Configuración personalizada
 
@@ -103,8 +111,10 @@ El reset:
 
 1. valida Docker, entorno y prefijo del proyecto;
 2. rechaza cualquier ejecución sin `--force`;
-3. ejecuta `compose down --volumes --remove-orphans` solo para ese proyecto;
-4. recrea los servicios y espera sus health checks.
+3. valida labels de los volúmenes autorizados;
+4. ejecuta `compose down --volumes --remove-orphans` solo para ese proyecto.
+
+El reset devnet queda detenido deliberadamente; `devnet:bootstrap` lo reconstruye.
 
 Los datos eliminados por reset no son recuperables salvo que exista un backup.
 

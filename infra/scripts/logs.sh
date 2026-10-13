@@ -14,7 +14,7 @@ fi
 
 service="${1:-}"
 case "${service}" in
-  '' | postgres | valkey) ;;
+  '' | api | admin-web | postgres | valkey | voter-web) ;;
   *) fail "unknown service: ${service}" ;;
 esac
 

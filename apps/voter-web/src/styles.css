@@ -12,6 +12,15 @@ body {
   margin: 0;
   min-width: 320px;
 }
+.devnet-banner {
+  padding: 0.55rem 1rem;
+  color: #321100;
+  background: #ffbf47;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
 button,
 input {
   font: inherit;

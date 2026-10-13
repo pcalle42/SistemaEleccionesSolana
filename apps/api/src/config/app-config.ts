@@ -164,6 +164,12 @@ function logLevel(environment: NodeJS.ProcessEnv, runtime: RuntimeEnvironment): 
 
 export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppConfig {
   const runtime = runtimeEnvironment(environment);
+  if (
+    runtime === 'production' &&
+    (environment['DEVNET_ADMIN_USERNAME'] || environment['DEVNET_ADMIN_PASSWORD'])
+  ) {
+    throw new Error('DEVNET_ADMIN credentials cannot be configured in production');
+  }
   const host = environment['APP_HOST'] ?? '127.0.0.1';
   if (!host || /\s/.test(host)) {
     throw new Error('APP_HOST is invalid');
