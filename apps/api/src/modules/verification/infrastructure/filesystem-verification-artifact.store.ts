@@ -2,6 +2,8 @@ import { constants } from 'node:fs';
 import { access, mkdir, mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
 import { join, resolve, sep } from 'node:path';
 
+import type { VerificationArtifactStore } from '../application/ports/verification-artifact-store.port.js';
+
 const SAFE_SEGMENT = /^[0-9a-z-]+$/u;
 
 function safeChild(root: string, ...segments: string[]): string {
@@ -13,7 +15,7 @@ function safeChild(root: string, ...segments: string[]): string {
   return path;
 }
 
-export class FilesystemVerificationArtifactStore {
+export class FilesystemVerificationArtifactStore implements VerificationArtifactStore {
   constructor(private readonly root: string) {}
 
   async putImmutable(

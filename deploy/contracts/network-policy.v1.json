@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "ProductionNetworkPolicyV1",
+  "defaultIngress": "deny",
+  "defaultEgress": "deny-with-explicit-platform-exceptions",
+  "zones": ["edge-public", "application", "data", "management"],
+  "flows": [
+    {
+      "from": "internet",
+      "to": "edge-public",
+      "protocol": "https",
+      "port": 443,
+      "purpose": "public and administrative front doors"
+    },
+    {
+      "from": "edge-public",
+      "to": "application",
+      "protocol": "http-or-platform-tls",
+      "port": 3000,
+      "purpose": "API traffic from trusted proxies only"
+    },
+    {
+      "from": "application",
+      "to": "data",
+      "protocol": "postgresql-private",
+      "port": 5432,
+      "purpose": "authoritative runtime transactions"
+    },
+    {
+      "from": "application",
+      "to": "data",
+      "protocol": "valkey-private",
+      "port": 6379,
+      "purpose": "auxiliary rate limits and sessions"
+    },
+    {
+      "from": "application",
+      "to": "data",
+      "protocol": "artifact-store-private",
+      "port": 443,
+      "purpose": "immutable package publication"
+    },
+    {
+      "from": "management",
+      "to": "data",
+      "protocol": "provider-specific-private",
+      "port": 0,
+      "purpose": "migration, backup and restore jobs with separate identity"
+    }
+  ],
+  "forbiddenPublicServices": ["postgresql", "valkey", "internal-artifacts", "metrics"]
+}

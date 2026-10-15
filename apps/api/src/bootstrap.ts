@@ -83,5 +83,6 @@ export async function listen(app: INestApplication, config: AppConfig): Promise<
   const server = (await app.listen(config.http.port, config.http.host)) as unknown as Server;
   server.requestTimeout = config.http.requestTimeoutMs;
   server.headersTimeout = Math.max(config.http.requestTimeoutMs + 1_000, 10_000);
+  server.keepAliveTimeout = Math.min(5_000, config.deployment.shutdownGraceMs);
   return server;
 }

@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://votaciones.invalid/schemas/production-profile-v1.schema.json",
+  "title": "ProductionProfileV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "environment",
+    "synthetic",
+    "profileId",
+    "providerDecision",
+    "releaseManifestDigest",
+    "topology",
+    "data",
+    "artifacts",
+    "secrets",
+    "iam",
+    "deployment",
+    "operations",
+    "capacity",
+    "gates"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "ProductionProfileV1" },
+    "environment": { "const": "production" },
+    "synthetic": { "type": "boolean" },
+    "profileId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$" },
+    "providerDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "adr"],
+      "properties": {
+        "status": { "enum": ["pending", "approved"] },
+        "adr": { "type": ["string", "null"] }
+      }
+    },
+    "releaseManifestDigest": { "$ref": "#/$defs/digest" },
+    "topology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adminOrigin",
+        "voterOrigin",
+        "apiOrigin",
+        "httpsOnly",
+        "httpRedirect",
+        "ingressPorts",
+        "trustedProxyCidrs",
+        "certificateLifecycleEvidence"
+      ],
+      "properties": {
+        "adminOrigin": { "type": "string", "format": "uri" },
+        "voterOrigin": { "type": "string", "format": "uri" },
+        "apiOrigin": { "type": "string", "format": "uri" },
+        "httpsOnly": { "type": "boolean" },
+        "httpRedirect": { "type": "boolean" },
+        "ingressPorts": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1, "maximum": 65535 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "trustedProxyCidrs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "certificateLifecycleEvidence": { "type": ["string", "null"] }
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["postgresql", "valkey"],
+      "properties": {
+        "postgresql": { "$ref": "#/$defs/postgresql" },
+        "valkey": { "$ref": "#/$defs/valkey" }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "durable",
+        "immutable",
+        "publicPrivateSeparated",
+        "productionSafe",
+        "digestVerified",
+        "backupEvidence"
+      ],
+      "properties": {
+        "durable": { "type": "boolean" },
+        "immutable": { "type": "boolean" },
+        "publicPrivateSeparated": { "type": "boolean" },
+        "productionSafe": { "type": "boolean" },
+        "digestVerified": { "type": "boolean" },
+        "backupEvidence": { "type": ["string", "null"] }
+      }
+    },
+    "secrets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtimeInjected",
+        "absentFromImages",
+        "absentFromFrontends",
+        "audited",
+        "rotationRunbook"
+      ],
+      "properties": {
+        "runtimeInjected": { "type": "boolean" },
+        "absentFromImages": { "type": "boolean" },
+        "absentFromFrontends": { "type": "boolean" },
+        "audited": { "type": "boolean" },
+        "rotationRunbook": { "type": ["string", "null"] }
+      }
+    },
+    "iam": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namedHumans",
+        "mfa",
+        "leastPrivilege",
+        "separateCiIdentity",
+        "breakGlassAudited"
+      ],
+      "properties": {
+        "namedHumans": { "type": "boolean" },
+        "mfa": { "type": "boolean" },
+        "leastPrivilege": { "type": "boolean" },
+        "separateCiIdentity": { "type": "boolean" },
+        "breakGlassAudited": { "type": "boolean" }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "images",
+        "migrationJob",
+        "migrationIdentitySeparate",
+        "readinessGate",
+        "startupMigrations",
+        "rollbackPlan"
+      ],
+      "properties": {
+        "images": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["api", "adminWeb", "voterWeb"],
+          "properties": {
+            "api": { "$ref": "#/$defs/image" },
+            "adminWeb": { "$ref": "#/$defs/image" },
+            "voterWeb": { "$ref": "#/$defs/image" }
+          }
+        },
+        "migrationJob": { "type": "boolean" },
+        "migrationIdentitySeparate": { "type": "boolean" },
+        "readinessGate": { "type": "boolean" },
+        "startupMigrations": { "type": "boolean" },
+        "rollbackPlan": { "type": ["string", "null"] }
+      }
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metricsProtected",
+        "logsSanitized",
+        "alertsActive",
+        "clockEvidence",
+        "restoreEvidence",
+        "onCallDefined"
+      ],
+      "properties": {
+        "metricsProtected": { "type": "boolean" },
+        "logsSanitized": { "type": "boolean" },
+        "alertsActive": { "type": "boolean" },
+        "clockEvidence": { "type": ["string", "null"] },
+        "restoreEvidence": { "type": ["string", "null"] },
+        "onCallDefined": { "type": "boolean" }
+      }
+    },
+    "capacity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "baselineEvidence", "peakVotesPerSecond", "headroomPercent"],
+      "properties": {
+        "status": { "enum": ["pending", "approved"] },
+        "baselineEvidence": { "type": ["string", "null"] },
+        "peakVotesPerSecond": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+        "headroomPercent": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
+      "properties": {
+        "P1": { "$ref": "#/$defs/gate" },
+        "P2": { "$ref": "#/$defs/gate" },
+        "P3": { "$ref": "#/$defs/gate" },
+        "P4": { "$ref": "#/$defs/gate" },
+        "P5": { "$ref": "#/$defs/gate" },
+        "P6": { "$ref": "#/$defs/gate" },
+        "P7": { "$ref": "#/$defs/gate" },
+        "P8": { "$ref": "#/$defs/gate" }
+      }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "image": { "type": "string", "pattern": "^[^@\\s]+@sha256:[a-f0-9]{64}$" },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": { "enum": ["pending", "approved"] },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "postgresql": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "private",
+        "authoritative",
+        "runtimeDdl",
+        "migrationIdentitySeparate",
+        "encryptionAtRest",
+        "transportPolicy",
+        "backupScheduled",
+        "restoreTested",
+        "pitrDecision",
+        "rpoMinutes",
+        "rtoMinutes"
+      ],
+      "properties": {
+        "private": { "type": "boolean" },
+        "authoritative": { "type": "boolean" },
+        "runtimeDdl": { "type": "boolean" },
+        "migrationIdentitySeparate": { "type": "boolean" },
+        "encryptionAtRest": { "type": "boolean" },
+        "transportPolicy": { "enum": ["platform-private", "tls-required"] },
+        "backupScheduled": { "type": "boolean" },
+        "restoreTested": { "type": "boolean" },
+        "pitrDecision": { "enum": ["required", "not-required"] },
+        "rpoMinutes": { "type": ["number", "null"], "minimum": 0 },
+        "rtoMinutes": { "type": ["number", "null"], "exclusiveMinimum": 0 }
+      }
+    },
+    "valkey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["private", "authoritative", "authenticated", "transportPolicy", "lossTested"],
+      "properties": {
+        "private": { "type": "boolean" },
+        "authoritative": { "type": "boolean" },
+        "authenticated": { "type": "boolean" },
+        "transportPolicy": { "enum": ["platform-private", "tls-required"] },
+        "lossTested": { "type": "boolean" }
+      }
+    }
+  }
+}

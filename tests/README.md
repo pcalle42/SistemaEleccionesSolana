@@ -20,6 +20,7 @@ pnpm test:security
 pnpm test:verification
 pnpm test:performance
 pnpm test:operations
+pnpm test:production
 pnpm test:all
 ```
 
@@ -31,6 +32,10 @@ levantan y detienen su infraestructura automáticamente. La base usa el puerto
 `test:operations` valida cardinalidad/privacidad de métricas, estructura de
 runbooks, metadata inmutable de backups, detección de tampering y cálculo de
 clock drift. El restore real se ejecuta con `pnpm db:restore:drill`.
+
+`test:production` valida el contrato agnóstico de proveedor, los gates P1–P8,
+el rechazo de perfiles pendientes o sintéticos y la separación entre imágenes
+productivas y fixtures de devnet.
 
 ## Seguridad destructiva
 

@@ -115,7 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build once and publish immutable RC image tags
-        run: bash scripts/release/build-images.sh "${{ needs.release-gates.outputs.version }}" "${GITHUB_SHA}" "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" artifacts/release
+        run: bash scripts/release/build-images.sh "${{ needs.release-gates.outputs.version }}" "${GITHUB_SHA}" "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" artifacts/release "${{ needs.release-gates.outputs.classification }}"
       - id: images
         name: Resolve digest-pinned image references
         run: |
@@ -123,8 +123,9 @@ jobs:
           printf 'admin=%s\n' "$(node -p "require('./artifacts/release/images.json').adminWeb.reference")" >>"${GITHUB_OUTPUT}"
           printf 'voter=%s\n' "$(node -p "require('./artifacts/release/images.json').voterWeb.reference")" >>"${GITHUB_OUTPUT}"
       - name: Verify image hardening and digest identity
-        run: bash scripts/release/verify-images.sh "${{ steps.images.outputs.api }}" "${{ steps.images.outputs.admin }}" "${{ steps.images.outputs.voter }}"
+        run: bash scripts/release/verify-images.sh "${{ steps.images.outputs.api }}" "${{ steps.images.outputs.admin }}" "${{ steps.images.outputs.voter }}" "${{ needs.release-gates.outputs.classification }}"
       - name: Rehearse the same immutable images with synthetic data
+        if: needs.release-gates.outputs.classification == 'devnet'
         env:
           ADMIN_WEB_IMAGE: ${{ steps.images.outputs.admin }}
           APP_VERSION: ${{ needs.release-gates.outputs.version }}

@@ -34,6 +34,10 @@ on:
         description: Optional HTTPS base URL for safe post-deploy checks
         required: false
         type: string
+      production_profile_path:
+        description: Production-only committed and approved ProductionProfileV1 path
+        required: false
+        type: string
 
 permissions:
   actions: read
@@ -73,7 +77,8 @@ jobs:
           api_image="$(node -p "require('./artifacts/release/release-manifest.json').images.api.reference")"
           admin_image="$(node -p "require('./artifacts/release/release-manifest.json').images.adminWeb.reference")"
           voter_image="$(node -p "require('./artifacts/release/release-manifest.json').images.voterWeb.reference")"
-          bash scripts/release/verify-images.sh "${api_image}" "${admin_image}" "${voter_image}"
+          classification="$(node -p "require('./artifacts/release/release-manifest.json').classification")"
+          bash scripts/release/verify-images.sh "${api_image}" "${admin_image}" "${voter_image}" "${classification}"
           if [[ "${{ inputs.target }}" == 'production' ]]; then
             [[ "${BACKUP_READY}" == 'true' && "${MIGRATION_APPROVED}" == 'true' ]] || {
               printf 'error: production evidence was not explicitly approved\n' >&2
@@ -86,6 +91,11 @@ jobs:
           args=(--target "${{ inputs.target }}" --manifest artifacts/release/release-manifest.json --current-release "${{ inputs.current_release }}")
           if [[ "${{ inputs.target }}" == 'production' ]]; then
             args+=(--backup-status artifacts/promotion/backup-status.json --migration-plan artifacts/promotion/migration-plan.json)
+            [[ -n "${{ inputs.production_profile_path }}" ]] || {
+              printf 'error: production profile path is required\n' >&2
+              exit 1
+            }
+            args+=(--production-profile "${{ inputs.production_profile_path }}")
           fi
           pnpm release:preflight -- "${args[@]}"
       - name: Record digest-only promotion handoff

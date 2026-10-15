@@ -8,6 +8,24 @@ const validEnvironment = {
   VOTACIONES_ENV: 'test',
 };
 
+const validProductionEnvironment = {
+  ADMIN_COOKIE_SECURE: 'true',
+  APP_VERSION: '1.0.0-rc.1',
+  DATABASE_URL: 'postgresql://votaciones_runtime:secret@postgres.internal/votaciones',
+  GIT_COMMIT: 'a'.repeat(40),
+  HTTP_CORS_ORIGINS: 'https://admin.example.test,https://vote.example.test',
+  HTTP_TRUST_PROXY_ADDRESSES: '10.20.0.0/16',
+  METRICS_AUTH_TOKEN: 'm'.repeat(32),
+  METRICS_ENABLED: 'true',
+  NODE_ENV: 'production',
+  PUBLIC_API_ORIGIN: 'https://api.example.test',
+  RELEASE_MANIFEST_DIGEST: `sha256:${'b'.repeat(64)}`,
+  VALKEY_HOST: 'valkey.internal',
+  VALKEY_PASSWORD: 'production-valkey-secret',
+  VERIFICATION_ARTIFACT_DIRECTORY: '/mnt/verification-packages',
+  VOTACIONES_ENV: 'production',
+};
+
 describe('application configuration', () => {
   it('validates all runtime boundaries centrally', () => {
     const config = getAppConfig(validEnvironment);
@@ -83,18 +101,66 @@ describe('application configuration', () => {
     ).toThrow('immutable release identity');
     expect(
       getAppConfig({
-        ...validEnvironment,
-        ADMIN_COOKIE_SECURE: 'true',
-        APP_VERSION: '1.0.0-rc.1',
-        GIT_COMMIT: 'a'.repeat(40),
-        HTTP_CORS_ORIGINS: 'https://admin.example.test',
-        RELEASE_MANIFEST_DIGEST: `sha256:${'b'.repeat(64)}`,
-        VOTACIONES_ENV: 'production',
+        ...validProductionEnvironment,
       }).release,
     ).toEqual({
       appVersion: '1.0.0-rc.1',
       gitCommit: 'a'.repeat(40),
       manifestDigest: `sha256:${'b'.repeat(64)}`,
+    });
+  });
+
+  it('accepts only an explicit hardened production runtime profile', () => {
+    const config = getAppConfig(validProductionEnvironment);
+    expect(config.deployment).toMatchObject({
+      artifactStorageProfile: 'durable-immutable',
+      protocolArtifactClassification: 'production',
+      publicApiOrigin: 'https://api.example.test',
+      shutdownGraceMs: 30_000,
+    });
+    expect(config.openApi.enabled).toBe(false);
+    expect(config.observability.metricsEnabled).toBe(true);
+  });
+
+  it('rejects dev/test boundaries and migration credentials in the production API', () => {
+    for (const environment of [
+      { ...validProductionEnvironment, NODE_ENV: 'development' },
+      { ...validProductionEnvironment, PUBLIC_API_ORIGIN: 'http://api.example.test' },
+      { ...validProductionEnvironment, HTTP_TRUST_PROXY_ADDRESSES: '' },
+      { ...validProductionEnvironment, OPENAPI_ENABLED: 'true' },
+      { ...validProductionEnvironment, METRICS_ENABLED: 'false' },
+      { ...validProductionEnvironment, PROTOCOL_ARTIFACT_CLASSIFICATION: 'devnet' },
+      { ...validProductionEnvironment, VERIFICATION_ARTIFACT_STORAGE_PROFILE: 'ephemeral' },
+      { ...validProductionEnvironment, VERIFICATION_ARTIFACT_DIRECTORY: 'relative/path' },
+      { ...validProductionEnvironment, VALKEY_PASSWORD: '' },
+      {
+        ...validProductionEnvironment,
+        DATABASE_MIGRATION_URL: 'postgresql://admin:secret@postgres.internal/votaciones',
+      },
+    ]) {
+      expect(() => getAppConfig(environment)).toThrow();
+    }
+  });
+
+  it('enforces explicit TLS transport policies', () => {
+    expect(() =>
+      getAppConfig({ ...validProductionEnvironment, DATABASE_TRANSPORT_POLICY: 'tls-required' }),
+    ).toThrow('sslmode=verify-full');
+    expect(() =>
+      getAppConfig({ ...validProductionEnvironment, VALKEY_TRANSPORT_POLICY: 'tls-required' }),
+    ).toThrow('rediss');
+    expect(
+      getAppConfig({
+        ...validProductionEnvironment,
+        DATABASE_TRANSPORT_POLICY: 'tls-required',
+        DATABASE_URL:
+          'postgresql://votaciones_runtime:secret@postgres.internal/votaciones?sslmode=verify-full',
+        VALKEY_TRANSPORT_POLICY: 'tls-required',
+        VALKEY_URL: 'rediss://runtime:secret@valkey.internal:6380/0',
+      }).deployment,
+    ).toMatchObject({
+      databaseTransportPolicy: 'tls-required',
+      valkeyTransportPolicy: 'tls-required',
     });
   });
 

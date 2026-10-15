@@ -25,6 +25,7 @@ import { DrizzleElectionRepository } from '../elections/infrastructure/persisten
 import { submissionFingerprintV1 } from '../voting/domain/vote-receipt.js';
 import { PostgresVoteRepository } from '../voting/infrastructure/persistence/postgres-vote.repository.js';
 import { VerificationService } from './application/verification.service.js';
+import { FilesystemVerificationArtifactStore } from './infrastructure/filesystem-verification-artifact.store.js';
 
 const runtimePool = createDatabasePool('runtime');
 const migrationPool = createDatabasePool('migration');
@@ -71,7 +72,10 @@ beforeAll(async () => {
     VERIFICATION_ARTIFACT_DIRECTORY: artifactDirectory,
     VOTACIONES_ENV: 'test',
   });
-  service = new VerificationService(runtimePool, config);
+  service = new VerificationService(
+    runtimePool,
+    new FilesystemVerificationArtifactStore(config.verification.artifactDirectory),
+  );
 });
 
 afterAll(async () => {

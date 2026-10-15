@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "ProductionProfileV1",
+  "environment": "production",
+  "synthetic": false,
+  "profileId": "replace_with_approved_profile",
+  "providerDecision": { "status": "pending", "adr": null },
+  "releaseManifestDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "topology": {
+    "adminOrigin": "https://admin.invalid",
+    "voterOrigin": "https://vote.invalid",
+    "apiOrigin": "https://api.invalid",
+    "httpsOnly": true,
+    "httpRedirect": true,
+    "ingressPorts": [443],
+    "trustedProxyCidrs": ["REPLACE_WITH_EDGE_CIDR"],
+    "certificateLifecycleEvidence": null
+  },
+  "data": {
+    "postgresql": {
+      "private": true,
+      "authoritative": true,
+      "runtimeDdl": false,
+      "migrationIdentitySeparate": true,
+      "encryptionAtRest": true,
+      "transportPolicy": "tls-required",
+      "backupScheduled": false,
+      "restoreTested": false,
+      "pitrDecision": "required",
+      "rpoMinutes": null,
+      "rtoMinutes": null
+    },
+    "valkey": {
+      "private": true,
+      "authoritative": false,
+      "authenticated": true,
+      "transportPolicy": "tls-required",
+      "lossTested": false
+    }
+  },
+  "artifacts": {
+    "durable": false,
+    "immutable": false,
+    "publicPrivateSeparated": false,
+    "productionSafe": false,
+    "digestVerified": false,
+    "backupEvidence": null
+  },
+  "secrets": {
+    "runtimeInjected": true,
+    "absentFromImages": true,
+    "absentFromFrontends": true,
+    "audited": false,
+    "rotationRunbook": null
+  },
+  "iam": {
+    "namedHumans": false,
+    "mfa": false,
+    "leastPrivilege": false,
+    "separateCiIdentity": false,
+    "breakGlassAudited": false
+  },
+  "deployment": {
+    "images": {
+      "api": "registry.invalid/votaciones-api@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "adminWeb": "registry.invalid/votaciones-admin-web@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "voterWeb": "registry.invalid/votaciones-voter-web@sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "migrationJob": true,
+    "migrationIdentitySeparate": true,
+    "readinessGate": true,
+    "startupMigrations": false,
+    "rollbackPlan": null
+  },
+  "operations": {
+    "metricsProtected": false,
+    "logsSanitized": true,
+    "alertsActive": false,
+    "clockEvidence": null,
+    "restoreEvidence": null,
+    "onCallDefined": false
+  },
+  "capacity": {
+    "status": "pending",
+    "baselineEvidence": null,
+    "peakVotesPerSecond": null,
+    "headroomPercent": null
+  },
+  "gates": {
+    "P1": { "status": "pending", "evidence": [] },
+    "P2": { "status": "pending", "evidence": [] },
+    "P3": { "status": "pending", "evidence": [] },
+    "P4": { "status": "pending", "evidence": [] },
+    "P5": { "status": "pending", "evidence": [] },
+    "P6": { "status": "pending", "evidence": [] },
+    "P7": { "status": "pending", "evidence": [] },
+    "P8": { "status": "pending", "evidence": [] }
+  }
+}

@@ -179,6 +179,7 @@ namespaces, TTLs y políticas ante indisponibilidad.
 18. [`docs/17-devnet-e2e-reproducible.md`](docs/17-devnet-e2e-reproducible.md)
 19. [`docs/18-ci-cd-calidad-release.md`](docs/18-ci-cd-calidad-release.md)
 20. [`docs/19-observabilidad-operacion-backup-recuperacion.md`](docs/19-observabilidad-operacion-backup-recuperacion.md)
+21. [`docs/20-produccion-despliegue-infraestructura.md`](docs/20-produccion-despliegue-infraestructura.md)
 
 ## Zero-knowledge
 

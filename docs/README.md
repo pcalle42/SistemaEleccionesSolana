@@ -17,3 +17,7 @@ La cadena de CI/CD y release está descrita en
 La operación, observabilidad y recuperación se especifican en
 [`19-observabilidad-operacion-backup-recuperacion.md`](19-observabilidad-operacion-backup-recuperacion.md)
 y se materializan en [`operations/`](operations/README.md).
+
+La topología productiva vendor-neutral, sus gates y runbooks están en
+[`20-produccion-despliegue-infraestructura.md`](20-produccion-despliegue-infraestructura.md)
+y [`production/`](production/README.md).

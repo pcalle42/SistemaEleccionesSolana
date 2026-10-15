@@ -13,5 +13,6 @@ pnpm test:valkey
 pnpm test:security
 pnpm test:verification
 pnpm test:operations
+pnpm test:production
 pnpm release:migrations:verify
 pnpm release:zk:verify -- --classification devnet

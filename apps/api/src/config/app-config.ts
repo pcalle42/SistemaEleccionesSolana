@@ -1,10 +1,17 @@
-import { getDatabaseConfig, type DatabaseConfig } from '../database/config/database-config.js';
+import {
+  getDatabaseConfig,
+  parseDatabaseUrl,
+  type DatabaseConfig,
+} from '../database/config/database-config.js';
 import { getValkeyConfig, type ValkeyConfig } from '../valkey/valkey.config.js';
 import { isIP } from 'node:net';
-import { resolve } from 'node:path';
+import { isAbsolute, resolve } from 'node:path';
 
 export type RuntimeEnvironment = 'local' | 'test' | 'devnet' | 'production';
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'silent';
+export type ArtifactStorageProfile = 'durable-immutable' | 'ephemeral';
+export type ProtocolArtifactClassification = 'devnet' | 'production';
+export type PrivateTransportPolicy = 'platform-private' | 'tls-required';
 
 export interface AppConfig {
   readonly auth: {
@@ -27,6 +34,14 @@ export interface AppConfig {
     readonly sessionIdleSeconds: number;
   };
   readonly database: DatabaseConfig;
+  readonly deployment: {
+    readonly artifactStorageProfile: ArtifactStorageProfile;
+    readonly databaseTransportPolicy: PrivateTransportPolicy;
+    readonly protocolArtifactClassification: ProtocolArtifactClassification;
+    readonly publicApiOrigin: string;
+    readonly shutdownGraceMs: number;
+    readonly valkeyTransportPolicy: PrivateTransportPolicy;
+  };
   readonly environment: RuntimeEnvironment;
   readonly http: {
     readonly bodyLimitBytes: number;
@@ -70,6 +85,15 @@ const semverPattern =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/u;
 const gitCommitPattern = /^[a-f0-9]{40}$/u;
 const releaseDigestPattern = /^sha256:[a-f0-9]{64}$/u;
+const artifactStorageProfiles = new Set<ArtifactStorageProfile>(['durable-immutable', 'ephemeral']);
+const protocolArtifactClassifications = new Set<ProtocolArtifactClassification>([
+  'devnet',
+  'production',
+]);
+const privateTransportPolicies = new Set<PrivateTransportPolicy>([
+  'platform-private',
+  'tls-required',
+]);
 
 function integer(
   environment: NodeJS.ProcessEnv,
@@ -175,6 +199,35 @@ function logLevel(environment: NodeJS.ProcessEnv, runtime: RuntimeEnvironment): 
   return value as LogLevel;
 }
 
+function enumValue<T extends string>(
+  environment: NodeJS.ProcessEnv,
+  key: string,
+  fallback: T,
+  allowed: ReadonlySet<T>,
+): T {
+  const value = (environment[key] ?? fallback) as T;
+  if (!allowed.has(value)) throw new Error(`${key} is invalid`);
+  return value;
+}
+
+function origin(environment: NodeJS.ProcessEnv, key: string, fallback: string): string {
+  const raw = environment[key] ?? fallback;
+  let parsed: URL;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    throw new Error(`${key} must be a valid origin`);
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol) || parsed.origin !== raw) {
+    throw new Error(`${key} must contain only scheme://host[:port]`);
+  }
+  return parsed.origin;
+}
+
+function isLoopback(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '::1' || hostname.startsWith('127.');
+}
+
 export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppConfig {
   const runtime = runtimeEnvironment(environment);
   if (
@@ -197,6 +250,44 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
   const manifestDigest = environment['RELEASE_MANIFEST_DIGEST'] ?? 'unreleased';
   const metricsEnabled = boolean(environment, 'METRICS_ENABLED', false);
   const metricsToken = environment['METRICS_AUTH_TOKEN'] ?? '';
+  const artifactStorageProfile = enumValue(
+    environment,
+    'VERIFICATION_ARTIFACT_STORAGE_PROFILE',
+    runtime === 'production' ? 'durable-immutable' : 'ephemeral',
+    artifactStorageProfiles,
+  );
+  const protocolArtifactClassification = enumValue(
+    environment,
+    'PROTOCOL_ARTIFACT_CLASSIFICATION',
+    runtime === 'production' ? 'production' : 'devnet',
+    protocolArtifactClassifications,
+  );
+  const databaseTransportPolicy = enumValue(
+    environment,
+    'DATABASE_TRANSPORT_POLICY',
+    'platform-private',
+    privateTransportPolicies,
+  );
+  const valkeyTransportPolicy = enumValue(
+    environment,
+    'VALKEY_TRANSPORT_POLICY',
+    'platform-private',
+    privateTransportPolicies,
+  );
+  const publicApiOrigin = origin(environment, 'PUBLIC_API_ORIGIN', 'http://localhost:3000');
+  const artifactDirectoryInput =
+    environment['VERIFICATION_ARTIFACT_DIRECTORY'] ?? '.artifacts/verification-packages';
+  const configuredLogLevel = logLevel(environment, runtime);
+  const configuredOpenApi = boolean(
+    environment,
+    'OPENAPI_ENABLED',
+    runtime === 'local' || runtime === 'devnet',
+  );
+  const requestTimeoutMs = integer(environment, 'HTTP_REQUEST_TIMEOUT_MS', 15_000, 1_000, 120_000);
+  const shutdownGraceMs = integer(environment, 'APP_SHUTDOWN_GRACE_MS', 30_000, 5_000, 120_000);
+  if (shutdownGraceMs < requestTimeoutMs) {
+    throw new Error('APP_SHUTDOWN_GRACE_MS must cover HTTP_REQUEST_TIMEOUT_MS');
+  }
   if (!semverPattern.test(appVersion)) {
     throw new Error('APP_VERSION must be SemVer');
   }
@@ -213,6 +304,58 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
     throw new Error(
       'METRICS_AUTH_TOKEN must contain at least 32 characters when metrics are enabled',
     );
+  }
+  const databaseUrl = parseDatabaseUrl(environment['DATABASE_URL'], 'DATABASE_URL');
+  const valkeyConfig = getValkeyConfig(environment);
+  const proxyAddresses = trustedProxyAddresses(environment);
+  if (
+    databaseTransportPolicy === 'tls-required' &&
+    databaseUrl.searchParams.get('sslmode') !== 'verify-full'
+  ) {
+    throw new Error('DATABASE_URL must use sslmode=verify-full when TLS is required');
+  }
+  if (valkeyTransportPolicy === 'tls-required' && !valkeyConfig.tls) {
+    throw new Error('VALKEY_URL must use rediss when TLS is required');
+  }
+  if (runtime === 'production') {
+    if (environment['NODE_ENV'] !== 'production') {
+      throw new Error('Production requires NODE_ENV=production');
+    }
+    if (
+      publicApiOrigin.startsWith('http:') ||
+      configuredCorsOrigins.some((value) => value.startsWith('http:'))
+    ) {
+      throw new Error('Production public origins must use HTTPS');
+    }
+    if (proxyAddresses.length === 0) {
+      throw new Error('Production requires an explicit trusted proxy boundary');
+    }
+    if (configuredOpenApi) throw new Error('OpenAPI must be disabled in production');
+    if (!metricsEnabled) throw new Error('Production requires protected metrics');
+    if (['trace', 'debug', 'silent'].includes(configuredLogLevel)) {
+      throw new Error('Production log level must preserve operational evidence');
+    }
+    if (protocolArtifactClassification !== 'production') {
+      throw new Error('Production requires production-classified protocol artifacts');
+    }
+    if (artifactStorageProfile !== 'durable-immutable') {
+      throw new Error('Production requires durable immutable verification artifact storage');
+    }
+    if (!environment['VERIFICATION_ARTIFACT_DIRECTORY'] || !isAbsolute(artifactDirectoryInput)) {
+      throw new Error('Production requires an absolute verification artifact mount');
+    }
+    if (environment['DATABASE_MIGRATION_URL']) {
+      throw new Error('API runtime cannot receive migration credentials in production');
+    }
+    if (databaseUrl.username === 'postgres' || isLoopback(databaseUrl.hostname)) {
+      throw new Error('Production requires a private non-superuser PostgreSQL runtime endpoint');
+    }
+    if (isLoopback(valkeyConfig.host)) {
+      throw new Error('Production requires a private Valkey endpoint');
+    }
+    if (!valkeyConfig.password) {
+      throw new Error('Production requires authenticated Valkey access');
+    }
   }
   const sessionIdleSeconds = integer(
     environment,
@@ -253,6 +396,14 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
       sessionIdleSeconds,
     }),
     database: getDatabaseConfig(environment),
+    deployment: Object.freeze({
+      artifactStorageProfile,
+      databaseTransportPolicy,
+      protocolArtifactClassification,
+      publicApiOrigin,
+      shutdownGraceMs,
+      valkeyTransportPolicy,
+    }),
     environment: runtime,
     http: Object.freeze({
       bodyLimitBytes: integer(
@@ -265,24 +416,22 @@ export function getAppConfig(environment: NodeJS.ProcessEnv = process.env): AppC
       corsOrigins: Object.freeze(configuredCorsOrigins),
       host,
       port: integer(environment, 'APP_PORT', 3_000, 1, 65_535),
-      requestTimeoutMs: integer(environment, 'HTTP_REQUEST_TIMEOUT_MS', 15_000, 1_000, 120_000),
-      trustedProxyAddresses: Object.freeze(trustedProxyAddresses(environment)),
+      requestTimeoutMs,
+      trustedProxyAddresses: Object.freeze(proxyAddresses),
     }),
     logging: Object.freeze({
-      level: logLevel(environment, runtime),
+      level: configuredLogLevel,
       service: 'votaciones-api',
     }),
     openApi: Object.freeze({
-      enabled: boolean(environment, 'OPENAPI_ENABLED', runtime === 'local' || runtime === 'devnet'),
+      enabled: configuredOpenApi,
       path: 'docs',
     }),
     observability: Object.freeze({ metricsEnabled, metricsToken }),
     release: Object.freeze({ appVersion, gitCommit, manifestDigest }),
-    valkey: getValkeyConfig(environment),
+    valkey: valkeyConfig,
     verification: Object.freeze({
-      artifactDirectory: resolve(
-        environment['VERIFICATION_ARTIFACT_DIRECTORY'] ?? '.artifacts/verification-packages',
-      ),
+      artifactDirectory: resolve(artifactDirectoryInput),
     }),
     voting: Object.freeze({
       maximumConcurrentProofs: integer(environment, 'VOTE_MAXIMUM_CONCURRENT_PROOFS', 2, 1, 32),

@@ -28,15 +28,14 @@ import {
 import type pg from 'pg';
 
 import { ApplicationError } from '../../../common/errors/application-error.js';
-import type { AppConfig } from '../../../config/app-config.js';
-import { APP_CONFIG } from '../../../config/config.tokens.js';
 import { DATABASE_POOL } from '../../../database/database.tokens.js';
 import type { AdminPrincipal } from '../../auth/domain/admin-principal.js';
 import {
   appendAuditEventPg,
   createCheckpointPg,
 } from '../../audit/infrastructure/persistence/audit-functions.js';
-import { FilesystemVerificationArtifactStore } from '../infrastructure/filesystem-verification-artifact.store.js';
+import type { VerificationArtifactStore } from './ports/verification-artifact-store.port.js';
+import { VERIFICATION_ARTIFACT_STORE } from '../verification.tokens.js';
 import { trustedProtocolManifestV1 } from '../domain/election-manifest.js';
 
 interface ElectionResultRow extends pg.QueryResultRow {
@@ -157,14 +156,10 @@ function packageEntries(files: Readonly<Record<string, string | Uint8Array>>) {
 
 @Injectable()
 export class VerificationService {
-  private readonly store: FilesystemVerificationArtifactStore;
-
   constructor(
     @Inject(DATABASE_POOL) private readonly pool: pg.Pool,
-    @Inject(APP_CONFIG) config: AppConfig,
-  ) {
-    this.store = new FilesystemVerificationArtifactStore(config.verification.artifactDirectory);
-  }
+    @Inject(VERIFICATION_ARTIFACT_STORE) private readonly store: VerificationArtifactStore,
+  ) {}
 
   async getManifest(electionId: string) {
     const result = await this.pool.query<ManifestRow>(

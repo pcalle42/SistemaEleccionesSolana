@@ -2,12 +2,21 @@
 
 set -Eeuo pipefail
 
-[[ "$#" -eq 3 ]] || {
-  printf 'usage: verify-images.sh <api-ref@digest> <admin-ref@digest> <voter-ref@digest>\n' >&2
+[[ "$#" -eq 4 ]] || {
+  printf 'usage: verify-images.sh <api-ref@digest> <admin-ref@digest> <voter-ref@digest> <devnet|production>\n' >&2
   exit 1
 }
 
-for image in "$@"; do
+API_IMAGE="$1"
+ADMIN_IMAGE="$2"
+VOTER_IMAGE="$3"
+CLASSIFICATION="$4"
+[[ "${CLASSIFICATION}" == 'devnet' || "${CLASSIFICATION}" == 'production' ]] || {
+  printf 'error: classification must be devnet or production\n' >&2
+  exit 1
+}
+
+for image in "${API_IMAGE}" "${ADMIN_IMAGE}" "${VOTER_IMAGE}"; do
   [[ "${image}" =~ @sha256:[a-f0-9]{64}$ ]] || {
     printf 'error: image is not digest-pinned: %s\n' "${image}" >&2
     exit 1
@@ -29,4 +38,9 @@ for image in "$@"; do
   fi
 done
 
-printf 'Digest pinning, non-root users, and image environment checks passed.\n'
+if [[ "${CLASSIFICATION}" == 'production' ]]; then
+  docker run --rm --entrypoint sh "${API_IMAGE}" -ceu \
+    'test ! -e /app/fixtures/devnet && test ! -e /app/scripts/devnet'
+fi
+
+printf 'Digest pinning, non-root users, image environment, and classification checks passed.\n'

@@ -1,8 +1,8 @@
 FROM node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a AS build
 WORKDIR /workspace
-ARG VITE_API_BASE_URL=http://localhost:3000/api/v1
+ARG VITE_API_BASE_URL=/api/v1
 ARG VITE_ARTIFACT_BASE_URL=/artifacts/anonymous-single-choice-v1
-ARG VITE_RUNTIME_ENV=local
+ARG VITE_RUNTIME_ENV=production
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL VITE_ARTIFACT_BASE_URL=$VITE_ARTIFACT_BASE_URL VITE_RUNTIME_ENV=$VITE_RUNTIME_ENV
 RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -15,7 +15,7 @@ RUN pnpm --filter @votaciones/voter-web build
 FROM node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a AS runtime
 ARG APP_VERSION=0.1.0-dev
 ARG GIT_COMMIT=unknown
-ENV NODE_ENV=production PORT=3002 API_ORIGIN=http://localhost:3000
+ENV NODE_ENV=production PORT=3002
 LABEL org.opencontainers.image.revision=$GIT_COMMIT \
   org.opencontainers.image.source="https://github.com/pcalle42/SistemaEleccionesSolana" \
   org.opencontainers.image.version=$APP_VERSION

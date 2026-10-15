@@ -1,5 +1,7 @@
 services:
   api:
+    build:
+      target: devnet
     labels:
       votaciones.environment: devnet
       votaciones.project: ${COMPOSE_PROJECT_NAME:-votaciones-devnet}
@@ -12,6 +14,7 @@ services:
   admin-web:
     build:
       args:
+        VITE_API_BASE_URL: http://localhost:${API_HOST_PORT:-3000}/api/v1
         VITE_RUNTIME_ENV: devnet
     labels:
       votaciones.environment: devnet
@@ -24,6 +27,7 @@ services:
   voter-web:
     build:
       args:
+        VITE_API_BASE_URL: http://localhost:${API_HOST_PORT:-3000}/api/v1
         VITE_RUNTIME_ENV: devnet
     labels:
       votaciones.environment: devnet
