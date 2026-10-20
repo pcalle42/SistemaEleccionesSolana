@@ -115,14 +115,14 @@
     "devnet:verify:persistence": "bash infra/scripts/verify-persistence.sh devnet"
   },
   "devDependencies": {
-    "@playwright/test": "1.64.0",
+    "@playwright/test": "1.64.1",
     "@types/node": "22.20.1",
     "@votaciones/config-eslint": "workspace:*",
     "@votaciones/config-typescript": "workspace:*",
     "ajv": "8.20.0",
-    "eslint": "10.9.1",
-    "fast-check": "4.3.0",
-    "prettier": "3.9.6",
+    "eslint": "10.13.0",
+    "fast-check": "4.10.2",
+    "prettier": "3.9.10",
     "typescript": "6.0.3",
     "vitest": "4.1.11"
   }
