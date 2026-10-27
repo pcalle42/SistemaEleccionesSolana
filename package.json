@@ -116,7 +116,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.64.0",
-    "@types/node": "22.20.1",
+    "@types/node": "26.6.5",
     "@votaciones/config-eslint": "workspace:*",
     "@votaciones/config-typescript": "workspace:*",
     "ajv": "8.20.0",
@@ -124,6 +124,6 @@
     "fast-check": "4.3.0",
     "prettier": "3.9.6",
     "typescript": "6.0.3",
-    "vitest": "4.1.11"
+    "vitest": "5.0.5"
   }
 }
