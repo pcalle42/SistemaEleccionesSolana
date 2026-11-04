@@ -33,7 +33,7 @@
     "@types/snarkjs": "0.7.9",
     "@votaciones/config-typescript": "workspace:*",
     "circomlib": "2.0.5",
-    "prettier": "3.9.6",
+    "prettier": "3.9.10",
     "snarkjs": "0.7.6",
     "typescript": "catalog:",
     "vitest": "catalog:"
