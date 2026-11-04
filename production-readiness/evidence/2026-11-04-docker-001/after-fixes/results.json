@@ -1,0 +1,50 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "test:integration"
+    ],
+    "startedAt": "2026-11-04T15:22:49.151150+00:00",
+    "finishedAt": "2026-11-04T15:23:13.642902+00:00",
+    "durationSeconds": 24.492,
+    "exitCode": 0,
+    "logSha256": "47e6993a4ce6f025d594fbd3d9a74ea94c05094885ace7a6fb37de63872d527a",
+    "tail": "apps/voter-web build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\napps/voter-web build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\napps/voter-web build: Done\napps/api build: Done\n\n> @votaciones/api@0.0.0 db:migrate:test <repository>/apps/api\n> tsx src/database/cli.ts migrate --target test\n\nDatabase migrations applied successfully.\n\n RUN  v4.1.11 <repository>/apps/api\n\n\n Test Files  9 passed (9)\n      Tests  35 passed (35)\n   Start at  10:23:00\n   Duration  11.01s (transform 384ms, setup 0ms, import 5.03s, tests 4.80s, environment 0ms)\n"
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:valkey"
+    ],
+    "startedAt": "2026-11-04T15:23:13.643616+00:00",
+    "finishedAt": "2026-11-04T15:23:32.302604+00:00",
+    "durationSeconds": 18.659,
+    "exitCode": 0,
+    "logSha256": "a7114b6bbb5ce65aeb17ccd68bb584b5b535c3d2cfd8bc144bc13562d26c830e",
+    "tail": "> tsx src/database/cli.ts migrate --target test\n\nDatabase migrations applied successfully.\n\n RUN  v4.1.11 <repository>/apps/api\n\n\n Test Files  1 passed (1)\n      Tests  6 passed (6)\n   Start at  10:23:25\n   Duration  1.51s (transform 44ms, setup 0ms, import 105ms, tests 1.25s, environment 0ms)\n\n Container votaciones-test-default-valkey-1 Restarting \n Container votaciones-test-default-valkey-1 Started \n Container votaciones-test-default-valkey-1 Running \n Container votaciones-test-default-valkey-1 Waiting \n Container votaciones-test-default-valkey-1 Healthy \nValkey restart preserved PostgreSQL truth and rebuilt disposable cache."
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:security"
+    ],
+    "startedAt": "2026-11-04T15:23:32.303376+00:00",
+    "finishedAt": "2026-11-04T15:24:05.973883+00:00",
+    "durationSeconds": 33.671,
+    "exitCode": 0,
+    "logSha256": "331f87a4daaad3d1a655754920250a09d9e4b83173dd68308e990c0dbd707b9f",
+    "tail": "[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:\n[WebServer] - Using dynamic import() to code-split the application\n[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\n[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n\n[WebServer] (node:13706) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n\n\nRunning 2 tests using 1 worker\n\n(node:13710) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n\n\n[1/2] tests/browser/frontend.e2e.spec.ts:45:1 \u203a admin uses cookie/CSRF boundaries and renders hostile election text safely\n[2/2] tests/browser/frontend.e2e.spec.ts:123:1 \u203a voter performs real WebCrypto/WASM/Worker proof and retries an unknown outcome privately\n  2 passed (8.0s)"
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:production"
+    ],
+    "startedAt": "2026-11-04T15:24:05.975669+00:00",
+    "finishedAt": "2026-11-04T15:24:06.963102+00:00",
+    "durationSeconds": 0.987,
+    "exitCode": 0,
+    "logSha256": "1ae571f17a751ca18cf9ad67a3b9aeb01dc937023470bc67b91cdf5e83567e0d",
+    "tail": "\n> sistema-elecciones-solana@0.1.0 test:production <repository>\n> vitest run tests/production\n\n\n RUN  v4.1.11 <repository>\n\n\n Test Files  2 passed (2)\n      Tests  10 passed (10)\n   Start at  10:24:06\n   Duration  439ms (transform 59ms, setup 0ms, import 157ms, tests 338ms, environment 0ms)\n"
+  }
+]

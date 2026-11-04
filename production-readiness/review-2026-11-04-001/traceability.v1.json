@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "TraceabilityMatrixV1",
+  "scope": "Inventario inicial de los 18 criterios DoD del documento 21; no constituye trazabilidad exhaustiva de 00–20 ni autorización productiva.",
+  "requirements": [
+    {
+      "requirementId": "DOM-001",
+      "sourceDocument": "docs/08-dominio-electoral.md",
+      "requirement": "Lifecycle, freeze, ventana y carreras CastVote/Close/Cancel",
+      "criticality": "critical",
+      "implementationRefs": [
+        "apps/api/src/modules/elections/domain/election.ts"
+      ],
+      "testRefs": [
+        "apps/api/src/modules/elections/elections.integration.spec.ts"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "ELG-001",
+      "sourceDocument": "docs/09-elegibilidad-identidad-electoral.md",
+      "requirement": "CSPRNG, snapshot determinista y separación estructural identidad/voto",
+      "criticality": "critical",
+      "implementationRefs": [
+        "apps/api/src/database/schema/voting.ts"
+      ],
+      "testRefs": [
+        "apps/api/src/modules/eligibility/eligibility.integration.spec.ts"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "VOTE-001",
+      "sourceDocument": "docs/11-protocolo-voto-nullifier-atomicidad.md",
+      "requirement": "Nullifier único, atomicidad PostgreSQL, retry y timeout posterior al commit",
+      "criticality": "critical",
+      "implementationRefs": [
+        "apps/api/src/modules/voting/application/cast-vote.service.ts"
+      ],
+      "testRefs": [
+        "apps/api/src/modules/voting/voting.integration.spec.ts"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "ZK-001",
+      "sourceDocument": "docs/10-zk-circom-snarkjs.md",
+      "requirement": "Constraints, vectores, pruebas negativas y replay entre elecciones",
+      "criticality": "critical",
+      "implementationRefs": [
+        "packages/zk-protocol/src"
+      ],
+      "testRefs": [
+        "packages/zk-protocol"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "ZK-002",
+      "sourceDocument": "docs/10-zk-circom-snarkjs.md",
+      "requirement": "Ceremonia Groth16 productiva y revisión ZK independiente",
+      "criticality": "critical",
+      "implementationRefs": [
+        "release/zk/production/README.md"
+      ],
+      "testRefs": [
+        "release/zk/registry.v1.json"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "ZK-003",
+      "sourceDocument": "docs/18-ci-cd-calidad-release.md",
+      "requirement": "Registro confiable de VK y digests de artifacts",
+      "criticality": "critical",
+      "implementationRefs": [
+        "scripts/release/verify-zk-registry.mjs"
+      ],
+      "testRefs": [
+        "tests/release"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "AUD-001",
+      "sourceDocument": "docs/12-auditoria-transparencia-verificabilidad.md",
+      "requirement": "Audit chain, checkpoints, tamper y verificador offline",
+      "criticality": "critical",
+      "implementationRefs": [
+        "packages/verification-protocol/src"
+      ],
+      "testRefs": [
+        "apps/api/src/modules/verification/verification.integration.spec.ts"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "RES-001",
+      "sourceDocument": "docs/13-conteo-resultados-publicacion.md",
+      "requirement": "Conteo, zero votes, empates y publicación versionada reproducible",
+      "criticality": "critical",
+      "implementationRefs": [
+        "apps/api/src/modules"
+      ],
+      "testRefs": [
+        "tests/property"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "UI-001",
+      "sourceDocument": "docs/14-frontend-flujos-ux-seguridad.md",
+      "requirement": "Browser E2E, Web Worker ZK real, UNKNOWN_OUTCOME y privacidad frontend",
+      "criticality": "critical",
+      "implementationRefs": [
+        "apps/voter-web/src"
+      ],
+      "testRefs": [
+        "tests"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "SEC-001",
+      "sourceDocument": "docs/15-testing-integracion-e2e-seguridad.md",
+      "requirement": "Suite completa, PostgreSQL/Valkey reales, seguridad y adversarial",
+      "criticality": "critical",
+      "implementationRefs": [
+        "tests"
+      ],
+      "testRefs": [
+        "tests/scripts/run-with-infra.sh"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "SEC-002",
+      "sourceDocument": "docs/16-seguridad-hardening-threat-model.md",
+      "requirement": "Pentest independiente y auditoría sin Critical/High relevantes abiertos",
+      "criticality": "critical",
+      "implementationRefs": [
+        "docs/security/preproduction-checklist.md"
+      ],
+      "testRefs": [
+        "tests/security"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "INF-001",
+      "sourceDocument": "docs/20-produccion-despliegue-infraestructura.md",
+      "requirement": "Gates P1–P8, TLS real, secrets y release exacto aprobado",
+      "criticality": "critical",
+      "implementationRefs": [
+        "deploy/production-profile.template.json"
+      ],
+      "testRefs": [
+        "tests/production/production.spec.ts"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "OPS-001",
+      "sourceDocument": "docs/19-observabilidad-operacion-backup-recuperacion.md",
+      "requirement": "Restore aislado, PITR, RPO/RTO, clock y game day del candidato",
+      "criticality": "critical",
+      "implementationRefs": [
+        "infra/scripts/restore-drill.sh"
+      ],
+      "testRefs": [
+        "tests/operations"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "OPS-002",
+      "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
+      "requirement": "Capacity/peak y simulacro electoral del release candidato exacto",
+      "criticality": "critical",
+      "implementationRefs": [
+        "tests/scripts/performance-baseline.mjs"
+      ],
+      "testRefs": [
+        "tests/scripts/reproducibility.sh"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "SEC-003",
+      "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
+      "requirement": "Registro de riesgos y evaluación jurídica/electoral de límites V1",
+      "criticality": "critical",
+      "implementationRefs": [
+        "docs/security/known-limitations.md"
+      ],
+      "testRefs": [
+        "docs/operations/residual-risks.md"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "OPS-003",
+      "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
+      "requirement": "Handoff operativo aprobado y documentación actualizada",
+      "criticality": "critical",
+      "implementationRefs": [
+        "docs/operations/election-checklists.md"
+      ],
+      "testRefs": [
+        "docs/production/readiness-gates.md"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "OPS-004",
+      "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
+      "requirement": "Readiness individual de cada elección real con configuración congelada",
+      "criticality": "critical",
+      "implementationRefs": [
+        "production-readiness/schemas/ElectionReadinessRecordV1.schema.json"
+      ],
+      "testRefs": [
+        "tests/production"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    },
+    {
+      "requirementId": "OPS-005",
+      "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
+      "requirement": "Registro de decisión y bundle versionado ligado al release probado",
+      "criticality": "critical",
+      "implementationRefs": [
+        "production-readiness/schemas/GoNoGoRecordV1.schema.json"
+      ],
+      "testRefs": [
+        "tests/production"
+      ],
+      "evidenceRefs": [],
+      "status": "NOT_TESTED",
+      "owner": "Pendiente asignación por autoridad electoral",
+      "notes": "Referencia de implementación/prueba candidata; no acredita ejecución ni cobertura completa. Requiere revisión desglosada de documentos 00–20."
+    }
+  ]
+}

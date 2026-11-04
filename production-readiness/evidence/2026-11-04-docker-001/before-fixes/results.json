@@ -1,0 +1,62 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "test:concurrency"
+    ],
+    "startedAt": "2026-11-04T15:15:56.814999+00:00",
+    "finishedAt": "2026-11-04T15:16:15.516257+00:00",
+    "durationSeconds": 18.701,
+    "exitCode": 0,
+    "logSha256": "40ea90e901fd86733509262be4d1ffdcab2cfbab63757494f1dbd83ad2c56418",
+    "tail": "apps/voter-web build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\napps/voter-web build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\napps/voter-web build: Done\napps/api build: Done\n\n> @votaciones/api@0.0.0 db:migrate:test <repository>/apps/api\n> tsx src/database/cli.ts migrate --target test\n\nDatabase migrations applied successfully.\n\n RUN  v4.1.11 <repository>/apps/api\n\n\n Test Files  5 passed (5)\n      Tests  24 passed (24)\n   Start at  10:16:08\n   Duration  5.51s (transform 219ms, setup 0ms, import 2.81s, tests 2.03s, environment 0ms)\n"
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:valkey"
+    ],
+    "startedAt": "2026-11-04T15:16:15.518175+00:00",
+    "finishedAt": "2026-11-04T15:16:34.369612+00:00",
+    "durationSeconds": 18.851,
+    "exitCode": 0,
+    "logSha256": "3694b3f75d18520797afa06cccdabc4bc8f57eedf7b4567fbd6fb4042c757e3e",
+    "tail": "> tsx src/database/cli.ts migrate --target test\n\nDatabase migrations applied successfully.\n\n RUN  v4.1.11 <repository>/apps/api\n\n\n Test Files  1 passed (1)\n      Tests  6 passed (6)\n   Start at  10:16:27\n   Duration  1.50s (transform 39ms, setup 0ms, import 95ms, tests 1.27s, environment 0ms)\n\n Container votaciones-test-default-valkey-1 Restarting \n Container votaciones-test-default-valkey-1 Started \n Container votaciones-test-default-valkey-1 Running \n Container votaciones-test-default-valkey-1 Waiting \n Container votaciones-test-default-valkey-1 Healthy \nValkey restart preserved PostgreSQL truth and rebuilt disposable cache."
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:verification"
+    ],
+    "startedAt": "2026-11-04T15:16:34.370152+00:00",
+    "finishedAt": "2026-11-04T15:16:50.132569+00:00",
+    "durationSeconds": 15.762,
+    "exitCode": 0,
+    "logSha256": "a36f722c08fe7f6e753b15428c69a35e017eb7a1c7f21fe7be82d2e748666367",
+    "tail": "apps/voter-web build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\napps/voter-web build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\napps/voter-web build: Done\napps/api build: Done\n\n> @votaciones/api@0.0.0 db:migrate:test <repository>/apps/api\n> tsx src/database/cli.ts migrate --target test\n\nDatabase migrations applied successfully.\n\n RUN  v4.1.11 <repository>/apps/api\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  10:16:45\n   Duration  2.96s (transform 189ms, setup 0ms, import 950ms, tests 1.86s, environment 0ms)\n"
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:zk"
+    ],
+    "startedAt": "2026-11-04T15:16:50.133173+00:00",
+    "finishedAt": "2026-11-04T15:17:20.363368+00:00",
+    "durationSeconds": 30.23,
+    "exitCode": 0,
+    "logSha256": "0d039400f0ae599faf04efd7c893b76368312bd43fdd087722ee018ec17ecbff",
+    "tail": "\n> @votaciones/zk-protocol@1.0.0-devnet.1 zk:verify-artifacts <repository>/packages/zk-protocol\n> node scripts/verify-artifacts.mjs\n\nTrusted devnet artifacts verified.\n\n> @votaciones/zk-protocol@1.0.0-devnet.1 test <repository>/packages/zk-protocol\n> vitest run\n\n\n RUN  v4.1.11 <repository>/packages/zk-protocol\n\n\n Test Files  3 passed (3)\n      Tests  8 passed (8)\n   Start at  10:17:18\n   Duration  1.31s (transform 141ms, setup 0ms, import 877ms, tests 1.49s, environment 0ms)\n"
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:security"
+    ],
+    "startedAt": "2026-11-04T15:17:20.364564+00:00",
+    "finishedAt": "2026-11-04T15:18:00.445186+00:00",
+    "durationSeconds": 40.081,
+    "exitCode": 0,
+    "logSha256": "d11a49a50edffef011a9f24ab02f97f94218027a3ee5a55991a4423164e61329",
+    "tail": "[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:\n[WebServer] - Using dynamic import() to code-split the application\n[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\n[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n\n[WebServer] (node:7830) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n\n\nRunning 2 tests using 1 worker\n\n(node:7843) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n\n\n[1/2] tests/browser/frontend.e2e.spec.ts:45:1 \u203a admin uses cookie/CSRF boundaries and renders hostile election text safely\n[2/2] tests/browser/frontend.e2e.spec.ts:123:1 \u203a voter performs real WebCrypto/WASM/Worker proof and retries an unknown outcome privately\n  2 passed (9.6s)"
+  }
+]

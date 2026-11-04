@@ -1,0 +1,17 @@
+{
+  "artifactsValid": true,
+  "checkpointsValid": true,
+  "errors": [],
+  "manifestValid": true,
+  "nullifiersUnique": true,
+  "packageDigest": "9ad6cf19b1abaf3f96d308794479b0e8780dd438b1d450dd7531f723a5bccbcf",
+  "packageContentDigest": "51b5c34ea2a03d9d8257b0a3a3bc5ca9ced159927917b5aea36798c6717142eb",
+  "packageVersion": "verification-package-v1",
+  "proofsValid": true,
+  "resultValid": true,
+  "tallyValid": true,
+  "valid": true,
+  "verificationReportVersion": "verification-report-v1",
+  "voteSetDigestValid": true
+}
+/tmp/votaciones-readiness-restore.sh: line 12:  9961 Terminated: 15          node packages/verification-protocol/dist/src/cli.js --package "${out}/verification-package"

@@ -1,0 +1,597 @@
+
+> sistema-elecciones-solana@0.1.0 test:production <repository>
+> vitest run tests/production
+
+
+ RUN  v4.1.11 <repository>
+
+ ❯ tests/production/readiness.spec.mjs (4 tests | 1 failed) 197ms
+     × rejects duplicate IDs, unsupported PASS and critical waivers 45ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/production/readiness.spec.mjs > initial production readiness inventory > rejects duplicate IDs, unsupported PASS and critical waivers
+AssertionError: promise resolved "{ …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "requirements": [
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/modules/elections/domain/election.ts",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Lifecycle, freeze, ventana y carreras CastVote/Close/Cancel",
++       "requirementId": "DOM-001",
++       "sourceDocument": "docs/08-dominio-electoral.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/modules/elections/elections.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/database/schema/voting.ts",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "CSPRNG, snapshot determinista y separación estructural identidad/voto",
++       "requirementId": "ELG-001",
++       "sourceDocument": "docs/09-elegibilidad-identidad-electoral.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "apps/api/src/modules/eligibility/eligibility.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/modules/voting/application/cast-vote.service.ts",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Nullifier único, atomicidad PostgreSQL, retry y timeout posterior al commit",
++       "requirementId": "VOTE-001",
++       "sourceDocument": "docs/11-protocolo-voto-nullifier-atomicidad.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "apps/api/src/modules/voting/voting.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "packages/zk-protocol/src",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Constraints, vectores, pruebas negativas y replay entre elecciones",
++       "requirementId": "ZK-001",
++       "sourceDocument": "docs/10-zk-circom-snarkjs.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "packages/zk-protocol",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "release/zk/registry.v1.json",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "release/zk/production/README.md",
++       ],
++       "notes": "Fallo constatado: únicamente artifacts devnet productionSafe=false. Ceremonia productiva y revisión independiente sin evidencia.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Ceremonia Groth16 productiva y revisión ZK independiente",
++       "requirementId": "ZK-002",
++       "sourceDocument": "docs/10-zk-circom-snarkjs.md",
++       "status": "FAIL",
++       "testRefs": [
++         "release/zk/registry.v1.json",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "scripts/release/verify-zk-registry.mjs",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Registro confiable de VK y digests de artifacts",
++       "requirementId": "ZK-003",
++       "sourceDocument": "docs/18-ci-cd-calidad-release.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/release",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "packages/verification-protocol/src",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Audit chain, checkpoints, tamper y verificador offline",
++       "requirementId": "AUD-001",
++       "sourceDocument": "docs/12-auditoria-transparencia-verificabilidad.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "apps/api/src/modules/verification/verification.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/modules",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Conteo, zero votes, empates y publicación versionada reproducible",
++       "requirementId": "RES-001",
++       "sourceDocument": "docs/13-conteo-resultados-publicacion.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/property",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/voter-web/src",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Browser E2E, Web Worker ZK real, UNKNOWN_OUTCOME y privacidad frontend",
++       "requirementId": "UI-001",
++       "sourceDocument": "docs/14-frontend-flujos-ux-seguridad.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "tests",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Suite completa, PostgreSQL/Valkey reales, seguridad y adversarial",
++       "requirementId": "SEC-001",
++       "sourceDocument": "docs/15-testing-integracion-e2e-seguridad.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/scripts/run-with-infra.sh",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "docs/security/preproduction-checklist.md",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Pentest independiente y auditoría sin Critical/High relevantes abiertos",
++       "requirementId": "SEC-002",
++       "sourceDocument": "docs/16-seguridad-hardening-threat-model.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/security",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "deploy/production-profile.template.json",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Gates P1–P8, TLS real, secrets y release exacto aprobado",
++       "requirementId": "INF-001",
++       "sourceDocument": "docs/20-produccion-despliegue-infraestructura.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/production/production.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "infra/scripts/restore-drill.sh",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Restore aislado, PITR, RPO/RTO, clock y game day del candidato",
++       "requirementId": "OPS-001",
++       "sourceDocument": "docs/19-observabilidad-operacion-backup-recuperacion.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/operations",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "tests/scripts/performance-baseline.mjs",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Capacity/peak y simulacro electoral del release candidato exacto",
++       "requirementId": "OPS-002",
++       "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/scripts/reproducibility.sh",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "docs/security/known-limitations.md",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Registro de riesgos y evaluación jurídica/electoral de límites V1",
++       "requirementId": "SEC-003",
++       "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "docs/operations/residual-risks.md",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "docs/operations/election-checklists.md",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Handoff operativo aprobado y documentación actualizada",
++       "requirementId": "OPS-003",
++       "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "docs/production/readiness-gates.md",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "production-readiness/schemas/ElectionReadinessRecordV1.schema.json",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Readiness individual de cada elección real con configuración congelada",
++       "requirementId": "OPS-004",
++       "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/production",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "production-readiness/schemas/GoNoGoRecordV1.schema.json",
++       ],
++       "notes": "Evidencia local parcial disponible en el informe Docker y controles específicos. Este criterio agregado no está completamente acreditado para producción; mantiene NOT_TESTED. Requiere desglose exhaustivo de documentos 00–20 y evidencia del release aprobado.",
++       "owner": "Pendiente asignación por autoridad electoral",
++       "requirement": "Registro de decisión y bundle versionado ligado al release probado",
++       "requirementId": "OPS-005",
++       "sourceDocument": "docs/21-checklist-final-produccion-auditoria.md",
++       "status": "NOT_TESTED",
++       "testRefs": [
++         "tests/production",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-integration.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/database/schema/voting.ts",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Local PostgreSQL: accepted_votes tiene FK únicamente a election; carece de credential_id, eligible_voter_id, identity_commitment, ip_address y user_agent.",
++       "requirementId": "ELG-002",
++       "sourceDocument": "docs/09-elegibilidad-identidad-electoral.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/modules/voting/voting.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-integration.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/modules/voting/infrastructure/persistence/postgres-vote.repository.ts",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Local PostgreSQL: ocho accepts concurrentes del mismo voto lógico producen un solo voto y un receipt común.",
++       "requirementId": "VOTE-002",
++       "sourceDocument": "docs/11-protocolo-voto-nullifier-atomicidad.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/modules/voting/voting.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-integration.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/modules/voting/infrastructure/persistence/postgres-vote.repository.ts",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Local PostgreSQL: selecciones distintas con un nullifier tienen un ganador y un rechazo sin revelar la selección previa.",
++       "requirementId": "VOTE-003",
++       "sourceDocument": "docs/11-protocolo-voto-nullifier-atomicidad.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/modules/voting/voting.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-integration.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/modules/voting/infrastructure/persistence/postgres-vote.repository.ts",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Local PostgreSQL: fallo de INSERT de evidencia obligatoria revierte la aceptación; retry después de commit recupera receipt.",
++       "requirementId": "VOTE-004",
++       "sourceDocument": "docs/11-protocolo-voto-nullifier-atomicidad.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/modules/voting/voting.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-integration.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/modules/voting/infrastructure/persistence/postgres-vote.repository.ts",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Local PostgreSQL: close/cancel que precede a accept rechaza el voto; transición posterior preserva voto committed; closesAt pasado rechaza con OPEN.",
++       "requirementId": "DOM-002",
++       "sourceDocument": "docs/08-dominio-electoral.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/modules/voting/voting.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-integration.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/api/src/modules/audit/infrastructure/persistence/postgres-audit.repository.ts",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Local PostgreSQL: doce appends concurrentes, checkpoint, rollback de auditoría, rechazo de mutación runtime y detección de alteración privilegiada.",
++       "requirementId": "AUD-002",
++       "sourceDocument": "docs/12-auditoria-transparencia-verificabilidad.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/modules/audit/audit.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-integration.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "packages/verification-protocol/src/cli.ts",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Local PostgreSQL: proof real, freeze/tally idempotentes, package, tamper y publicación; CLI con terminación acotada para válido y alterado.",
++       "requirementId": "RES-002",
++       "sourceDocument": "docs/13-conteo-resultados-publicacion.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/modules/verification/verification.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-security.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "apps/voter-web/src",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Chromium local con API interceptada: proof WebCrypto/WASM/Worker real, retry UNKNOWN_OUTCOME, no persistencia de secretos y ausencia de terceros en el escenario probado.",
++       "requirementId": "UI-002",
++       "sourceDocument": "docs/14-frontend-flujos-ux-seguridad.md",
++       "status": "PASS",
++       "testRefs": [
++         "tests/browser/frontend.e2e.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/test-valkey.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "tests/scripts/valkey-restart.sh",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Valkey local: reinicio pierde cache, conserva fila autoritativa PostgreSQL y reconstruye valor de cache.",
++       "requirementId": "INF-002",
++       "sourceDocument": "docs/05-valkey-cache-coordinacion.md",
++       "status": "PASS",
++       "testRefs": [
++         "apps/api/src/valkey/valkey.integration.spec.ts",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/restore.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "infra/scripts/restore-drill.sh",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Restore local aislado de backup con seis votos sintéticos, invariantes SQL, comparación de evidencia lógica y verificación offline del package exportado.",
++       "requirementId": "OPS-006",
++       "sourceDocument": "docs/19-observabilidad-operacion-backup-recuperacion.md",
++       "status": "PASS",
++       "testRefs": [
++         "infra/postgres/post-restore-invariants.sql",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/reproducibility.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "tests/scripts/reproducibility.sh",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Copia temporal limpia del working tree: install frozen, build, verificación artifacts devnet y construcción de imágenes frontend sin dist/node_modules heredados.",
++       "requirementId": "OPS-007",
++       "sourceDocument": "docs/17-devnet-e2e-reproducible.md",
++       "status": "PASS",
++       "testRefs": [
++         "tests/scripts/reproducibility.sh",
++       ],
++     },
++     {
++       "criticality": "critical",
++       "evidenceRefs": [
++         "production-readiness/evidence/2026-11-04-docker-001/after-fixes/devnet.txt",
++         "production-readiness/docker-review-2026-11-04.md",
++       ],
++       "implementationRefs": [
++         "scripts/devnet/e2e.mjs",
++       ],
++       "notes": "PASS limitado al escenario local descrito. No acredita todos los requisitos del documento fuente ni producción. El repositorio de voto usa comandos sintéticos para propiedades transaccionales; la integración de verificación y el devnet usan proofs reales. Ver source-inputs/runtime-images y límites del informe.",
++       "owner": "Revisión técnica local automatizada; aprobación electoral pendiente",
++       "requirement": "Devnet sintético: navegador cruza API real para emitir voto; E2E publica resultados, incluye recibos y verifica tras reinicios API/Valkey/PostgreSQL.",
++       "requirementId": "UI-003",
++       "sourceDocument": "docs/17-devnet-e2e-reproducible.md",
++       "status": "PASS",
++       "testRefs": [
++         "tests/browser-devnet/connected.e2e.spec.ts",
++       ],
++     },
++   ],
++   "schemaVersion": "TraceabilityMatrixV1",
++   "scope": "18 criterios agregados DoD de etapa 21 más 12 controles locales acotados con evidencia. No constituye trazabilidad exhaustiva de 00–20 ni autorización productiva.",
+  }
+
+ ❯ tests/production/readiness.spec.mjs:30:43
+     28|     const pass = await matrix();
+     29|     pass.requirements[0].status = 'PASS';
+     30|     await expect(verifyTraceability(pass)).rejects.toThrow(/evidenceRe…
+       |                                           ^
+     31|     for (const status of ['RISK_ACCEPTED', 'NOT_APPLICABLE']) {
+     32|       const waived = await matrix();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 9 passed (10)
+   Start at  10:30:16
+   Duration  400ms (transform 54ms, setup 0ms, import 141ms, tests 292ms, environment 0ms)
+
+ ELIFECYCLE  Command failed with exit code 1.

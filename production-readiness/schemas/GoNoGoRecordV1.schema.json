@@ -1,0 +1,145 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "releaseVersion",
+    "releaseManifestDigest",
+    "protocolVersions",
+    "criticalGateSummary",
+    "traceabilityDigest",
+    "securityReviewRefs",
+    "zkReviewRefs",
+    "pentestRefs",
+    "restoreTestRef",
+    "capacityTestRef",
+    "rehearsalRef",
+    "residualRiskRegisterDigest",
+    "decision",
+    "decisionReason",
+    "decidedAt",
+    "decisionAuthority"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "GoNoGoRecordV1"
+    },
+    "releaseVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "releaseManifestDigest": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "protocolVersions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "criticalGateSummary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirementId", "status"],
+        "properties": {
+          "requirementId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": ["PASS", "FAIL", "NOT_TESTED", "NOT_APPLICABLE", "RISK_ACCEPTED"]
+          }
+        }
+      }
+    },
+    "traceabilityDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "securityReviewRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "zkReviewRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "pentestRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "restoreTestRef": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "capacityTestRef": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rehearsalRef": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "residualRiskRegisterDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "decision": {
+      "enum": ["GO", "NO-GO", "INCOMPLETE"]
+    },
+    "decisionReason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decidedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "decisionAuthority": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

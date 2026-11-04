@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "ReadinessSourceV1",
+  "gitCommit": "389f2de148ead8dd51766bdd551ea0149beb44ad",
+  "scope": "Working-tree snapshot, not an immutable release. No test execution implied.",
+  "inputs": [
+    {
+      "path": "production-readiness/traceability.v1.json",
+      "sha256": "1ff578a52ca6106f03773bc677af147404ec56849fa39fc006ea6460209207f8"
+    },
+    {
+      "path": "production-readiness/risks.v1.json",
+      "sha256": "db25c71979e2f08289fdba6270c420d53e9596e2cb5be4aada377132422ee57c"
+    },
+    {
+      "path": "release/zk/registry.v1.json",
+      "sha256": "bc9d0c8a0eb9e3c3439fe93ba444c54043e96f8a8db6c20165ab95136eb19b85"
+    },
+    {
+      "path": "deploy/production-profile.template.json",
+      "sha256": "8aedc0340e78854d5b1c25e2f36476735c482d873403562a1e1970e0c7befea0"
+    }
+  ]
+}

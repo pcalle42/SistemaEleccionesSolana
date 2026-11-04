@@ -1,0 +1,24 @@
+{
+  "command": [
+    "pnpm",
+    "audit",
+    "--prod",
+    "--json"
+  ],
+  "finishedAt": "2026-11-04T15:23:13.591941+00:00",
+  "exitCode": 1,
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 1,
+      "moderate": 2,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 348,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 348
+  },
+  "logSha256": "369b7677e31ed02afa9101e20dc98b75613ee6d4855eaecdb6d646e163f60503"
+}

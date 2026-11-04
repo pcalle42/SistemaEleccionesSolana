@@ -1,0 +1,83 @@
+{
+  "artifactsValid": true,
+  "checkpointsValid": true,
+  "errors": [],
+  "manifestValid": true,
+  "nullifiersUnique": true,
+  "packageDigest": "532a5a82fc2c1aebe648c102b2c6ae53744b8d4a082609b027c137f61e467531",
+  "packageContentDigest": "9758106e6228ebd386ac89be261bf20552533bc9a862962a2263e89af5bee07c",
+  "packageVersion": "verification-package-v1",
+  "proofsValid": true,
+  "resultValid": true,
+  "tallyValid": true,
+  "valid": true,
+  "verificationReportVersion": "verification-report-v1",
+  "voteSetDigestValid": true
+}
+environment=devnet project=votaciones-devnet-readiness-20261104 env_file=/tmp/votaciones-readiness-devnet.env
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Running 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Running 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Running 
+ Container votaciones-devnet-readiness-20261104-api-1 Recreate 
+ Container votaciones-devnet-readiness-20261104-api-1 Recreated 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Starting 
+ Container votaciones-devnet-readiness-20261104-api-1 Started 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-api-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Healthy 
+<repository>/.artifacts/readiness-2026-11-04-patched/synthetic.dump.metadata.json
+Backup created with digest and logical evidence: <repository>/.artifacts/readiness-2026-11-04-patched/synthetic.dump
+{
+  "archive": "synthetic.dump",
+  "digest": "4851d5bac5930788263106f20d72e497f9c9382bc0953d4ddc66b0f42735d151",
+  "kind": "postgresql",
+  "verified": true
+}
+ Network votaciones-test-restore-16293_internal Creating 
+ Network votaciones-test-restore-16293_internal Created 
+ Container votaciones-test-restore-16293-postgres-1 Creating 
+ Container votaciones-test-restore-16293-postgres-1 Created 
+ Container votaciones-test-restore-16293-postgres-1 Starting 
+ Container votaciones-test-restore-16293-postgres-1 Started 
+ Container votaciones-test-restore-16293-postgres-1 Waiting 
+ Container votaciones-test-restore-16293-postgres-1 Healthy 
+DO
+{
+  "archive": "synthetic.dump",
+  "digest": "4851d5bac5930788263106f20d72e497f9c9382bc0953d4ddc66b0f42735d151",
+  "kind": "postgresql",
+  "verified": true
+}
+
+> @votaciones/verification-protocol@1.0.0-devnet.1 build <repository>/packages/verification-protocol
+> tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+
+{
+  "artifactsValid": true,
+  "checkpointsValid": true,
+  "errors": [],
+  "manifestValid": true,
+  "nullifiersUnique": true,
+  "packageDigest": "532a5a82fc2c1aebe648c102b2c6ae53744b8d4a082609b027c137f61e467531",
+  "packageContentDigest": "9758106e6228ebd386ac89be261bf20552533bc9a862962a2263e89af5bee07c",
+  "packageVersion": "verification-package-v1",
+  "proofsValid": true,
+  "resultValid": true,
+  "tallyValid": true,
+  "valid": true,
+  "verificationReportVersion": "verification-report-v1",
+  "voteSetDigestValid": true
+}
+Isolated restore drill passed: schema, votes, audit, results and backup evidence verified.

@@ -1,0 +1,30 @@
+
+> sistema-elecciones-solana@0.1.0 test:zk <repository>
+> pnpm --filter @votaciones/zk-protocol test
+
+
+> @votaciones/zk-protocol@1.0.0-devnet.1 pretest <repository>/packages/zk-protocol
+> pnpm build && pnpm zk:verify-artifacts
+
+
+> @votaciones/zk-protocol@1.0.0-devnet.1 build <repository>/packages/zk-protocol
+> tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+
+
+> @votaciones/zk-protocol@1.0.0-devnet.1 zk:verify-artifacts <repository>/packages/zk-protocol
+> node scripts/verify-artifacts.mjs
+
+Trusted devnet artifacts verified.
+
+> @votaciones/zk-protocol@1.0.0-devnet.1 test <repository>/packages/zk-protocol
+> vitest run
+
+
+ RUN  v4.1.11 <repository>/packages/zk-protocol
+
+
+ Test Files  3 passed (3)
+      Tests  8 passed (8)
+   Start at  10:17:18
+   Duration  1.31s (transform 141ms, setup 0ms, import 877ms, tests 1.49s, environment 0ms)
+

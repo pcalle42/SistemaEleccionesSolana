@@ -1,0 +1,681 @@
+ Image votaciones-devnet-readiness-20261104-admin-web Building 
+ Image votaciones-devnet-readiness-20261104-voter-web Building 
+ Image votaciones-devnet-readiness-20261104-api Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.94kB done
+#1 DONE 0.0s
+
+#2 [voter-web internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.29kB done
+#2 DONE 0.0s
+
+#3 [admin-web internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.14kB done
+#3 DONE 0.0s
+
+#4 [api internal] load build definition from Dockerfile
+#4 transferring dockerfile: 1.66kB done
+#4 DONE 0.0s
+
+#5 [api internal] load metadata for docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a
+#5 DONE 0.0s
+
+#6 [admin-web internal] load .dockerignore
+#6 transferring context: 139B done
+#6 DONE 0.0s
+
+#7 [admin-web build 1/9] FROM docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a
+#7 resolve docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a 0.0s done
+#7 DONE 0.0s
+
+#8 [admin-web internal] load build context
+#8 transferring context: 185.17kB 0.0s done
+#8 DONE 0.0s
+
+#9 [voter-web internal] load build context
+#9 transferring context: 186.43kB 0.0s done
+#9 DONE 0.0s
+
+#10 [admin-web build 3/8] RUN corepack enable
+#10 CACHED
+
+#11 [api internal] load build context
+#11 transferring context: 219.60kB 0.0s done
+#11 DONE 0.0s
+
+#12 [api build 2/9] WORKDIR /workspace
+#12 CACHED
+
+#13 [voter-web build 3/9] RUN corepack enable
+#13 CACHED
+
+#14 [api build  3/11] RUN corepack enable
+#14 CACHED
+
+#15 [admin-web build 4/8] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#15 DONE 0.0s
+
+#16 [voter-web build 4/9] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#16 DONE 0.0s
+
+#17 [api build  4/11] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#17 DONE 0.0s
+
+#18 [api build  5/11] COPY packages ./packages
+#18 ...
+
+#19 [voter-web build 5/9] COPY packages ./packages
+#19 DONE 0.3s
+
+#20 [admin-web build 5/8] COPY packages ./packages
+#20 DONE 0.4s
+
+#18 [api build  5/11] COPY packages ./packages
+#18 DONE 0.3s
+
+#21 [voter-web build 6/9] COPY apps/voter-web ./apps/voter-web
+#21 DONE 0.1s
+
+#22 [api build  6/11] COPY apps/api ./apps/api
+#22 DONE 0.2s
+
+#23 [admin-web build 6/8] COPY apps/admin-web ./apps/admin-web
+#23 DONE 0.1s
+
+#24 [api build  7/11] RUN pnpm install --frozen-lockfile
+#24 0.309 ! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-10.9.0.tgz
+#24 ...
+
+#25 [admin-web build 7/8] RUN pnpm install --frozen-lockfile
+#25 0.278 ! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-10.9.0.tgz
+#25 2.996 Scope: all 10 workspace projects
+#25 3.063 Lockfile is up to date, resolution step is skipped
+#25 3.117 Progress: resolved 1, reused 0, downloaded 0, added 0
+#25 3.196 Packages: +240
+#25 3.196 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#25 4.125 Progress: resolved 240, reused 0, downloaded 13, added 11
+#25 4.161 
+#25 4.161    ╭───────────────────────────────────────────────╮
+#25 4.161    │                                               │
+#25 4.161    │      Update available! 10.9.0 → 12.16.1.      │
+#25 4.161    │     Changelog: https://pnpm.io/v/12.16.1      │
+#25 4.161    │   To update, run: corepack use pnpm@12.16.1   │
+#25 4.161    │                                               │
+#25 4.161    ╰───────────────────────────────────────────────╯
+#25 4.161 
+#25 5.127 Progress: resolved 240, reused 0, downloaded 76, added 76
+#25 6.132 Progress: resolved 240, reused 0, downloaded 96, added 96
+#25 7.132 Progress: resolved 240, reused 0, downloaded 120, added 120
+#25 8.136 Progress: resolved 240, reused 0, downloaded 128, added 128
+#25 ...
+
+#24 [api build  7/11] RUN pnpm install --frozen-lockfile
+#24 8.503 Scope: all 10 workspace projects
+#24 8.574 Lockfile is up to date, resolution step is skipped
+#24 8.631 Progress: resolved 1, reused 0, downloaded 0, added 0
+#24 8.752 Packages: +431
+#24 8.752 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#24 9.633 Progress: resolved 431, reused 0, downloaded 14, added 14
+#24 ...
+
+#26 [voter-web build 7/9] RUN pnpm install --frozen-lockfile
+#26 0.282 ! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-10.9.0.tgz
+#26 4.017 Scope: all 10 workspace projects
+#26 4.186 Lockfile is up to date, resolution step is skipped
+#26 4.267 Progress: resolved 1, reused 0, downloaded 0, added 0
+#26 4.404 Packages: +244
+#26 4.404 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#26 5.267 Progress: resolved 244, reused 0, downloaded 10, added 10
+#26 6.158 
+#26 6.158    ╭───────────────────────────────────────────────╮
+#26 6.158    │                                               │
+#26 6.158    │      Update available! 10.9.0 → 12.16.1.      │
+#26 6.158    │     Changelog: https://pnpm.io/v/12.16.1      │
+#26 6.158    │   To update, run: corepack use pnpm@12.16.1   │
+#26 6.158    │                                               │
+#26 6.158    ╰───────────────────────────────────────────────╯
+#26 6.158 
+#26 6.272 Progress: resolved 244, reused 0, downloaded 41, added 41
+#26 7.277 Progress: resolved 244, reused 0, downloaded 74, added 74
+#26 8.278 Progress: resolved 244, reused 0, downloaded 88, added 88
+#26 9.279 Progress: resolved 244, reused 0, downloaded 102, added 102
+#26 ...
+
+#25 [admin-web build 7/8] RUN pnpm install --frozen-lockfile
+#25 9.137 Progress: resolved 240, reused 0, downloaded 143, added 143
+#25 10.14 Progress: resolved 240, reused 0, downloaded 148, added 148
+#25 11.14 Progress: resolved 240, reused 0, downloaded 167, added 167
+#25 12.14 Progress: resolved 240, reused 0, downloaded 179, added 179
+#25 13.14 Progress: resolved 240, reused 0, downloaded 192, added 192
+#25 14.14 Progress: resolved 240, reused 0, downloaded 206, added 205
+#25 15.15 Progress: resolved 240, reused 0, downloaded 217, added 217
+#25 16.15 Progress: resolved 240, reused 0, downloaded 223, added 223
+#25 ...
+
+#24 [api build  7/11] RUN pnpm install --frozen-lockfile
+#24 10.61 
+#24 10.61    ╭───────────────────────────────────────────────╮
+#24 10.61    │                                               │
+#24 10.61    │      Update available! 10.9.0 → 12.16.1.      │
+#24 10.61    │     Changelog: https://pnpm.io/v/12.16.1      │
+#24 10.61    │   To update, run: corepack use pnpm@12.16.1   │
+#24 10.61    │                                               │
+#24 10.61    ╰───────────────────────────────────────────────╯
+#24 10.61 
+#24 10.63 Progress: resolved 431, reused 0, downloaded 59, added 57
+#24 11.63 Progress: resolved 431, reused 0, downloaded 89, added 89
+#24 12.64 Progress: resolved 431, reused 0, downloaded 107, added 107
+#24 13.63 Progress: resolved 431, reused 0, downloaded 128, added 128
+#24 14.64 Progress: resolved 431, reused 0, downloaded 146, added 146
+#24 15.64 Progress: resolved 431, reused 0, downloaded 160, added 160
+#24 16.64 Progress: resolved 431, reused 0, downloaded 186, added 186
+#24 ...
+
+#25 [admin-web build 7/8] RUN pnpm install --frozen-lockfile
+#25 17.15 Progress: resolved 240, reused 0, downloaded 229, added 229
+#25 18.15 Progress: resolved 240, reused 0, downloaded 230, added 230
+#25 19.15 Progress: resolved 240, reused 0, downloaded 231, added 231
+#25 20.15 Progress: resolved 240, reused 0, downloaded 233, added 233
+#25 ...
+
+#26 [voter-web build 7/9] RUN pnpm install --frozen-lockfile
+#26 10.28 Progress: resolved 244, reused 0, downloaded 106, added 106
+#26 11.29 Progress: resolved 244, reused 0, downloaded 114, added 114
+#26 12.29 Progress: resolved 244, reused 0, downloaded 122, added 122
+#26 13.29 Progress: resolved 244, reused 0, downloaded 127, added 127
+#26 14.29 Progress: resolved 244, reused 0, downloaded 129, added 129
+#26 15.29 Progress: resolved 244, reused 0, downloaded 134, added 134
+#26 16.29 Progress: resolved 244, reused 0, downloaded 136, added 136
+#26 17.29 Progress: resolved 244, reused 0, downloaded 142, added 142
+#26 18.29 Progress: resolved 244, reused 0, downloaded 145, added 145
+#26 19.30 Progress: resolved 244, reused 0, downloaded 147, added 147
+#26 20.30 Progress: resolved 244, reused 0, downloaded 155, added 155
+#26 ...
+
+#24 [api build  7/11] RUN pnpm install --frozen-lockfile
+#24 17.64 Progress: resolved 431, reused 0, downloaded 209, added 209
+#24 18.64 Progress: resolved 431, reused 0, downloaded 220, added 220
+#24 19.64 Progress: resolved 431, reused 0, downloaded 224, added 224
+#24 20.64 Progress: resolved 431, reused 0, downloaded 242, added 242
+#24 21.64 Progress: resolved 431, reused 0, downloaded 264, added 263
+#24 22.64 Progress: resolved 431, reused 0, downloaded 273, added 273
+#24 23.63 Progress: resolved 431, reused 0, downloaded 299, added 299
+#24 24.63 Progress: resolved 431, reused 0, downloaded 321, added 321
+#24 25.64 Progress: resolved 431, reused 0, downloaded 335, added 335
+#24 ...
+
+#26 [voter-web build 7/9] RUN pnpm install --frozen-lockfile
+#26 21.30 Progress: resolved 244, reused 0, downloaded 170, added 170
+#26 22.30 Progress: resolved 244, reused 0, downloaded 179, added 179
+#26 23.29 Progress: resolved 244, reused 0, downloaded 196, added 196
+#26 24.29 Progress: resolved 244, reused 0, downloaded 217, added 217
+#26 25.30 Progress: resolved 244, reused 0, downloaded 232, added 232
+#26 26.30 Progress: resolved 244, reused 0, downloaded 235, added 235
+#26 ...
+
+#24 [api build  7/11] RUN pnpm install --frozen-lockfile
+#24 26.64 Progress: resolved 431, reused 0, downloaded 353, added 353
+#24 27.64 Progress: resolved 431, reused 0, downloaded 377, added 376
+#24 28.64 Progress: resolved 431, reused 0, downloaded 392, added 392
+#24 29.64 Progress: resolved 431, reused 0, downloaded 418, added 418
+#24 30.64 Progress: resolved 431, reused 0, downloaded 422, added 422
+#24 31.65 Progress: resolved 431, reused 0, downloaded 423, added 423
+#24 ...
+
+#25 [admin-web build 7/8] RUN pnpm install --frozen-lockfile
+#25 21.81 Progress: resolved 240, reused 0, downloaded 234, added 233
+#25 22.81 Progress: resolved 240, reused 0, downloaded 234, added 234
+#25 26.41 Progress: resolved 240, reused 0, downloaded 235, added 234
+#25 27.41 Progress: resolved 240, reused 0, downloaded 235, added 235
+#25 28.41 Progress: resolved 240, reused 0, downloaded 236, added 236
+#25 29.41 Progress: resolved 240, reused 0, downloaded 237, added 237
+#25 ...
+
+#26 [voter-web build 7/9] RUN pnpm install --frozen-lockfile
+#26 27.30 Progress: resolved 244, reused 0, downloaded 236, added 236
+#26 28.30 Progress: resolved 244, reused 0, downloaded 238, added 238
+#26 29.43 Progress: resolved 244, reused 0, downloaded 239, added 238
+#26 30.43 Progress: resolved 244, reused 0, downloaded 239, added 239
+#26 31.43 Progress: resolved 244, reused 0, downloaded 240, added 240
+#26 32.43 Progress: resolved 244, reused 0, downloaded 241, added 241
+#26 ...
+
+#24 [api build  7/11] RUN pnpm install --frozen-lockfile
+#24 32.65 Progress: resolved 431, reused 0, downloaded 426, added 426
+#24 33.65 Progress: resolved 431, reused 0, downloaded 427, added 427
+#24 35.23 Progress: resolved 431, reused 0, downloaded 428, added 427
+#24 36.24 Progress: resolved 431, reused 0, downloaded 428, added 428
+#24 37.24 Progress: resolved 431, reused 0, downloaded 429, added 429
+#24 ...
+
+#26 [voter-web build 7/9] RUN pnpm install --frozen-lockfile
+#26 35.42 Progress: resolved 244, reused 0, downloaded 242, added 241
+#26 36.42 Progress: resolved 244, reused 0, downloaded 243, added 243
+#26 39.18 Progress: resolved 244, reused 0, downloaded 244, added 243
+#26 39.19 Progress: resolved 244, reused 0, downloaded 244, added 244, done
+#26 39.47 .../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+#26 39.58 .../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+#26 39.76 
+#26 39.76 devDependencies:
+#26 39.76 + @playwright/test 1.64.0
+#26 39.76 + @types/node 22.20.1
+#26 39.76 + @votaciones/config-eslint 0.0.0 <- packages/config-eslint
+#26 39.76 + @votaciones/config-typescript 0.0.0 <- packages/config-typescript
+#26 39.76 + ajv 8.20.0
+#26 39.76 + eslint 10.9.1
+#26 39.76 + fast-check 4.3.0
+#26 39.76 + prettier 3.9.6
+#26 39.76 + typescript 6.0.3
+#26 39.76 + vitest 4.1.11
+#26 39.76 
+#26 39.76 ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+#26 39.76 │                                                                              │
+#26 39.76 │   Ignored build scripts: blake-hash.                                         │
+#26 39.76 │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+#26 39.76 │   to run scripts.                                                            │
+#26 39.76 │                                                                              │
+#26 39.76 ╰──────────────────────────────────────────────────────────────────────────────╯
+#26 39.76 
+#26 39.86 Done in 36.6s using pnpm v10.9.0
+#26 DONE 40.4s
+
+#25 [admin-web build 7/8] RUN pnpm install --frozen-lockfile
+#25 35.80 Progress: resolved 240, reused 0, downloaded 238, added 237
+#25 36.80 Progress: resolved 240, reused 0, downloaded 238, added 238
+#25 38.94 Progress: resolved 240, reused 0, downloaded 239, added 238
+#25 39.70 Progress: resolved 240, reused 0, downloaded 240, added 240, done
+#25 39.88 .../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+#25 39.94 .../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+#25 40.48 
+#25 40.48 devDependencies:
+#25 40.48 + @playwright/test 1.64.0
+#25 40.48 + @types/node 22.20.1
+#25 40.48 + @votaciones/config-eslint 0.0.0 <- packages/config-eslint
+#25 40.48 + @votaciones/config-typescript 0.0.0 <- packages/config-typescript
+#25 40.48 + ajv 8.20.0
+#25 40.48 + eslint 10.9.1
+#25 40.48 + fast-check 4.3.0
+#25 40.48 + prettier 3.9.6
+#25 40.48 + typescript 6.0.3
+#25 40.48 + vitest 4.1.11
+#25 40.48 
+#25 40.48 ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+#25 40.48 │                                                                              │
+#25 40.48 │   Ignored build scripts: blake-hash.                                         │
+#25 40.48 │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+#25 40.48 │   to run scripts.                                                            │
+#25 40.48 │                                                                              │
+#25 40.48 ╰──────────────────────────────────────────────────────────────────────────────╯
+#25 40.48 
+#25 40.66 Done in 38s using pnpm v10.9.0
+#25 DONE 40.9s
+
+#27 [voter-web build 8/9] RUN pnpm --filter @votaciones/zk-protocol build
+#27 1.022 
+#27 1.022 > @votaciones/zk-protocol@1.0.0-devnet.1 build /workspace/packages/zk-protocol
+#27 1.022 > tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+#27 1.022 
+#27 DONE 4.7s
+
+#24 [api build  7/11] RUN pnpm install --frozen-lockfile
+#24 41.69 Progress: resolved 431, reused 0, downloaded 430, added 429
+#24 42.69 Progress: resolved 431, reused 0, downloaded 430, added 430
+#24 44.49 Progress: resolved 431, reused 0, downloaded 431, added 430
+#24 44.50 Progress: resolved 431, reused 0, downloaded 431, added 431, done
+#24 44.75 .../esbuild@0.18.20/node_modules/esbuild postinstall$ node install.js
+#24 44.75 .../esbuild@0.25.12/node_modules/esbuild postinstall$ node install.js
+#24 44.75 .../argon2@0.45.1/node_modules/argon2 install$ cross-env ZERO_AR_DATE=1 node-gyp-build
+#24 44.76 .../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+#24 44.83 .../esbuild@0.18.20/node_modules/esbuild postinstall: Done
+#24 44.84 .../esbuild@0.25.12/node_modules/esbuild postinstall: Done
+#24 44.84 .../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+#24 44.89 .../argon2@0.45.1/node_modules/argon2 install: Done
+#24 44.95  WARN  Failed to create bin at /workspace/apps/api/node_modules/.bin/verify-election. ENOENT: no such file or directory, open '/workspace/packages/verification-protocol/dist/src/cli.js'
+#24 45.12 
+#24 45.12 devDependencies:
+#24 45.12 + @playwright/test 1.64.0
+#24 45.12 + @types/node 22.20.1
+#24 45.12 + @votaciones/config-eslint 0.0.0 <- packages/config-eslint
+#24 45.12 + @votaciones/config-typescript 0.0.0 <- packages/config-typescript
+#24 45.12 + ajv 8.20.0
+#24 45.12 + eslint 10.9.1
+#24 45.12 + fast-check 4.3.0
+#24 45.12 + prettier 3.9.6
+#24 45.12 + typescript 6.0.3
+#24 45.12 + vitest 4.1.11
+#24 45.12 
+#24 45.12 ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+#24 45.12 │                                                                              │
+#24 45.12 │   Ignored build scripts: @scarf/scarf, blake-hash.                           │
+#24 45.12 │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+#24 45.12 │   to run scripts.                                                            │
+#24 45.12 │                                                                              │
+#24 45.12 ╰──────────────────────────────────────────────────────────────────────────────╯
+#24 45.12 
+#24 45.16  WARN  Failed to create bin at /workspace/apps/api/node_modules/.bin/verify-election. ENOENT: no such file or directory, open '/workspace/apps/api/node_modules/@votaciones/verification-protocol/dist/src/cli.js'
+#24 45.20 Done in 37s using pnpm v10.9.0
+#24 DONE 45.4s
+
+#28 [voter-web build 9/9] RUN pnpm --filter @votaciones/voter-web build
+#28 ...
+
+#29 [admin-web build 8/8] RUN pnpm --filter @votaciones/admin-web build
+#29 0.658 
+#29 0.658 > @votaciones/admin-web@0.0.0 build /workspace/apps/admin-web
+#29 0.658 > tsc --noEmit && vite build
+#29 0.658 
+#29 4.600 vite v8.2.2 building client environment for production...
+#29 4.618 transforming...
+#29 4.655 ✓ 7 modules transformed.
+#29 4.681 rendering chunks...
+#29 4.696 computing gzip size...
+#29 4.697 dist/index.html                  0.56 kB │ gzip: 0.34 kB
+#29 4.697 dist/assets/index-mBJoIBSh.css   4.14 kB │ gzip: 1.65 kB
+#29 4.697 dist/assets/index-DWHXqMlE.js   12.81 kB │ gzip: 4.99 kB
+#29 4.697 
+#29 4.697 ✓ built in 95ms
+#29 DONE 4.8s
+
+#30 [admin-web runtime 2/4] WORKDIR /app
+#30 CACHED
+
+#31 [admin-web runtime 3/4] COPY --from=build --chown=node:node /workspace/apps/admin-web/dist ./dist
+#31 CACHED
+
+#32 [admin-web runtime 4/4] COPY --from=build --chown=node:node /workspace/apps/admin-web/server.mjs ./server.mjs
+#32 CACHED
+
+#33 [admin-web] exporting to image
+#33 exporting layers done
+#33 exporting manifest sha256:64565c43f6f085c261bcf63f8f6e9dbc9ba41d64bcd36cf4e492573437e0996f done
+#33 exporting config sha256:d29969c389b35cb68983903881d4eebc898ddb173882729780e7024e0f6f7498 done
+#33 exporting attestation manifest sha256:79ce04dc98f76fdd44178c79dac87d65dd47ea8d508295a249f2b6e7c10532a5 0.0s done
+#33 exporting manifest list sha256:7335516aa925909198acfac687075ba1cdaa4c164f31ed17bb2790a19431c019 done
+#33 naming to docker.io/library/votaciones-devnet-readiness-20261104-admin-web:latest done
+#33 unpacking to docker.io/library/votaciones-devnet-readiness-20261104-admin-web:latest done
+#33 DONE 0.1s
+
+#34 [api build  8/11] RUN pnpm --filter @votaciones/zk-protocol build   && pnpm --filter @votaciones/verification-protocol build   && pnpm --filter @votaciones/api build
+#34 ...
+
+#35 [admin-web] resolving provenance for metadata file
+#35 DONE 0.0s
+
+#28 [voter-web build 9/9] RUN pnpm --filter @votaciones/voter-web build
+#28 0.683 
+#28 0.683 > @votaciones/voter-web@0.0.0 build /workspace/apps/voter-web
+#28 0.683 > pnpm artifacts:prepare && tsc --noEmit && vite build
+#28 0.683 
+#28 1.061 
+#28 1.061 > @votaciones/voter-web@0.0.0 artifacts:prepare /workspace/apps/voter-web
+#28 1.061 > node scripts/prepare-artifacts.mjs
+#28 1.061 
+#28 4.086 vite v8.2.2 building client environment for production...
+#28 4.096 transforming...
+#28 4.130 
+#28 4.130 new URL('../artifacts/anonymous-single-choice-v1/', import.meta.url) doesn't exist at build time, it will remain unchanged to be resolved at runtime. If this is intended, you can use the /* @vite-ignore */ comment to suppress this warning.
+#28 5.374 ✓ 232 modules transformed.
+#28 5.467 rendering chunks...
+#28 5.575 computing gzip size...
+#28 5.629 dist/index.html                           0.56 kB │ gzip:     0.34 kB
+#28 5.629 dist/assets/proof.worker-D8MucKCc.js     30.31 kB
+#28 5.629 dist/assets/browser.esm-B-gkokYB.js     445.78 kB
+#28 5.629 dist/assets/src-BbqKnd4L.js           2,815.59 kB
+#28 5.629 dist/assets/index-DovGktm5.css            4.27 kB │ gzip:     1.69 kB
+#28 5.629 dist/assets/index-D5wnhfTF.js            49.94 kB │ gzip:    15.92 kB
+#28 5.629 dist/assets/src-DYajiyNb.js           2,798.79 kB │ gzip: 1,363.71 kB
+#28 5.629 
+#28 5.630 [plugin builtin:vite-reporter] 
+#28 5.630 (!) Some chunks are larger than 500 kB after minification. Consider:
+#28 5.630 - Using dynamic import() to code-split the application
+#28 5.630 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#28 5.630 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#28 5.631 ✓ built in 1.54s
+#28 DONE 5.7s
+
+#34 [api build  8/11] RUN pnpm --filter @votaciones/zk-protocol build   && pnpm --filter @votaciones/verification-protocol build   && pnpm --filter @votaciones/api build
+#34 0.849 
+#34 0.849 > @votaciones/zk-protocol@1.0.0-devnet.1 build /workspace/packages/zk-protocol
+#34 0.849 > tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+#34 0.849 
+#34 3.433 
+#34 3.433 > @votaciones/verification-protocol@1.0.0-devnet.1 build /workspace/packages/verification-protocol
+#34 3.433 > tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+#34 3.433 
+#34 ...
+
+#36 [voter-web runtime 3/4] COPY --from=build --chown=node:node /workspace/apps/voter-web/dist ./dist
+#36 CACHED
+
+#30 [voter-web runtime 2/4] WORKDIR /app
+#30 CACHED
+
+#37 [voter-web runtime 4/4] COPY --from=build --chown=node:node /workspace/apps/voter-web/server.mjs ./server.mjs
+#37 CACHED
+
+#38 [voter-web] exporting to image
+#38 exporting layers done
+#38 exporting manifest sha256:bd2de6e73b1d2ae3f699086e96b8e02fe88e554a55bde010d47dfc6dc56acb2b done
+#38 exporting config sha256:05890a3b396f63268003bce50c47d74c3d038e6c9a6525bf22fa770d437696ed done
+#38 exporting attestation manifest sha256:0dab3595ea836dd9a47b801cd990fe3c8978480a8c8ce23d7f74af245d77733b 0.0s done
+#38 exporting manifest list sha256:22fe5fbe3ae64ec4f3c3a996a2f4d61382261789d574ea9448ec0213eab4959b 0.0s done
+#38 naming to docker.io/library/votaciones-devnet-readiness-20261104-voter-web:latest done
+#38 unpacking to docker.io/library/votaciones-devnet-readiness-20261104-voter-web:latest 0.0s done
+#38 DONE 0.1s
+
+#39 [voter-web] resolving provenance for metadata file
+#39 DONE 0.0s
+
+#34 [api build  8/11] RUN pnpm --filter @votaciones/zk-protocol build   && pnpm --filter @votaciones/verification-protocol build   && pnpm --filter @votaciones/api build
+#34 7.165 
+#34 7.165 > @votaciones/api@0.0.0 build /workspace/apps/api
+#34 7.165 > tsc -p tsconfig.build.json
+#34 7.165 
+#34 DONE 11.4s
+
+#40 [api build  9/11] RUN pnpm --filter @votaciones/api deploy --prod --legacy /opt/votaciones-api
+#40 0.612  WARN  Shared workspace lockfile detected but configuration forces legacy deploy implementation.
+#40 0.662 Packages are copied from the content-addressable store to the virtual store.
+#40 0.662   Content-addressable store is at: /root/.local/share/pnpm/store/v10
+#40 0.662   Virtual store is at:             ../opt/votaciones-api/node_modules/.pnpm
+#40 0.685 Progress: resolved 1, reused 0, downloaded 0, added 0
+#40 1.685 Progress: resolved 21, reused 0, downloaded 0, added 0
+#40 2.700 Progress: resolved 44, reused 0, downloaded 0, added 0
+#40 3.700 Progress: resolved 85, reused 0, downloaded 0, added 0
+#40 4.701 Progress: resolved 154, reused 0, downloaded 0, added 0
+#40 5.704 Progress: resolved 200, reused 0, downloaded 0, added 0
+#40 6.704 Progress: resolved 240, reused 0, downloaded 0, added 0
+#40 7.753 Progress: resolved 294, reused 0, downloaded 0, added 0
+#40 8.753 Progress: resolved 359, reused 0, downloaded 0, added 0
+#40 9.756 Progress: resolved 394, reused 0, downloaded 0, added 0
+#40 10.76 Progress: resolved 409, reused 0, downloaded 0, added 0
+#40 11.76 Progress: resolved 479, reused 0, downloaded 0, added 0
+#40 12.76 Progress: resolved 499, reused 0, downloaded 0, added 0
+#40 13.76 Progress: resolved 515, reused 0, downloaded 0, added 0
+#40 14.34  WARN  2 deprecated subdependencies found: @esbuild-kit/core-utils@3.3.2, @esbuild-kit/esm-loader@2.6.5
+#40 14.34 Progress: resolved 532, reused 0, downloaded 0, added 0, done
+#40 14.41 .                                        | +259 ++++++++++++++++++++++++++
+#40 DONE 22.0s
+
+#41 [api build 10/11] COPY scripts/devnet ./scripts/devnet
+#41 DONE 0.2s
+
+#42 [api build 11/11] COPY fixtures/devnet ./fixtures/devnet
+#42 DONE 0.0s
+
+#30 [api runtime 2/4] WORKDIR /app
+#30 CACHED
+
+#43 [api runtime-base 3/4] COPY --from=build --chown=node:node /opt/votaciones-api ./
+#43 DONE 2.9s
+
+#44 [api runtime-base 4/4] COPY --from=build --chown=node:node /workspace/apps/api/drizzle ./drizzle
+#44 DONE 0.1s
+
+#45 [api devnet 1/2] COPY --from=build --chown=node:node /workspace/scripts/devnet ./scripts/devnet
+#45 DONE 0.0s
+
+#46 [api devnet 2/2] COPY --from=build --chown=node:node /workspace/fixtures/devnet ./fixtures/devnet
+#46 DONE 0.0s
+
+#47 [api] exporting to image
+#47 exporting layers
+#47 exporting layers 5.6s done
+#47 exporting manifest sha256:8376b6fd6c859c66ad0b26c99787b301e3d9a803a0e3510175b71ca28a5750d6 done
+#47 exporting config sha256:62c268a74c959f576bdce399b200d8469f173f64506c72870530653a78b1bc29 done
+#47 exporting attestation manifest sha256:cea5de3344e0866d3b506fb29b7ca2864a6b41e05db6c3f651f20bf1913741e5 done
+#47 exporting manifest list sha256:362ed3b57fe6c74df9c364c1bd64c4e0f0b3adf8a7a2519f37fab4e439c372f9 done
+#47 naming to docker.io/library/votaciones-devnet-readiness-20261104-api:latest done
+#47 unpacking to docker.io/library/votaciones-devnet-readiness-20261104-api:latest
+#47 unpacking to docker.io/library/votaciones-devnet-readiness-20261104-api:latest 2.9s done
+#47 DONE 8.6s
+
+#48 [api] resolving provenance for metadata file
+#48 DONE 0.0s
+ Image votaciones-devnet-readiness-20261104-voter-web Built 
+ Image votaciones-devnet-readiness-20261104-admin-web Built 
+ Image votaciones-devnet-readiness-20261104-api Built 
+environment=devnet project=votaciones-devnet-readiness-20261104 env_file=/tmp/votaciones-readiness-devnet.env
+ Container votaciones-devnet-readiness-20261104-valkey-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-artifact-init-run-698f24f05fd8 Creating 
+ Container votaciones-devnet-readiness-20261104-artifact-init-run-698f24f05fd8 Created 
+ Container votaciones-devnet-readiness-20261104-api-run-68deb354f313 Creating 
+ Container votaciones-devnet-readiness-20261104-api-run-68deb354f313 Created 
+Trusted devnet ZK artifact digests verified.
+ Container votaciones-devnet-readiness-20261104-api-run-362a058dce3c Creating 
+ Container votaciones-devnet-readiness-20261104-api-run-362a058dce3c Created 
+Database migrations applied successfully.
+ Container votaciones-devnet-readiness-20261104-valkey-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Running 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Recreate 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Recreate 
+ Container votaciones-devnet-readiness-20261104-api-1 Recreate 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Recreated 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Recreated 
+ Container votaciones-devnet-readiness-20261104-api-1 Recreated 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Starting 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Starting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Started 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Started 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Starting 
+ Container votaciones-devnet-readiness-20261104-api-1 Started 
+ Container votaciones-devnet-readiness-20261104-api-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Healthy 
+Demo election already READY: eefb07d5-2289-4a06-8f29-7d68a32caabf
+environment=devnet project=votaciones-devnet-readiness-20261104 env_file=/tmp/votaciones-readiness-devnet.env
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Running 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Running 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Running 
+ Container votaciones-devnet-readiness-20261104-api-1 Running 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-api-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Healthy 
+PostgreSQL, Valkey, API readiness, frontends, TTL, and network smoke tests passed.
+Devnet bootstrap completed.
+ Container votaciones-devnet-readiness-20261104-valkey-1 Running 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Running 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Running 
+ Container votaciones-devnet-readiness-20261104-api-1 Running 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-api-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-admin-web-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-voter-web-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+
+Running 1 test using 1 worker
+
+(node:14907) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/1] tests/browser-devnet/connected.e2e.spec.ts:57:1 › real admin and voter browsers cross the live devnet API boundary
+  1 passed (5.6s)
+Devnet E2E verified: election=c380e315-d169-4369-8962-b355d72765fe package=9758106e6228ebd386ac89be261bf20552533bc9a862962a2263e89af5bee07c
+ Container votaciones-devnet-readiness-20261104-api-1 Restarting 
+ Container votaciones-devnet-readiness-20261104-api-1 Started 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Running 
+ Container votaciones-devnet-readiness-20261104-api-1 Recreate 
+ Container votaciones-devnet-readiness-20261104-api-1 Recreated 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Starting 
+ Container votaciones-devnet-readiness-20261104-api-1 Started 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-api-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Restarting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Started 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Running 
+ Container votaciones-devnet-readiness-20261104-api-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-api-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Restarting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Started 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Running 
+ Container votaciones-devnet-readiness-20261104-api-1 Running 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Waiting 
+ Container votaciones-devnet-readiness-20261104-valkey-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-postgres-1 Healthy 
+ Container votaciones-devnet-readiness-20261104-api-1 Healthy 
+API, Valkey flush/restart, PostgreSQL restart, and offline verification passed.

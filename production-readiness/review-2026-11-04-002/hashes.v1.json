@@ -1,0 +1,18 @@
+[
+  {
+    "path": "traceability.v1.json",
+    "sha256": "f50b0e35c8b715481b7b226ec0f86d659700e3e809d0d0d58199360cb275632d"
+  },
+  {
+    "path": "risks.v1.json",
+    "sha256": "c251f70e2e8e3639970d23675323bd482ccf1dcdd16012b7246ad8bfecb20982"
+  },
+  {
+    "path": "decision.v1.json",
+    "sha256": "42486eb37089c863c9ba308792c4da5c7e2ba13962f41f70ccaa462d7a0f42cb"
+  },
+  {
+    "path": "source.v1.json",
+    "sha256": "40f3ea6feca15e56f0146771f3743aa2c6bdb6f740200ade8f110ffb843dd153"
+  }
+]

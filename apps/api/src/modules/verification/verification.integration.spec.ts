@@ -1,7 +1,10 @@
+import { execFile } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -32,6 +35,10 @@ const migrationPool = createDatabasePool('migration');
 const repository = new DrizzleElectionRepository(createDatabase(runtimePool));
 const voteRepository = new PostgresVoteRepository(runtimePool);
 const adminId = randomUUID();
+const runCli = promisify(execFile);
+const verifierCli = fileURLToPath(
+  new URL('../../../../../packages/verification-protocol/dist/src/cli.js', import.meta.url),
+);
 let now = new Date('2030-01-01T10:00:00.000Z');
 const clock: Clock = { now: () => new Date(now) };
 let artifactDirectory = '';
@@ -226,6 +233,14 @@ describe('verifiable result lifecycle', () => {
     expect(publicPackageText).not.toContain('not-used');
     expect(publicPackageText).not.toContain(adminId);
     expect(publicPackageText).not.toContain('acceptedAt');
+    // Real snarkjs worker handles used to keep this CLI alive after reporting
+    // success, indefinitely blocking restore-drill.sh. Enforce bounded exit.
+    const verifiedCli = await runCli(
+      process.execPath,
+      [verifierCli, '--package', stored.rows[0]!.package_path],
+      { timeout: 10_000 },
+    );
+    expect(JSON.parse(verifiedCli.stdout)).toMatchObject({ valid: true, proofsValid: true });
     for (const file of [
       'accepted-votes.jsonl',
       'checkpoints.json',
@@ -240,6 +255,13 @@ describe('verifiable result lifecycle', () => {
       await expect(verifyElectionPackage(stored.rows[0]!.package_path)).resolves.toMatchObject({
         valid: false,
       });
+      if (file === 'tally.json') {
+        await expect(
+          runCli(process.execPath, [verifierCli, '--package', stored.rows[0]!.package_path], {
+            timeout: 10_000,
+          }),
+        ).rejects.toMatchObject({ code: 1, killed: false });
+      }
       await writeFile(path, original);
     }
     const tallyPath = join(stored.rows[0]!.package_path, 'tally.json');

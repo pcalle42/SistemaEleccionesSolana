@@ -1,0 +1,13 @@
+
+> sistema-elecciones-solana@0.1.0 test:production <repository>
+> vitest run tests/production
+
+
+ RUN  v4.1.11 <repository>
+
+
+ Test Files  2 passed (2)
+      Tests  10 passed (10)
+   Start at  10:24:06
+   Duration  439ms (transform 59ms, setup 0ms, import 157ms, tests 338ms, environment 0ms)
+

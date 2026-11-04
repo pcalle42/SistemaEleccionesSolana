@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "GoNoGoRecordV1",
+  "releaseVersion": "0.1.0",
+  "releaseManifestDigest": null,
+  "protocolVersions": [
+    "anonymous-single-choice-v1"
+  ],
+  "criticalGateSummary": [
+    {
+      "requirementId": "DOM-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "ELG-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "VOTE-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "ZK-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "ZK-002",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "ZK-003",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "AUD-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "RES-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "UI-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "SEC-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "SEC-002",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "INF-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-002",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "SEC-003",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-003",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-004",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-005",
+      "status": "NOT_TESTED"
+    }
+  ],
+  "traceabilityDigest": "sha256:da57508dd442ece0036429cc26866fbdb87f07c130169fc2bb8e0b23aeebb833",
+  "securityReviewRefs": [],
+  "zkReviewRefs": [],
+  "pentestRefs": [],
+  "restoreTestRef": null,
+  "capacityTestRef": null,
+  "rehearsalRef": null,
+  "residualRiskRegisterDigest": "sha256:66d7a529fe29c46a82d0d47d08f3aaba7e999d66a47e00a285d039e24248e778",
+  "decision": "NO-GO",
+  "decisionReason": "No hay artifacts ZK productivos seguros registrados. Evidencia del release exacto y aprobaciones externas incompletas.",
+  "decidedAt": "2026-11-04T15:07:26.884Z",
+  "decisionAuthority": "Evaluación técnica automática; no sustituye autoridad electoral ni aprobación humana."
+}

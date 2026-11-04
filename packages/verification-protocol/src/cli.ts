@@ -10,6 +10,9 @@ if (!directory) {
   process.exitCode = 2;
 } else {
   const report = await verifyElectionPackage(resolve(directory));
-  process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-  process.exitCode = report.valid ? 0 : 1;
+  // snarkjs retains worker handles after verifying real proofs. This bounded CLI
+  // must exit after flushing the complete report so restore jobs can continue.
+  process.stdout.write(`${JSON.stringify(report, null, 2)}\n`, () => {
+    process.exit(report.valid ? 0 : 1);
+  });
 }

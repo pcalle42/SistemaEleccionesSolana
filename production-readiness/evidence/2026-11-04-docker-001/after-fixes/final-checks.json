@@ -1,0 +1,35 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "typecheck"
+    ],
+    "startedAt": "2026-11-04T15:29:51.438680+00:00",
+    "finishedAt": "2026-11-04T15:30:02.513157+00:00",
+    "durationSeconds": 11.074,
+    "exitCode": 0,
+    "logSha256": "d281c30ed781904b95323ce0f46938b9baaa0d49188a3b3a1dc25da8b2338d53"
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:unit"
+    ],
+    "startedAt": "2026-11-04T15:30:02.513704+00:00",
+    "finishedAt": "2026-11-04T15:30:15.541379+00:00",
+    "durationSeconds": 13.028,
+    "exitCode": 0,
+    "logSha256": "6ed48ca50da3cb8427c94b9bf86e361157f931eceb99ab6983f7f6fe6ed50575"
+  },
+  {
+    "command": [
+      "pnpm",
+      "test:production"
+    ],
+    "startedAt": "2026-11-04T15:30:15.541870+00:00",
+    "finishedAt": "2026-11-04T15:30:16.500661+00:00",
+    "durationSeconds": 0.959,
+    "exitCode": 1,
+    "logSha256": "3e3a5a68c803477f5879d5a14b06a785a07c57b627dbfafead25c91acbf679cb"
+  }
+]

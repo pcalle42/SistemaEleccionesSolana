@@ -1,0 +1,24 @@
+{
+  "artifactDigests": {
+    "r1csSha256": "098465c9bcab5eda909fb5b2993b08042671714ed103edb50117b077974e0c6b",
+    "wasmSha256": "6302410aa95c391cb2895e923a77095a2f89a95edbec7dda84da8bcf897d725d",
+    "zkeySha256": "0ec5be294b43109fae4d9c3d875ab93af2e1a87af81d8ffbe72859139f8ea61c",
+    "powersOfTauSha256": "4604f7befd830cdcb12248c65a4d1ee886d1a95bdcb463573c70788de8f78460",
+    "setupTranscriptSha256": "b11c4594b4d5edb63ab4a27f834624502d39408170c60956c8d955bff2850c7c",
+    "verificationKeySha256": "9ae0f83182a1492f69844091d20d493725f68a4aacf3f4880ed4e28f8a551a47"
+  },
+  "circuitVersion": "1.0.0",
+  "containerImageIdentifiers": {
+    "api": "local-devnet-build"
+  },
+  "electionId": "c380e315-d169-4369-8962-b355d72765fe",
+  "finishedAt": "2026-11-04T15:25:15.333Z",
+  "fixtureVersion": "devnet-fixtures-v1",
+  "gitCommit": "389f2de148ead8dd51766bdd551ea0149beb44ad",
+  "packageContentDigest": "9758106e6228ebd386ac89be261bf20552533bc9a862962a2263e89af5bee07c",
+  "packagePath": "/app/.artifacts/verification-packages/c380e315-d169-4369-8962-b355d72765fe/results/v1/9758106e6228ebd386ac89be261bf20552533bc9a862962a2263e89af5bee07c",
+  "protocolVersion": "anonymous-single-choice-v1",
+  "runId": "4099041f-1fe4-45fd-a6f4-03860a0d0859",
+  "startedAt": "2026-11-04T15:25:10.948Z",
+  "verificationResult": "verified"
+}

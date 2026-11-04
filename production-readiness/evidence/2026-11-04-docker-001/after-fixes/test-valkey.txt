@@ -1,0 +1,93 @@
+
+> sistema-elecciones-solana@0.1.0 test:valkey <repository>
+> bash tests/scripts/run-with-infra.sh valkey
+
+ Network votaciones-test-default_access Creating 
+ Network votaciones-test-default_access Created 
+ Network votaciones-test-default_internal Creating 
+ Network votaciones-test-default_internal Created 
+ Container votaciones-test-default-valkey-1 Creating 
+ Container votaciones-test-default-postgres-1 Creating 
+ Container votaciones-test-default-valkey-1 Created 
+ Container votaciones-test-default-postgres-1 Created 
+ Container votaciones-test-default-postgres-1 Starting 
+ Container votaciones-test-default-valkey-1 Starting 
+ Container votaciones-test-default-valkey-1 Started 
+ Container votaciones-test-default-postgres-1 Started 
+ Container votaciones-test-default-postgres-1 Waiting 
+ Container votaciones-test-default-valkey-1 Waiting 
+ Container votaciones-test-default-valkey-1 Healthy 
+ Container votaciones-test-default-postgres-1 Healthy 
+
+> sistema-elecciones-solana@0.1.0 build <repository>
+> pnpm --recursive --if-present build
+
+Scope: 11 of 12 workspace projects
+packages/shared-crypto build$ tsc -p tsconfig.build.json
+packages/shared-types build$ tsc -p tsconfig.build.json
+packages/zk-protocol build$ tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+packages/shared-validation build$ tsc -p tsconfig.build.json
+packages/shared-crypto build: Done
+packages/shared-types build: Done
+packages/shared-validation build: Done
+packages/zk-protocol build: Done
+packages/verification-protocol build$ tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+packages/shared-testing build$ tsc -p tsconfig.build.json
+packages/shared-testing build: Done
+packages/verification-protocol build: Done
+apps/admin-web build$ tsc --noEmit && vite build
+apps/voter-web build$ pnpm artifacts:prepare && tsc --noEmit && vite build
+apps/api build$ tsc -p tsconfig.build.json
+apps/voter-web build: > @votaciones/voter-web@0.0.0 artifacts:prepare <repository>/apps/voter-web
+apps/voter-web build: > node scripts/prepare-artifacts.mjs
+apps/admin-web build: vite v8.2.2 building client environment for production...
+apps/admin-web build: transforming...
+apps/admin-web build: ✓ 7 modules transformed.
+apps/admin-web build: rendering chunks...
+apps/admin-web build: computing gzip size...
+apps/admin-web build: dist/index.html                  0.56 kB │ gzip: 0.34 kB
+apps/admin-web build: dist/assets/index-mBJoIBSh.css   4.14 kB │ gzip: 1.65 kB
+apps/admin-web build: dist/assets/index-OURVMN8w.js   12.66 kB │ gzip: 4.97 kB
+apps/admin-web build: ✓ built in 74ms
+apps/admin-web build: Done
+apps/voter-web build: vite v8.2.2 building client environment for production...
+apps/voter-web build: transforming...
+apps/voter-web build: new URL('../artifacts/anonymous-single-choice-v1/', import.meta.url) doesn't exist at build time, it will remain unchanged to be resolved at runtime. If this is intended, you can use the /* @vite-ignore */ comment to suppress this warning.
+apps/voter-web build: ✓ 232 modules transformed.
+apps/voter-web build: rendering chunks...
+apps/voter-web build: computing gzip size...
+apps/voter-web build: dist/index.html                           0.56 kB │ gzip:     0.34 kB
+apps/voter-web build: dist/assets/proof.worker-D8MucKCc.js     30.31 kB
+apps/voter-web build: dist/assets/browser.esm-B-gkokYB.js     445.78 kB
+apps/voter-web build: dist/assets/src-BbqKnd4L.js           2,815.59 kB
+apps/voter-web build: dist/assets/index-DovGktm5.css            4.27 kB │ gzip:     1.69 kB
+apps/voter-web build: dist/assets/index-UKHUYqfx.js            49.53 kB │ gzip:    15.90 kB
+apps/voter-web build: dist/assets/src-BKEaJyBR.js           2,798.79 kB │ gzip: 1,363.71 kB
+apps/voter-web build: [plugin builtin:vite-reporter] 
+apps/voter-web build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/voter-web build: - Using dynamic import() to code-split the application
+apps/voter-web build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+apps/voter-web build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/voter-web build: ✓ built in 383ms
+apps/voter-web build: Done
+apps/api build: Done
+
+> @votaciones/api@0.0.0 db:migrate:test <repository>/apps/api
+> tsx src/database/cli.ts migrate --target test
+
+Database migrations applied successfully.
+
+ RUN  v4.1.11 <repository>/apps/api
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  10:23:25
+   Duration  1.51s (transform 44ms, setup 0ms, import 105ms, tests 1.25s, environment 0ms)
+
+ Container votaciones-test-default-valkey-1 Restarting 
+ Container votaciones-test-default-valkey-1 Started 
+ Container votaciones-test-default-valkey-1 Running 
+ Container votaciones-test-default-valkey-1 Waiting 
+ Container votaciones-test-default-valkey-1 Healthy 
+Valkey restart preserved PostgreSQL truth and rebuilt disposable cache.

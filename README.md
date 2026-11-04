@@ -212,3 +212,5 @@ reales están ignorados; solo se versionan plantillas con valores ficticios.
 ## Licencia
 
 La licencia está pendiente de decisión del propietario. Consulte `LICENSE`.
+
+El cierre técnico de la etapa 21 está en el [inventario de producción](production-readiness/README.md), con contratos de evidencias, riesgos y snapshots NO-GO/INCOMPLETE.

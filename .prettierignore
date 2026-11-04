@@ -5,3 +5,7 @@ coverage
 pnpm-lock.yaml
 docs/**/*.md
 packages/zk-protocol/artifacts
+
+# Evidence snapshots preserve hashed bytes; create a new version instead of formatting.
+production-readiness/review-*/
+production-readiness/evidence/

@@ -1,0 +1,9 @@
+{
+  "command": "devnet pg_dump + backup metadata + isolated restore-drill + offline verifier after fixes",
+  "project": "votaciones-devnet-readiness-20261104",
+  "startedAt": "2026-11-04T15:27:42.069655+00:00",
+  "finishedAt": "2026-11-04T15:27:57.749431+00:00",
+  "durationSeconds": 15.679,
+  "exitCode": 0,
+  "logSha256": "79106680f5b72d3d91960e9855aaa776bec69815ac61121b13bd774fd49cd850"
+}

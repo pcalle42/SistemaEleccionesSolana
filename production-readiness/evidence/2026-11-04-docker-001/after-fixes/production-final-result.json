@@ -1,0 +1,11 @@
+{
+  "command": [
+    "pnpm",
+    "test:production"
+  ],
+  "startedAt": "2026-11-04T15:30:41.485847+00:00",
+  "finishedAt": "2026-11-04T15:30:42.483644+00:00",
+  "durationSeconds": 0.998,
+  "exitCode": 0,
+  "logSha256": "da935e626630ab5ec594ce2b6ee1e20d8099f0479df10787034d395b445621fc"
+}

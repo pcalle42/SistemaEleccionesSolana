@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "GoNoGoRecordV1",
+  "releaseVersion": "0.1.0",
+  "releaseManifestDigest": null,
+  "protocolVersions": [
+    "anonymous-single-choice-v1"
+  ],
+  "criticalGateSummary": [
+    {
+      "requirementId": "DOM-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "ELG-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "VOTE-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "ZK-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "ZK-002",
+      "status": "FAIL"
+    },
+    {
+      "requirementId": "ZK-003",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "AUD-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "RES-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "UI-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "SEC-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "SEC-002",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "INF-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-001",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-002",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "SEC-003",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-003",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-004",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "OPS-005",
+      "status": "NOT_TESTED"
+    },
+    {
+      "requirementId": "ELG-002",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "VOTE-002",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "VOTE-003",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "VOTE-004",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "DOM-002",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "AUD-002",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "RES-002",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "UI-002",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "INF-002",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "OPS-006",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "OPS-007",
+      "status": "PASS"
+    },
+    {
+      "requirementId": "UI-003",
+      "status": "PASS"
+    }
+  ],
+  "traceabilityDigest": "sha256:6b6a1bdc36985ebe422d58e97d18cb8ab63a07ce1f4b26b60732478809d7596c",
+  "securityReviewRefs": [],
+  "zkReviewRefs": [],
+  "pentestRefs": [],
+  "restoreTestRef": null,
+  "capacityTestRef": null,
+  "rehearsalRef": null,
+  "residualRiskRegisterDigest": "sha256:1f6023a0f9d5f680ebf7c0f12e479ee218189747fc987bda95fb2b686f705d2f",
+  "decision": "NO-GO",
+  "decisionReason": "No hay artifacts ZK productivos seguros registrados. Evidencia del release exacto y aprobaciones externas incompletas.",
+  "decidedAt": "2026-11-04T15:32:08.898Z",
+  "decisionAuthority": "Evaluación técnica automática; no sustituye autoridad electoral ni aprobación humana."
+}

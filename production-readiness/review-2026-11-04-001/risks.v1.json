@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "RiskRegisterV1",
+  "risks": [
+    {
+      "id": "RISK-001",
+      "property": "Backend conoce la selección anónima en claro",
+      "severity": "High",
+      "likelihood": "No evaluada",
+      "mitigation": "Evaluar adecuación electoral y jurídica; V1 no ofrece secreto de papeleta frente al backend.",
+      "evidence": [
+        "docs/security/known-limitations.md",
+        "docs/production/readiness-gates.md"
+      ],
+      "owner": "Pendiente designación",
+      "decision": "Pendiente; no aceptado"
+    },
+    {
+      "id": "RISK-002",
+      "property": "Sin coercion resistance ni receipt-freeness",
+      "severity": "High",
+      "likelihood": "No evaluada",
+      "mitigation": "No prometer estas propiedades; aprobación explícita del alcance electoral.",
+      "evidence": [
+        "docs/security/known-limitations.md",
+        "docs/production/readiness-gates.md"
+      ],
+      "owner": "Pendiente designación",
+      "decision": "Pendiente; no aceptado"
+    },
+    {
+      "id": "RISK-003",
+      "property": "Provisioning conoce persona→commitment y no hay anonimato global de red",
+      "severity": "High",
+      "likelihood": "No evaluada",
+      "mitigation": "Separar identidad/voto y retención, logs, sesiones y trazas; revisar correlación temporal.",
+      "evidence": [
+        "docs/security/known-limitations.md",
+        "docs/production/readiness-gates.md"
+      ],
+      "owner": "Pendiente designación",
+      "decision": "Pendiente; no aceptado"
+    },
+    {
+      "id": "RISK-004",
+      "property": "Operador total puede reescribir hash chain dentro de una sola DB",
+      "severity": "High",
+      "likelihood": "No evaluada",
+      "mitigation": "Publicar checkpoints con anclaje externo y custodia independiente; no afirmar inmutabilidad absoluta.",
+      "evidence": [
+        "docs/security/known-limitations.md",
+        "docs/production/readiness-gates.md"
+      ],
+      "owner": "Pendiente designación",
+      "decision": "Pendiente; no aceptado"
+    },
+    {
+      "id": "RISK-005",
+      "property": "Solo artifacts ZK devnet registrados",
+      "severity": "High",
+      "likelihood": "No evaluada",
+      "mitigation": "Ceremonia productiva verificable y revisión independiente antes de GO.",
+      "evidence": [
+        "docs/security/known-limitations.md",
+        "docs/production/readiness-gates.md"
+      ],
+      "owner": "Pendiente designación",
+      "decision": "Pendiente; no aceptado"
+    },
+    {
+      "id": "RISK-006",
+      "property": "Proveedor, TLS, pentest, capacidad y recuperación del candidato sin evidencia final",
+      "severity": "High",
+      "likelihood": "No evaluada",
+      "mitigation": "Completar P1–P8 con evidencia del release exacto y autoridad designada.",
+      "evidence": [
+        "docs/security/known-limitations.md",
+        "docs/production/readiness-gates.md"
+      ],
+      "owner": "Pendiente designación",
+      "decision": "Pendiente; no aceptado"
+    }
+  ]
+}

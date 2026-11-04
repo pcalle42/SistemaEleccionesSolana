@@ -21,3 +21,5 @@ y se materializan en [`operations/`](operations/README.md).
 La topología productiva vendor-neutral, sus gates y runbooks están en
 [`20-produccion-despliegue-infraestructura.md`](20-produccion-despliegue-infraestructura.md)
 y [`production/`](production/README.md).
+
+El [checklist final 21](21-checklist-final-produccion-auditoria.md) se materializa inicialmente en [production-readiness](../production-readiness/README.md). La matriz inicial y el informe local no equivalen a aprobación productiva.

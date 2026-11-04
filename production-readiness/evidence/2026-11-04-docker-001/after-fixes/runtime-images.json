@@ -1,0 +1,17 @@
+{
+  "capturedAt": "2026-11-04T15:27:56.883698+00:00",
+  "project": "votaciones-devnet-readiness-20261104",
+  "imageIds": {
+    "api": "sha256:362ed3b57fe6c74df9c364c1bd64c4e0f0b3adf8a7a2519f37fab4e439c372f9",
+    "admin-web": "sha256:7335516aa925909198acfac687075ba1cdaa4c164f31ed17bb2790a19431c019",
+    "voter-web": "sha256:22fe5fbe3ae64ec4f3c3a996a2f4d61382261789d574ea9448ec0213eab4959b"
+  },
+  "runtimeDependencyVersions": {
+    "bodyParser": "2.4.0",
+    "multer": "2.5.0",
+    "qs": "6.16.1"
+  },
+  "dockerVersion": "29.5.3",
+  "hostNodeVersion": "v22.22.2",
+  "hostArchitecture": "arm64"
+}

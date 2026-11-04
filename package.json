@@ -16,7 +16,10 @@
     ],
     "overrides": {
       "underscore@<=1.13.7": "1.13.8",
-      "ws@>=8.0.0 <8.21.0": "8.21.0"
+      "ws@>=8.0.0 <8.21.0": "8.21.0",
+      "body-parser@>=2.0.0 <2.4.0": "2.4.0",
+      "multer@>=2.0.0 <2.5.0": "2.5.0",
+      "qs@>=6.7.0 <=6.16.0": "6.16.1"
     }
   },
   "scripts": {
@@ -112,7 +115,8 @@
     "devnet:status": "bash infra/scripts/status.sh devnet",
     "devnet:up": "bash infra/scripts/up.sh devnet",
     "devnet:verify": "bash infra/scripts/devnet-verify.sh devnet",
-    "devnet:verify:persistence": "bash infra/scripts/verify-persistence.sh devnet"
+    "devnet:verify:persistence": "bash infra/scripts/verify-persistence.sh devnet",
+    "production:readiness": "node scripts/production/readiness.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0",

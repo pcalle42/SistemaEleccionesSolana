@@ -1,0 +1,11 @@
+{
+  "command": [
+    "pnpm",
+    "test:reproducibility"
+  ],
+  "startedAt": "2026-11-04T15:18:12.968850+00:00",
+  "finishedAt": "2026-11-04T15:19:39.068747+00:00",
+  "durationSeconds": 86.1,
+  "exitCode": 0,
+  "logSha256": "192c82e9867242a3c789550d06477564a6fac793129003a4107f500ade404fb8"
+}

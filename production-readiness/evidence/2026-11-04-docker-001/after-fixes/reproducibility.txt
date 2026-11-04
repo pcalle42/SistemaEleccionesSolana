@@ -1,0 +1,381 @@
+
+> sistema-elecciones-solana@0.1.0 test:reproducibility <repository>
+> bash tests/scripts/reproducibility.sh
+
+Scope: all 12 workspace projects
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +433
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 433, reused 433, downloaded 0, added 298
+Progress: resolved 433, reused 433, downloaded 0, added 431
+Progress: resolved 433, reused 433, downloaded 0, added 433, done
+ WARN  Failed to create bin at /private/var/folders/w5/zn5zgbvd347300mlzw97tt6c0000gn/T/votaciones-repro.IZ2FpZ/apps/api/node_modules/.bin/verify-election. ENOENT: no such file or directory, open '/private/var/folders/w5/zn5zgbvd347300mlzw97tt6c0000gn/T/votaciones-repro.IZ2FpZ/packages/verification-protocol/dist/src/cli.js'
+
+devDependencies:
++ @playwright/test 1.64.0
++ @types/node 22.20.1
++ @votaciones/config-eslint 0.0.0 <- packages/config-eslint
++ @votaciones/config-typescript 0.0.0 <- packages/config-typescript
++ ajv 8.20.0
++ eslint 10.9.1
++ fast-check 4.3.0
++ prettier 3.9.6
++ typescript 6.0.3
++ vitest 4.1.11
+
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @scarf/scarf, blake-hash.                           │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+ WARN  Failed to create bin at /private/var/folders/w5/zn5zgbvd347300mlzw97tt6c0000gn/T/votaciones-repro.IZ2FpZ/apps/api/node_modules/.bin/verify-election. ENOENT: no such file or directory, open '/private/var/folders/w5/zn5zgbvd347300mlzw97tt6c0000gn/T/votaciones-repro.IZ2FpZ/apps/api/node_modules/@votaciones/verification-protocol/dist/src/cli.js'
+Done in 3.2s using pnpm v10.9.0
+
+> sistema-elecciones-solana@0.1.0 build /private/var/folders/w5/zn5zgbvd347300mlzw97tt6c0000gn/T/votaciones-repro.IZ2FpZ
+> pnpm --recursive --if-present build
+
+Scope: 11 of 12 workspace projects
+packages/shared-crypto build$ tsc -p tsconfig.build.json
+packages/shared-validation build$ tsc -p tsconfig.build.json
+packages/shared-types build$ tsc -p tsconfig.build.json
+packages/zk-protocol build$ tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+packages/shared-types build: Done
+packages/shared-crypto build: Done
+packages/shared-validation build: Done
+packages/zk-protocol build: Done
+packages/shared-testing build$ tsc -p tsconfig.build.json
+packages/verification-protocol build$ tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+packages/shared-testing build: Done
+packages/verification-protocol build: Done
+apps/api build$ tsc -p tsconfig.build.json
+apps/voter-web build$ pnpm artifacts:prepare && tsc --noEmit && vite build
+apps/admin-web build$ tsc --noEmit && vite build
+apps/voter-web build: > @votaciones/voter-web@0.0.0 artifacts:prepare /private/var/folders/w5/zn5zgbvd347300mlzw97tt6c0000gn/T/votaciones-repro.IZ2FpZ/apps/voter-web
+apps/voter-web build: > node scripts/prepare-artifacts.mjs
+apps/voter-web build: vite v8.2.2 building client environment for production...
+apps/admin-web build: vite v8.2.2 building client environment for production...
+apps/admin-web build: transforming...
+apps/voter-web build: transforming...
+apps/admin-web build: ✓ 7 modules transformed.
+apps/voter-web build: new URL('../artifacts/anonymous-single-choice-v1/', import.meta.url) doesn't exist at build time, it will remain unchanged to be resolved at runtime. If this is intended, you can use the /* @vite-ignore */ comment to suppress this warning.
+apps/voter-web build: ✓ 232 modules transformed.
+apps/admin-web build: rendering chunks...
+apps/admin-web build: computing gzip size...
+apps/voter-web build: rendering chunks...
+apps/admin-web build: dist/index.html                  0.56 kB │ gzip: 0.34 kB
+apps/admin-web build: dist/assets/index-mBJoIBSh.css   4.14 kB │ gzip: 1.65 kB
+apps/admin-web build: dist/assets/index-OURVMN8w.js   12.66 kB │ gzip: 4.97 kB
+apps/admin-web build: ✓ built in 357ms
+apps/admin-web build: Done
+apps/voter-web build: computing gzip size...
+apps/voter-web build: dist/index.html                           0.56 kB │ gzip:     0.34 kB
+apps/voter-web build: dist/assets/proof.worker-D8MucKCc.js     30.31 kB
+apps/voter-web build: dist/assets/browser.esm-B-gkokYB.js     445.78 kB
+apps/voter-web build: dist/assets/src-BbqKnd4L.js           2,815.59 kB
+apps/voter-web build: dist/assets/index-DovGktm5.css            4.27 kB │ gzip:     1.69 kB
+apps/voter-web build: dist/assets/index-UKHUYqfx.js            49.53 kB │ gzip:    15.90 kB
+apps/voter-web build: dist/assets/src-BKEaJyBR.js           2,798.79 kB │ gzip: 1,363.71 kB
+apps/voter-web build: ✓ built in 452ms
+apps/voter-web build: [plugin builtin:vite-reporter] 
+apps/voter-web build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/voter-web build: - Using dynamic import() to code-split the application
+apps/voter-web build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+apps/voter-web build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/voter-web build: Done
+apps/api build: Done
+
+> sistema-elecciones-solana@0.1.0 zk:verify-artifacts /private/var/folders/w5/zn5zgbvd347300mlzw97tt6c0000gn/T/votaciones-repro.IZ2FpZ
+> pnpm --filter @votaciones/zk-protocol zk:verify-artifacts
+
+
+> @votaciones/zk-protocol@1.0.0-devnet.1 zk:verify-artifacts /private/var/folders/w5/zn5zgbvd347300mlzw97tt6c0000gn/T/votaciones-repro.IZ2FpZ/packages/zk-protocol
+> node scripts/verify-artifacts.mjs
+
+Trusted devnet artifacts verified.
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.14kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 139B done
+#3 DONE 0.0s
+
+#4 [build 1/8] FROM docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a
+#4 resolve docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 29.18MB 0.3s done
+#5 DONE 0.3s
+
+#6 [build 2/8] WORKDIR /workspace
+#6 CACHED
+
+#7 [build 3/8] RUN corepack enable
+#7 CACHED
+
+#8 [build 4/8] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#8 DONE 0.0s
+
+#9 [build 5/8] COPY packages ./packages
+#9 DONE 0.1s
+
+#10 [build 6/8] COPY apps/admin-web ./apps/admin-web
+#10 DONE 0.0s
+
+#11 [build 7/8] RUN pnpm install --frozen-lockfile
+#11 0.160 ! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-10.9.0.tgz
+#11 1.875 Scope: all 10 workspace projects
+#11 1.932 Lockfile is up to date, resolution step is skipped
+#11 1.978 Progress: resolved 1, reused 0, downloaded 0, added 0
+#11 2.027 Packages: +240
+#11 2.027 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#11 2.978 Progress: resolved 240, reused 0, downloaded 42, added 42
+#11 3.101 
+#11 3.101    ╭───────────────────────────────────────────────╮
+#11 3.101    │                                               │
+#11 3.101    │      Update available! 10.9.0 → 12.16.1.      │
+#11 3.101    │     Changelog: https://pnpm.io/v/12.16.1      │
+#11 3.101    │   To update, run: corepack use pnpm@12.16.1   │
+#11 3.101    │                                               │
+#11 3.101    ╰───────────────────────────────────────────────╯
+#11 3.101 
+#11 3.978 Progress: resolved 240, reused 0, downloaded 103, added 103
+#11 4.978 Progress: resolved 240, reused 0, downloaded 132, added 132
+#11 5.983 Progress: resolved 240, reused 0, downloaded 142, added 142
+#11 6.984 Progress: resolved 240, reused 0, downloaded 154, added 154
+#11 7.989 Progress: resolved 240, reused 0, downloaded 166, added 166
+#11 8.989 Progress: resolved 240, reused 0, downloaded 192, added 191
+#11 9.990 Progress: resolved 240, reused 0, downloaded 216, added 216
+#11 10.99 Progress: resolved 240, reused 0, downloaded 232, added 232
+#11 11.99 Progress: resolved 240, reused 0, downloaded 235, added 235
+#11 13.12 Progress: resolved 240, reused 0, downloaded 236, added 235
+#11 14.12 Progress: resolved 240, reused 0, downloaded 237, added 237
+#11 15.12 Progress: resolved 240, reused 0, downloaded 238, added 238
+#11 16.12 Progress: resolved 240, reused 0, downloaded 239, added 239
+#11 20.44 Progress: resolved 240, reused 0, downloaded 240, added 239
+#11 20.44 Progress: resolved 240, reused 0, downloaded 240, added 240, done
+#11 20.58 .../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+#11 20.65 .../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+#11 20.74 
+#11 20.74 devDependencies:
+#11 20.74 + @playwright/test 1.64.0
+#11 20.74 + @types/node 22.20.1
+#11 20.74 + @votaciones/config-eslint 0.0.0 <- packages/config-eslint
+#11 20.74 + @votaciones/config-typescript 0.0.0 <- packages/config-typescript
+#11 20.74 + ajv 8.20.0
+#11 20.74 + eslint 10.9.1
+#11 20.74 + fast-check 4.3.0
+#11 20.74 + prettier 3.9.6
+#11 20.74 + typescript 6.0.3
+#11 20.74 + vitest 4.1.11
+#11 20.74 
+#11 20.74 ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+#11 20.74 │                                                                              │
+#11 20.74 │   Ignored build scripts: blake-hash.                                         │
+#11 20.74 │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+#11 20.74 │   to run scripts.                                                            │
+#11 20.74 │                                                                              │
+#11 20.74 ╰──────────────────────────────────────────────────────────────────────────────╯
+#11 20.74 
+#11 20.80 Done in 19.2s using pnpm v10.9.0
+#11 DONE 21.1s
+
+#12 [build 8/8] RUN pnpm --filter @votaciones/admin-web build
+#12 0.701 
+#12 0.701 > @votaciones/admin-web@0.0.0 build /workspace/apps/admin-web
+#12 0.701 > tsc --noEmit && vite build
+#12 0.701 
+#12 3.188 vite v8.2.2 building client environment for production...
+#12 3.242 transforming...
+#12 3.281 ✓ 7 modules transformed.
+#12 3.338 rendering chunks...
+#12 3.346 computing gzip size...
+#12 3.380 dist/index.html                  0.56 kB │ gzip: 0.34 kB
+#12 3.380 dist/assets/index-mBJoIBSh.css   4.14 kB │ gzip: 1.65 kB
+#12 3.380 dist/assets/index-BKS5a3p8.js   12.77 kB │ gzip: 4.99 kB
+#12 3.380 
+#12 3.380 ✓ built in 191ms
+#12 DONE 3.4s
+
+#13 [runtime 2/4] WORKDIR /app
+#13 CACHED
+
+#14 [runtime 3/4] COPY --from=build --chown=node:node /workspace/apps/admin-web/dist ./dist
+#14 CACHED
+
+#15 [runtime 4/4] COPY --from=build --chown=node:node /workspace/apps/admin-web/server.mjs ./server.mjs
+#15 CACHED
+
+#16 exporting to image
+#16 exporting layers done
+#16 exporting manifest sha256:a47a5827adc4f5539699812ff501c9becd15de2ebcf1d75f520ba4026eee014e done
+#16 exporting config sha256:e405f80003877586b473e0babc55ec2653014ab7673ff20d1eedaa240465973f done
+#16 exporting attestation manifest sha256:43798f877102def68eb0d80ce8e75d23e2e938cb9909d1ad98b586b26aff1b50 0.0s done
+#16 exporting manifest list sha256:44b12012c3b1aac592bea9e7b1d2f6145999c182a015e72b7a2845ca344ab8b8 done
+#16 naming to docker.io/library/votaciones-admin-repro:test done
+#16 unpacking to docker.io/library/votaciones-admin-repro:test done
+#16 DONE 0.1s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/4cblq388ivne33undrqi8lf4c
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.29kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 139B done
+#3 DONE 0.0s
+
+#4 [build 1/9] FROM docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a
+#4 resolve docker.io/library/node:22.23.3-alpine3.23@sha256:baf676f7d0e552f3231945c2f979055ca121bce128c152f7a34e6bd1728b1c5a done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 75.42kB 0.0s done
+#5 DONE 0.0s
+
+#6 [build 2/9] WORKDIR /workspace
+#6 CACHED
+
+#7 [build 3/9] RUN corepack enable
+#7 CACHED
+
+#8 [build 4/9] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#8 DONE 0.0s
+
+#9 [build 5/9] COPY packages ./packages
+#9 DONE 0.1s
+
+#10 [build 6/9] COPY apps/voter-web ./apps/voter-web
+#10 DONE 0.0s
+
+#11 [build 7/9] RUN pnpm install --frozen-lockfile
+#11 0.174 ! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-10.9.0.tgz
+#11 1.886 Scope: all 10 workspace projects
+#11 1.947 Lockfile is up to date, resolution step is skipped
+#11 1.991 Progress: resolved 1, reused 0, downloaded 0, added 0
+#11 2.044 Packages: +244
+#11 2.044 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#11 2.652 
+#11 2.652    ╭───────────────────────────────────────────────╮
+#11 2.652    │                                               │
+#11 2.652    │      Update available! 10.9.0 → 12.16.1.      │
+#11 2.652    │     Changelog: https://pnpm.io/v/12.16.1      │
+#11 2.652    │   To update, run: corepack use pnpm@12.16.1   │
+#11 2.652    │                                               │
+#11 2.652    ╰───────────────────────────────────────────────╯
+#11 2.652 
+#11 2.993 Progress: resolved 244, reused 0, downloaded 60, added 56
+#11 3.993 Progress: resolved 244, reused 0, downloaded 102, added 102
+#11 4.994 Progress: resolved 244, reused 0, downloaded 116, added 116
+#11 6.000 Progress: resolved 244, reused 0, downloaded 130, added 130
+#11 7.001 Progress: resolved 244, reused 0, downloaded 150, added 150
+#11 8.003 Progress: resolved 244, reused 0, downloaded 173, added 173
+#11 9.004 Progress: resolved 244, reused 0, downloaded 206, added 206
+#11 10.01 Progress: resolved 244, reused 0, downloaded 234, added 234
+#11 11.01 Progress: resolved 244, reused 0, downloaded 236, added 236
+#11 12.01 Progress: resolved 244, reused 0, downloaded 241, added 241
+#11 13.67 Progress: resolved 244, reused 0, downloaded 242, added 241
+#11 14.67 Progress: resolved 244, reused 0, downloaded 242, added 242
+#11 15.67 Progress: resolved 244, reused 0, downloaded 243, added 243
+#11 16.55 Progress: resolved 244, reused 0, downloaded 244, added 244, done
+#11 16.69 .../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+#11 16.76 .../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+#11 16.88 
+#11 16.88 devDependencies:
+#11 16.88 + @playwright/test 1.64.0
+#11 16.88 + @types/node 22.20.1
+#11 16.88 + @votaciones/config-eslint 0.0.0 <- packages/config-eslint
+#11 16.88 + @votaciones/config-typescript 0.0.0 <- packages/config-typescript
+#11 16.88 + ajv 8.20.0
+#11 16.88 + eslint 10.9.1
+#11 16.88 + fast-check 4.3.0
+#11 16.88 + prettier 3.9.6
+#11 16.88 + typescript 6.0.3
+#11 16.88 + vitest 4.1.11
+#11 16.88 
+#11 16.88 ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+#11 16.88 │                                                                              │
+#11 16.88 │   Ignored build scripts: blake-hash.                                         │
+#11 16.88 │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+#11 16.88 │   to run scripts.                                                            │
+#11 16.88 │                                                                              │
+#11 16.88 ╰──────────────────────────────────────────────────────────────────────────────╯
+#11 16.88 
+#11 16.93 Done in 15.3s using pnpm v10.9.0
+#11 DONE 17.1s
+
+#12 [build 8/9] RUN pnpm --filter @votaciones/zk-protocol build
+#12 0.541 
+#12 0.541 > @votaciones/zk-protocol@1.0.0-devnet.1 build /workspace/packages/zk-protocol
+#12 0.541 > tsc -p tsconfig.build.json && node scripts/copy-static.mjs
+#12 0.541 
+#12 DONE 2.7s
+
+#13 [build 9/9] RUN pnpm --filter @votaciones/voter-web build
+#13 0.459 
+#13 0.459 > @votaciones/voter-web@0.0.0 build /workspace/apps/voter-web
+#13 0.459 > pnpm artifacts:prepare && tsc --noEmit && vite build
+#13 0.459 
+#13 0.737 
+#13 0.737 > @votaciones/voter-web@0.0.0 artifacts:prepare /workspace/apps/voter-web
+#13 0.737 > node scripts/prepare-artifacts.mjs
+#13 0.737 
+#13 3.411 vite v8.2.2 building client environment for production...
+#13 3.461 transforming...
+#13 3.570 
+#13 3.570 new URL('../artifacts/anonymous-single-choice-v1/', import.meta.url) doesn't exist at build time, it will remain unchanged to be resolved at runtime. If this is intended, you can use the /* @vite-ignore */ comment to suppress this warning.
+#13 5.070 ✓ 232 modules transformed.
+#13 5.139 rendering chunks...
+#13 5.196 computing gzip size...
+#13 5.242 dist/index.html                           0.56 kB │ gzip:     0.34 kB
+#13 5.242 dist/assets/proof.worker-D8MucKCc.js     30.31 kB
+#13 5.242 dist/assets/browser.esm-B-gkokYB.js     445.78 kB
+#13 5.242 dist/assets/src-BbqKnd4L.js           2,815.59 kB
+#13 5.242 dist/assets/index-DovGktm5.css            4.27 kB │ gzip:     1.69 kB
+#13 5.242 dist/assets/index-BRGhpeTJ.js            49.89 kB │ gzip:    15.91 kB
+#13 5.242 dist/assets/src-DgHyQTDI.js           2,798.79 kB │ gzip: 1,363.71 kB
+#13 5.242 
+#13 5.243 ✓ built in 1.83s
+#13 5.244 [plugin builtin:vite-reporter] 
+#13 5.244 (!) Some chunks are larger than 500 kB after minification. Consider:
+#13 5.244 - Using dynamic import() to code-split the application
+#13 5.244 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#13 5.244 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#13 DONE 5.3s
+
+#14 [runtime 2/4] WORKDIR /app
+#14 CACHED
+
+#15 [runtime 3/4] COPY --from=build --chown=node:node /workspace/apps/voter-web/dist ./dist
+#15 CACHED
+
+#16 [runtime 4/4] COPY --from=build --chown=node:node /workspace/apps/voter-web/server.mjs ./server.mjs
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:12cfa97772240fd8554bf3959b577df28ff1e05c14b9d9ec4d7646159e56c459 done
+#17 exporting config sha256:ff66392c79b18232c7663ba5020b6c39aac7e95ca7147eafc14c5564e8847dbf done
+#17 exporting attestation manifest sha256:3de9823eb8a97d42ad352826be26f42d3c246c8a4de1c24d71bb3c44452e152c 0.0s done
+#17 exporting manifest list sha256:ce9346daad27b992b22955421664be5ef7b6e75b031a22b3ef347b67a87468b6 done
+#17 naming to docker.io/library/votaciones-voter-repro:test done
+#17 unpacking to docker.io/library/votaciones-voter-repro:test done
+#17 DONE 0.1s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/uhyn5tueok44fw42eatmelykv
+Reproducibility build completed from a clean temporary source snapshot.

@@ -1,0 +1,10 @@
+{
+  "command": "Isolated compose build + devnet:bootstrap + devnet:e2e after dependency/CLI fixes",
+  "project": "votaciones-devnet-readiness-20261104",
+  "environment": "synthetic devnet",
+  "startedAt": "2026-11-04T15:23:10.728614+00:00",
+  "finishedAt": "2026-11-04T15:26:56.086031+00:00",
+  "durationSeconds": 225.353,
+  "exitCode": 0,
+  "logSha256": "756ab7ef9cab7dc832acde9f481312ae38fd35a917beb58eb725e91624537f12"
+}

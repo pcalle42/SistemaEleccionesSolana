@@ -1,0 +1,12 @@
+{
+  "command": [
+    "pnpm",
+    "audit",
+    "--prod",
+    "--json"
+  ],
+  "startedAt": "2026-11-04T15:20:41.674553+00:00",
+  "finishedAt": "2026-11-04T15:20:42.873918+00:00",
+  "durationSeconds": 1.199,
+  "exitCode": 1
+}
